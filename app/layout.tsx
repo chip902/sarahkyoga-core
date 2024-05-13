@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { fonts } from "./fonts";
 import "./globals.css";
-import { Providers } from "./providers";
 import NavBar from "./NavBar";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -19,7 +19,7 @@ export default function RootLayout({
 			<body>
 				<Providers>
 					<NavBar />
-					<div className={fonts.quicksand.variable}>{children}</div>
+					<main>{children}</main>
 				</Providers>
 			</body>
 		</html>

@@ -1,108 +1,214 @@
 "use client";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, HamburgerIcon } from "@chakra-ui/icons";
 import {
+	Accordion,
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
 	Box,
 	Button,
 	Drawer,
 	DrawerBody,
-	DrawerCloseButton,
 	DrawerContent,
-	DrawerFooter,
 	DrawerHeader,
 	DrawerOverlay,
-	Flex,
+	Grid,
 	IconButton,
 	Image,
-	Spacer,
+	Menu,
+	MenuButton,
+	MenuList,
+	Stack,
 	useBreakpointValue,
 	useDisclosure,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { useRef, useState } from "react";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const isMobile = useBreakpointValue({ base: true, lg: false });
-	return (
-		<Box borderRadius="lg" position="sticky" top={0} zIndex={1} w="100%" bg="brand.200">
-			<Image src="sky_banner.webp" />
-			<Flex
-				borderRadius="lg"
-				bg="brand.200"
-				color="grey"
-				as="nav"
-				align="center"
-				justify="space-between" // This keeps items aligned to the edges
-				wrap="wrap"
-				w="100%"
-				h="60px"
-				px={4} // Adjust padding as needed
-			>
-				{/* Spacer to push content to the center */}
-				<Spacer mx={5} />
+	const [menuOpen, setMenuOpen] = useState(false);
+	const closeTimeoutRef = useRef<number | null>(null);
 
-				{/* Centered Navigation Menu */}
-				<Flex align="center" justify="center">
-					<Button variant="linkNav">
-						<Link href="/">Home</Link>
-					</Button>
-					<Button variant="linkNav">
-						<Link href="#">About</Link>
-					</Button>
-					<Button variant="linkNav">
-						<Link href="#">Contact</Link>
-					</Button>
-				</Flex>
+	const openMenu = () => {
+		if (closeTimeoutRef.current !== null) {
+			clearTimeout(closeTimeoutRef.current);
+		}
+		setMenuOpen(true);
+	};
+	const closeMenu = () => {
+		closeTimeoutRef.current = window.setTimeout(() => {
+			setMenuOpen(false);
+		}, 80) as number;
+	};
+	const isMobile = false;
 
-				{/* Spacer to push content to the center */}
-				<Spacer />
-
-				{/* Hamburger Icon always visible */}
-				<IconButton icon={<HamburgerIcon />} onClick={onOpen} variant="outline" aria-label="Open Menu" />
-
-				{/* Drawer for additional navigation */}
-				<Drawer placement="right" onClose={onClose} isOpen={isOpen}>
-					<DrawerOverlay />
-					<DrawerContent>
-						<DrawerCloseButton />
-						{isMobile ? (
-							<>
-								<DrawerHeader borderBottomWidth="1px">Navigation</DrawerHeader>
-								<DrawerBody>
-									<Flex flexDirection="column">
-										<Button variant="drawer" onClick={onClose} mb={4}>
-											<Link href="/">Home</Link>
+	if (!isMobile) {
+		return (
+			<nav>
+				<Grid templateColumns="1fr auto 1fr" alignItems="center" gap={4} px={4} py={2} bgColor="#000000" color="brand.100">
+					<Box display="flex" height="100%" />
+					<Box display="flex">
+						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
+					</Box>
+					<Box display="flex" justifyContent="flex-end" alignItems="center">
+						<Link href="/" passHref>
+							<ChakraLink
+								as={Button}
+								height="100%" // Ensure the height matches that of links
+								lineHeight="1.2" // Line height to match links
+								p={0} // No padding to align text properly
+								backgroundColor="transparent"
+								flex={1}
+								variant="linkNav"
+								mx={5}>
+								Home
+							</ChakraLink>
+						</Link>
+						<Link href="/about" passHref>
+							<ChakraLink
+								as={Button}
+								height="100%" // Ensure the height matches that of links
+								lineHeight="1.2" // Line height to match links
+								p={0} // No padding to align text properly
+								backgroundColor="transparent"
+								flex={1}
+								variant="linkNav"
+								mx={5}>
+								About
+							</ChakraLink>
+						</Link>
+						<Menu isOpen={menuOpen} onClose={closeMenu}>
+							<MenuButton
+								variant="linkNav"
+								mx={5}
+								as={Button}
+								p={0}
+								height="normal"
+								lineHeight="1.2"
+								backgroundColor="transparent"
+								rightIcon={<ChevronDownIcon height="100%" lineHeight="normal" boxSize="20px" />}
+								onMouseEnter={openMenu}
+								onMouseLeave={closeMenu}
+								_focus={{ outline: "none", boxShadow: "none" }}>
+								Schedule
+							</MenuButton>
+							<MenuList my={1} onMouseEnter={openMenu} onMouseLeave={closeMenu}>
+								<Link href="/all-classes">
+									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
+										All Classes
+									</ChakraLink>
+								</Link>
+								<Link href="/private-sessions">
+									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
+										Private Sessions
+									</ChakraLink>
+								</Link>
+								<Link href="/workshops">
+									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
+										Workshops
+									</ChakraLink>
+								</Link>
+							</MenuList>
+						</Menu>
+						<Link href="/contact">
+							<ChakraLink
+								height="100%"
+								lineHeight="1.2"
+								p={0}
+								backgroundColor="transparent"
+								as={Button}
+								flex={1}
+								variant="linkNav"
+								mx={5}
+								marginRight={70}>
+								Contact
+							</ChakraLink>
+						</Link>
+					</Box>
+				</Grid>
+			</nav>
+		);
+	} else {
+		return (
+			<nav>
+				<Grid templateColumns="1fr auto 1fr" alignItems="center" gap={4} px={4} py={2} bgColor="#000000" color="brand.100">
+					<Box height="100%" />
+					<Box>
+						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
+					</Box>
+					<Box>
+						<Menu>
+							<MenuButton
+								alignItems="center"
+								as={IconButton}
+								aria-label="Open menu"
+								icon={<HamburgerIcon />}
+								variant="outline"
+								onClick={onOpen}
+							/>
+						</Menu>
+					</Box>
+					<Drawer isOpen={isOpen} placement="start" onClose={onClose}>
+						<DrawerOverlay />
+						<DrawerContent flexDirection="column">
+							<DrawerHeader textAlign="center" as="h2" borderBottomWidth="1px">
+								Sarah K Yoga
+							</DrawerHeader>
+							<DrawerBody textAlign="left" flexDirection="column">
+								<Stack direction="column" spacing={4}>
+									<Link href="/">
+										<Button variant="mobileMenu" onClick={onClose}>
+											Home
 										</Button>
-										<Button variant="drawer" onClick={onClose} mb={4}>
-											<Link href="/about">About</Link>
+									</Link>
+									<Link href="/about">
+										<Button variant="mobileMenu" onClick={onClose}>
+											About Me
 										</Button>
-										<Button variant="drawer" onClick={onClose}>
-											<Link href="/contact">Contact</Link>
+									</Link>
+									<Accordion allowToggle>
+										<AccordionItem border="none">
+											<AccordionButton>
+												<Box as="span" flex="1" textAlign="left" fontWeight="semibold">
+													Schedule
+												</Box>
+												<AccordionIcon />
+											</AccordionButton>
+											<AccordionPanel pb={4}>
+												<Link href="/all-classes">
+													<Button variant="mobileMenu" onClick={onClose}>
+														All Classes
+													</Button>
+												</Link>
+												<Link href="/private-sessions">
+													<Button variant="mobileMenu" onClick={onClose}>
+														Private Sessions
+													</Button>
+												</Link>
+												<Link href="/workshops">
+													<Button variant="mobileMenu" onClick={onClose}>
+														Workshops
+													</Button>
+												</Link>
+											</AccordionPanel>
+										</AccordionItem>
+									</Accordion>
+									<Link href="/contact">
+										<Button variant="mobileMenu" onClick={onClose}>
+											Contact
 										</Button>
-									</Flex>
-								</DrawerBody>
-							</>
-						) : (
-							<>
-								<DrawerHeader borderBottomWidth="1px">Rating</DrawerHeader>
-								<DrawerBody>
-									<Flex flexDirection="column">
-										This is explaining the rating system. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sit ullam enim
-										laudantium voluptatibus, distinctio nam voluptas at ducimus suscipit quas libero, quia nesciunt perferendis tempora
-										accusamus debitis quisquam aliquam expedita!
-									</Flex>
-								</DrawerBody>
-							</>
-						)}
-						<DrawerFooter borderTopWidth="1px">
-							<Button variant="outline" mr={3} onClick={onClose}>
-								Close
-							</Button>
-						</DrawerFooter>
-					</DrawerContent>
-				</Drawer>
-			</Flex>
-		</Box>
-	);
+									</Link>
+								</Stack>
+							</DrawerBody>
+						</DrawerContent>
+					</Drawer>
+				</Grid>
+			</nav>
+		);
+	}
 };
 
 export default NavBar;
