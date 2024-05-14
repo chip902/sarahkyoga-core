@@ -20,17 +20,18 @@ import {
 	MenuButton,
 	MenuList,
 	Stack,
-	useBreakpointValue,
 	useDisclosure,
+	VStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { Link as ChakraLink } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
+	const [isMobile, setIsMobile] = useState(false);
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -43,8 +44,19 @@ const NavBar = () => {
 			setMenuOpen(false);
 		}, 80) as number;
 	};
-	const isMobile = false;
 
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth < 968);
+		};
+
+		handleResize();
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
 	if (!isMobile) {
 		return (
 			<nav>
@@ -55,37 +67,20 @@ const NavBar = () => {
 					</Box>
 					<Box display="flex" justifyContent="flex-end" alignItems="center">
 						<Link href="/" passHref>
-							<ChakraLink
-								as={Button}
-								height="100%" // Ensure the height matches that of links
-								lineHeight="1.2" // Line height to match links
-								p={0} // No padding to align text properly
-								backgroundColor="transparent"
-								flex={1}
-								variant="linkNav"
-								mx={5}>
+							<ChakraLink as={Button} height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
 							</ChakraLink>
 						</Link>
 						<Link href="/about" passHref>
-							<ChakraLink
-								as={Button}
-								height="100%" // Ensure the height matches that of links
-								lineHeight="1.2" // Line height to match links
-								p={0} // No padding to align text properly
-								backgroundColor="transparent"
-								flex={1}
-								variant="linkNav"
-								mx={5}>
+							<ChakraLink as={Button} height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								About
 							</ChakraLink>
 						</Link>
 						<Menu isOpen={menuOpen} onClose={closeMenu}>
 							<MenuButton
 								variant="linkNav"
-								mx={5}
+								fontSize="lg"
 								as={Button}
-								p={0}
 								height="normal"
 								lineHeight="1.2"
 								backgroundColor="transparent"
@@ -95,22 +90,24 @@ const NavBar = () => {
 								_focus={{ outline: "none", boxShadow: "none" }}>
 								Schedule
 							</MenuButton>
-							<MenuList my={1} onMouseEnter={openMenu} onMouseLeave={closeMenu}>
-								<Link href="/all-classes">
-									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
-										All Classes
-									</ChakraLink>
-								</Link>
-								<Link href="/private-sessions">
-									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
-										Private Sessions
-									</ChakraLink>
-								</Link>
-								<Link href="/workshops">
-									<ChakraLink flex={1} variant="mobileMenu" onClick={onClose} mx={5}>
-										Workshops
-									</ChakraLink>
-								</Link>
+							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
+								<VStack py="10px">
+									<Link href="/all-classes">
+										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+											All Classes
+										</ChakraLink>
+									</Link>
+									<Link href="/private-sessions">
+										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+											Private Sessions
+										</ChakraLink>
+									</Link>
+									<Link href="/workshops">
+										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+											Workshops
+										</ChakraLink>
+									</Link>
+								</VStack>
 							</MenuList>
 						</Menu>
 						<Link href="/contact">

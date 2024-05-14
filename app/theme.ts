@@ -1,98 +1,10 @@
-import { theme } from "@chakra-ui/pro-theme";
+import { theme as proTheme } from "@chakra-ui/pro-theme";
 import { extendTheme } from "@chakra-ui/react";
-
-const proTheme = extendTheme(theme);
-const imageConfig = {
-	components: {
-		Image: {
-			global: {
-				shadow: "2xl",
-			},
-		},
-	},
-};
-const breakpoints = {
-	sm: "30em",
-	base: "48em",
-	lg: "62em",
-	xl: "80em",
-	"2xl": "96em",
-};
-
-const extension = {
-	styles: {
-		global: {
-			body: {
-				backgroundImage: "url('/background.jpg')",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-				backgroundRepeat: "no-repeat",
-			},
-		},
-		variants: {
-			nav: {
-				backgroundColor: "#000000",
-			},
-		},
-	},
-	colors: {
-		...proTheme.colors,
-		brand: {
-			100: "#cc7152",
-			200: "#03131e",
-			300: "#0c131d",
-			400: "#38383a",
-			500: "#443c3b",
-			600: "#a2684d",
-			700: "#e0b78f",
-			800: "#02121d",
-		},
-	},
-};
-
-const buttonLink = {
-	components: {
-		Link: {
-			baseStyle: {
-				position: "relative",
-				textDecoration: "none",
-				_hover: {
-					textDecoration: "none",
-				},
-			},
-			variants: {
-				linkNav: {
-					position: "relative",
-					textDecoration: "none",
-					_hover: {
-						textDecoration: "none",
-						_after: {
-							width: "100%",
-							backgroundColor: "brand.100", // Ensuring the color is set on hover
-						},
-					},
-					_after: {
-						content: '""',
-						position: "absolute",
-						width: "0",
-						height: "3px",
-						backgroundColor: "brand.100", // Color of the underline
-						bottom: "-10px", // Adjusted for more spacing from the text
-						left: "0", // Start from the left edge
-						transform: "translateX(0%)", // Adjust transform to start the effect from the left
-						transition: "width 0.3s ease-out",
-					},
-				},
-			},
-		},
-	},
-};
 
 const fontConfig = {
 	fonts: {
-		body: "Quicksand, system-ui, sans-serif",
-		nav: "Quicksand, system-ui, sans-serif",
-		heading: "Quicksand, Georgia, serif",
+		heading: "var(--font-quicksand)",
+		body: "var(--font-quicksand)",
 		mono: "Menlo, monospace",
 	},
 	fontSizes: {
@@ -148,6 +60,90 @@ const fontConfig = {
 	},
 };
 
-const extendedConfig = extendTheme({ ...fontConfig, ...extension, ...imageConfig, ...buttonLink });
+// Custom theme extensions
+const extension = {
+	styles: {
+		global: {
+			body: {
+				backgroundImage: "url('/background.jpg')",
+				backgroundSize: "cover",
+				backgroundPosition: "center",
+				backgroundRepeat: "no-repeat",
+				fontFamily: "var(--font-quicksand)",
+			},
+		},
+		variants: {
+			nav: {
+				backgroundColor: "#000000",
+			},
+		},
+	},
+	colors: {
+		brand: {
+			100: "#cc7152",
+			200: "#03131e",
+			300: "#0c131d",
+			400: "#38383a",
+			500: "#443c3b",
+			600: "#a2684d",
+			700: "#e0b78f",
+			800: "#02121d",
+		},
+	},
+};
+
+const buttonLink = {
+	components: {
+		Link: {
+			baseStyle: {
+				position: "relative",
+				textDecoration: "none",
+				_hover: {
+					textDecoration: "none",
+				},
+			},
+			variants: {
+				linkNav: {
+					marginX: 5,
+					padding: 1,
+					fontSize: "lg",
+					position: "relative",
+					textDecoration: "none",
+					_hover: {
+						textDecoration: "none",
+						_after: {
+							width: "100%",
+							backgroundColor: "brand.100", // Ensuring the color is set on hover
+						},
+					},
+					_after: {
+						content: '""',
+						position: "absolute",
+						width: "0",
+						height: "3px",
+						backgroundColor: "brand.100", // Color of the underline
+						bottom: "-6px", // Adjusted for more spacing from the text
+						left: "0", // Start from the left edge
+						transform: "translateX(0%)", // Adjust transform to start the effect from the left
+						transition: "width 0.3s ease-out",
+					},
+				},
+			},
+		},
+	},
+};
+
+const extendedConfig = extendTheme({
+	...extension,
+	...buttonLink,
+	...fontConfig,
+	breakpoints: {
+		sm: "30em",
+		base: "48em",
+		lg: "62em",
+		xl: "80em",
+		"2xl": "96em",
+	},
+});
 
 export const skyTheme = extendTheme(proTheme, extendedConfig);
