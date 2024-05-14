@@ -20,18 +20,17 @@ import {
 	MenuButton,
 	MenuList,
 	Stack,
-	useDisclosure,
 	VStack,
+	useDisclosure,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { Link as ChakraLink } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import NextLink from "next/link";
+import { useRef, useState } from "react";
+import useResponsive from "./components/hooks/useResponsive";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
-	const [isMobile, setIsMobile] = useState(false);
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -39,43 +38,32 @@ const NavBar = () => {
 		}
 		setMenuOpen(true);
 	};
+
 	const closeMenu = () => {
 		closeTimeoutRef.current = window.setTimeout(() => {
 			setMenuOpen(false);
 		}, 80) as number;
 	};
 
-	useEffect(() => {
-		const handleResize = () => {
-			setIsMobile(window.innerWidth < 968);
-		};
-
-		handleResize();
-		window.addEventListener("resize", handleResize);
-
-		return () => {
-			window.removeEventListener("resize", handleResize);
-		};
-	}, []);
-	if (!isMobile) {
+	if (!useResponsive()) {
 		return (
-			<nav>
-				<Grid templateColumns="1fr auto 1fr" alignItems="center" gap={4} px={4} py={2} bgColor="#000000" color="brand.100">
-					<Box display="flex" height="100%" />
+			<Box as="nav" position="fixed" width="100%" zIndex="10" bgColor="#000000" color="brand.100">
+				<Grid templateColumns="1fr auto 1fr" alignItems="center" gap={4} px={4} py={2}>
+					<Box height="100%" />
 					<Box display="flex">
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
 					<Box display="flex" justifyContent="flex-end" alignItems="center">
-						<Link href="/" passHref>
-							<ChakraLink as={Button} height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+						<NextLink href="/" passHref>
+							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
-							</ChakraLink>
-						</Link>
-						<Link href="/about" passHref>
-							<ChakraLink as={Button} height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+							</Button>
+						</NextLink>
+						<NextLink href="/about" passHref>
+							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								About
-							</ChakraLink>
-						</Link>
+							</Button>
+						</NextLink>
 						<Menu isOpen={menuOpen} onClose={closeMenu}>
 							<MenuButton
 								variant="linkNav"
@@ -92,41 +80,41 @@ const NavBar = () => {
 							</MenuButton>
 							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
 								<VStack py="10px">
-									<Link href="/all-classes">
-										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+									<NextLink href="/all-classes" passHref>
+										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											All Classes
-										</ChakraLink>
-									</Link>
-									<Link href="/private-sessions">
-										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+										</Button>
+									</NextLink>
+									<NextLink href="/private-sessions" passHref>
+										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Private Sessions
-										</ChakraLink>
-									</Link>
-									<Link href="/workshops">
-										<ChakraLink flex={1} variant="linkNav" onClick={onClose} my={5}>
+										</Button>
+									</NextLink>
+									<NextLink href="/workshops" passHref>
+										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Workshops
-										</ChakraLink>
-									</Link>
+										</Button>
+									</NextLink>
 								</VStack>
 							</MenuList>
 						</Menu>
-						<Link href="/contact">
-							<ChakraLink
+						<NextLink href="/contact" passHref>
+							<Button
+								as="a"
 								height="100%"
 								lineHeight="1.2"
 								p={0}
 								backgroundColor="transparent"
-								as={Button}
 								flex={1}
 								variant="linkNav"
 								mx={5}
 								marginRight={70}>
 								Contact
-							</ChakraLink>
-						</Link>
+							</Button>
+						</NextLink>
 					</Box>
 				</Grid>
-			</nav>
+			</Box>
 		);
 	} else {
 		return (
@@ -156,16 +144,16 @@ const NavBar = () => {
 							</DrawerHeader>
 							<DrawerBody textAlign="left" flexDirection="column">
 								<Stack direction="column" spacing={4}>
-									<Link href="/">
+									<NextLink href="/" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Home
 										</Button>
-									</Link>
-									<Link href="/about">
+									</NextLink>
+									<NextLink href="/about" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											About Me
 										</Button>
-									</Link>
+									</NextLink>
 									<Accordion allowToggle>
 										<AccordionItem border="none">
 											<AccordionButton>
@@ -175,29 +163,29 @@ const NavBar = () => {
 												<AccordionIcon />
 											</AccordionButton>
 											<AccordionPanel pb={4}>
-												<Link href="/all-classes">
+												<NextLink href="/all-classes" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														All Classes
 													</Button>
-												</Link>
-												<Link href="/private-sessions">
+												</NextLink>
+												<NextLink href="/private-sessions" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Private Sessions
 													</Button>
-												</Link>
-												<Link href="/workshops">
+												</NextLink>
+												<NextLink href="/workshops" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>
-												</Link>
+												</NextLink>
 											</AccordionPanel>
 										</AccordionItem>
 									</Accordion>
-									<Link href="/contact">
+									<NextLink href="/contact" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Contact
 										</Button>
-									</Link>
+									</NextLink>
 								</Stack>
 							</DrawerBody>
 						</DrawerContent>

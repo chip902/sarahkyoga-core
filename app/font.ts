@@ -1,3 +1,4 @@
+"use client";
 import { Quicksand } from "next/font/google";
 
 const quicksand = Quicksand({

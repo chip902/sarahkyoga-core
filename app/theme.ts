@@ -1,3 +1,4 @@
+"use client";
 import { theme as proTheme } from "@chakra-ui/pro-theme";
 import { extendTheme } from "@chakra-ui/react";
 
