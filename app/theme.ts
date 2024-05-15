@@ -131,6 +131,35 @@ const buttonLink = {
 				},
 			},
 		},
+		Button: {
+			variants: {
+				linkNav: {
+					marginX: 5,
+					padding: 1,
+					fontSize: "lg",
+					position: "relative",
+					textDecoration: "none",
+					_hover: {
+						textDecoration: "none",
+						_after: {
+							width: "100%",
+							backgroundColor: "brand.100", // Ensuring the color is set on hover
+						},
+					},
+					_after: {
+						content: '""',
+						position: "absolute",
+						width: "0",
+						height: "3px",
+						backgroundColor: "brand.100", // Color of the underline
+						bottom: "-6px", // Adjusted for more spacing from the text
+						left: "0", // Start from the left edge
+						transform: "translateX(0%)", // Adjust transform to start the effect from the left
+						transition: "width 0.3s ease-out",
+					},
+				},
+			},
+		},
 	},
 };
 

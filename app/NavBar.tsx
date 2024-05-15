@@ -54,12 +54,12 @@ const NavBar = () => {
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
 					<Box display="flex" justifyContent="flex-end" alignItems="center">
-						<NextLink href="/" passHref>
+						<NextLink href="/" passHref legacyBehavior>
 							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
 							</Button>
 						</NextLink>
-						<NextLink href="/about" passHref>
+						<NextLink href="/about" passHref legacyBehavior>
 							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								About
 							</Button>
@@ -80,17 +80,17 @@ const NavBar = () => {
 							</MenuButton>
 							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
 								<VStack py="10px">
-									<NextLink href="/all-classes" passHref>
+									<NextLink href="/all-classes" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											All Classes
 										</Button>
 									</NextLink>
-									<NextLink href="/private-sessions" passHref>
+									<NextLink href="/private-sessions" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Private Sessions
 										</Button>
 									</NextLink>
-									<NextLink href="/workshops" passHref>
+									<NextLink href="/workshops" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Workshops
 										</Button>
@@ -98,7 +98,7 @@ const NavBar = () => {
 								</VStack>
 							</MenuList>
 						</Menu>
-						<NextLink href="/contact" passHref>
+						<NextLink href="/contact" passHref legacyBehavior>
 							<Button
 								as="a"
 								height="100%"
@@ -144,12 +144,12 @@ const NavBar = () => {
 							</DrawerHeader>
 							<DrawerBody textAlign="left" flexDirection="column">
 								<Stack direction="column" spacing={4}>
-									<NextLink href="/" passHref>
+									<NextLink href="/" passHref legacyBehavior>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Home
 										</Button>
 									</NextLink>
-									<NextLink href="/about" passHref>
+									<NextLink href="/about" passHref legacyBehavior>
 										<Button variant="mobileMenu" onClick={onClose}>
 											About Me
 										</Button>
@@ -163,17 +163,17 @@ const NavBar = () => {
 												<AccordionIcon />
 											</AccordionButton>
 											<AccordionPanel pb={4}>
-												<NextLink href="/all-classes" passHref>
+												<NextLink href="/all-classes" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														All Classes
 													</Button>
 												</NextLink>
-												<NextLink href="/private-sessions" passHref>
+												<NextLink href="/private-sessions" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Private Sessions
 													</Button>
 												</NextLink>
-												<NextLink href="/workshops" passHref>
+												<NextLink href="/workshops" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>
@@ -181,7 +181,7 @@ const NavBar = () => {
 											</AccordionPanel>
 										</AccordionItem>
 									</Accordion>
-									<NextLink href="/contact" passHref>
+									<NextLink href="/contact" passHref legacyBehavior>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Contact
 										</Button>
