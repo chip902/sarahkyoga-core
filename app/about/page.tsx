@@ -1,7 +1,8 @@
 "use client";
-import { Text, Box, Container, Flex, Heading } from "@chakra-ui/react";
+import { Box, Container, Flex, Heading, Text } from "@chakra-ui/react";
 import Slider from "react-slick";
-import React from "react";
+import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
 import { testimonials } from "./data";
 
 const AboutPage = () => {
@@ -74,7 +75,7 @@ const AboutPage = () => {
 					</Container>
 				</Flex>
 			</Box>
-			<Box mt={16} p={4} maxWidth="100vw" overflow="hidden">
+			<Box mt={16} p={4} maxW="90vw" mx="auto" overflow="hidden">
 				<Heading as="h2" size="lg" mb={4}>
 					Testimonials
 				</Heading>
