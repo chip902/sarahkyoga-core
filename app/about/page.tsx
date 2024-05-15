@@ -68,7 +68,7 @@ const AboutPage = () => {
 				</Box>
 			</Center>
 			<Center>
-				<Flex bg="rgba(255, 255, 255, 0.7)" boxShadow="xl" borderRadius="md" p={8} maxW="800px" w="100%">
+				<Flex bg="rgba(255, 255, 255, 0.7)" boxShadow="xl" borderRadius="md" mt="10vh" maxW="800px" w="100%">
 					<Container>
 						<Heading as="h1" fontSize="3xl" mb={4}>
 							TEACHING STYLE
@@ -100,7 +100,6 @@ const AboutPage = () => {
 								www.katonahyoga.com
 							</Button>
 						</NextLink>
-
 						<Heading as="h2" fontSize="2xl">
 							CHAIR YOGA
 						</Heading>
@@ -112,7 +111,7 @@ const AboutPage = () => {
 						<Heading as="h2" fontSize="2xl">
 							VINYASA
 						</Heading>
-						<Text>
+						<Text mb="7vh">
 							Vinyasa yoga, also known as Flow or Vinyasa Flow, is focuses on a linking one breath per movement so that there is a tempo as we
 							travel through class. Classes incorporate sun salutations, inversions, twists, folds and more.. In my Vinyasa/Flow classes, Katonah
 							Yoga ® elements will be introduced and explored.

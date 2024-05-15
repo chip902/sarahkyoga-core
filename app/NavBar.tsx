@@ -80,17 +80,17 @@ const NavBar = () => {
 							</MenuButton>
 							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
 								<VStack py="10px">
-									<NextLink href="/all-classes" passHref legacyBehavior>
+									<NextLink href="/" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											All Classes
 										</Button>
 									</NextLink>
-									<NextLink href="/private-sessions" passHref legacyBehavior>
+									<NextLink href="/" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Private Sessions
 										</Button>
 									</NextLink>
-									<NextLink href="/workshops" passHref legacyBehavior>
+									<NextLink href="/" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Workshops
 										</Button>
@@ -98,7 +98,7 @@ const NavBar = () => {
 								</VStack>
 							</MenuList>
 						</Menu>
-						<NextLink href="/contact" passHref legacyBehavior>
+						<NextLink href="/" passHref legacyBehavior>
 							<Button
 								as="a"
 								height="100%"
@@ -163,17 +163,17 @@ const NavBar = () => {
 												<AccordionIcon />
 											</AccordionButton>
 											<AccordionPanel pb={4}>
-												<NextLink href="/all-classes" passHref legacyBehavior>
+												<NextLink href="/" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														All Classes
 													</Button>
 												</NextLink>
-												<NextLink href="/private-sessions" passHref legacyBehavior>
+												<NextLink href="/" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Private Sessions
 													</Button>
 												</NextLink>
-												<NextLink href="/workshops" passHref legacyBehavior>
+												<NextLink href="/" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>
@@ -181,7 +181,7 @@ const NavBar = () => {
 											</AccordionPanel>
 										</AccordionItem>
 									</Accordion>
-									<NextLink href="/contact" passHref legacyBehavior>
+									<NextLink href="/" passHref legacyBehavior>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Contact
 										</Button>
