@@ -95,8 +95,8 @@ const AboutPage = () => {
 							<br />
 							Bedford Hills, NY 10517
 						</Text>
-						<NextLink href="/" passHref legacyBehavior target="_blank">
-							<Button as="a" flex={1} variant="inline">
+						<NextLink href="https://katonahyoga.com/" passHref legacyBehavior>
+							<Button as="a" flex={1} variant="inline" target="_blank">
 								www.katonahyoga.com
 							</Button>
 						</NextLink>
