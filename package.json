@@ -29,10 +29,12 @@
 	},
 	"devDependencies": {
 		"@next/third-parties": "^14.2.3",
+		"@sendgrid/mail": "^8.1.3",
 		"@types/node": "^20.12.11",
 		"@types/react": "^18.3.2",
 		"@types/react-dom": "^18",
 		"@types/react-slick": "^0.23.13",
+		"dotenv": "^16.4.5",
 		"eslint": "^8",
 		"eslint-config-next": "^14.2.3",
 		"react-slick": "^0.30.2",
