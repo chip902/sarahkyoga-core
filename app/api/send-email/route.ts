@@ -6,10 +6,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export async function POST(req: NextRequest) {
-	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "marilynrifkin.com";
+	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";
 	const origin =
 		process.env.NODE_ENV === "production"
-			? "https://marilynrifkin.com"
+			? "https://sarahkyoga.com"
 			: frontendDomain.includes("localhost")
 			? "http://localhost:3000"
 			: `https://${frontendDomain}`;
