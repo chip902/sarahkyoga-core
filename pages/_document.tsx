@@ -10,10 +10,19 @@ class MyDocument extends Document {
 		return (
 			<Html lang="en">
 				<Head>
-					<link rel="icon" href="/favicon.ico" sizes="any" />
 					<link rel="preconnect" href="https://fonts.googleapis.com" />
 					<link rel="preconnect" href="https://fonts.gstatic.com" />
 					<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet" />
+					<link rel="icon" href="/favicon.ico" type="image/ico" sizes="32x32" />
+					<link rel="icon" href="/favicon.ico" type="image/ico" sizes="16x16" />
+					<link rel="icon" href="/favicon.ico" type="image/ico" sizes="any" />
+					<meta name="msapplication-TileColor" content="#da532c" />
+					<meta name="theme-color" content="#ffffff" />
+					<meta property="og:title" content="Sarah K. Yoga" />
+					<meta property="og:description" content="Student and Teacher of Katonah Yoga" />
+					<meta property="og:image" content="/sky_banner.webp" />
+					<meta property="og:url" content="https://sarahkyoga.com" />
+					<meta name="twitter:card" content="summary_large_image" />
 				</Head>
 				<body>
 					<Main />

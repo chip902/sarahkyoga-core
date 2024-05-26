@@ -18,7 +18,7 @@
     "@fontsource-variable/quicksand": "^5.0.18",
     "@fontsource/quicksand": "^5.0.18",
     "@prisma/client": "^5.14.0",
-    "framer-motion": "^11.1.9",
+    "framer-motion": "^11.2.6",
     "next": "^14.2.3",
     "next-auth": "^4.24.7",
     "react": "^18",
@@ -28,6 +28,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@next/third-parties": "^14.2.3",
     "@types/node": "^20.12.11",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18",
