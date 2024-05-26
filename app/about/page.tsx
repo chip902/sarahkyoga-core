@@ -81,7 +81,7 @@ const AboutPage = () => {
 							classical Hatha yoga with Taoist theory, geometry, magic, mythology, metaphor, and imagination — in a practical framework designed
 							to potentiate personal and communal well-being. Framing the practice, maps of time and personal space are defined and refined.
 							Themes using asana as origami, manipulating form for function, and developing a sense of personal measure are incorporated in
-							Katonah Yoga ® practices.
+							Katonah Yoga® practices.
 						</Text>
 						<Text fontSize="lg" mb={4}>
 							Katonah Yoga® is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has

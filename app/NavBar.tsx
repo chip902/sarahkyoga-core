@@ -98,7 +98,7 @@ const NavBar = () => {
 								</VStack>
 							</MenuList>
 						</Menu>
-						<NextLink href="/" passHref legacyBehavior>
+						<NextLink href="/contact" passHref legacyBehavior>
 							<Button
 								as="a"
 								height="100%"
@@ -181,7 +181,7 @@ const NavBar = () => {
 											</AccordionPanel>
 										</AccordionItem>
 									</Accordion>
-									<NextLink href="/" passHref legacyBehavior>
+									<NextLink href="/contact" passHref legacyBehavior>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Contact
 										</Button>
