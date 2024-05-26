@@ -32,7 +32,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/fonts.tsx.off"
+    "app/fonts.tsx.off",
+    "app/api/users/route.ts.off"
   ],
   "exclude": [
     "node_modules"
