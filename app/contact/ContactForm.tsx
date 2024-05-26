@@ -24,7 +24,7 @@ const ContactForm = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					to: "marilyn@marilynrifkin.com",
+					to: "sarah@sarahkyoga.com",
 					from: formData.email,
 					subject: `Contact Form Submission from ${formData.name}`,
 					text: formData.message,
@@ -81,7 +81,7 @@ const ContactForm = () => {
 						<FormLabel>Message</FormLabel>
 						<Textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your Message" />
 					</FormControl>
-					<Button type="submit" variant="inline" size="lg" mt={4}>
+					<Button type="submit" variant="outline" size="lg" mt={4}>
 						Send Message
 					</Button>
 				</VStack>
