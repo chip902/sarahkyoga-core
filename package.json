@@ -1,42 +1,43 @@
 {
-  "name": "sarahkyoga-core",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/next-js": "^2.2.0",
-    "@chakra-ui/pro-theme": "^0.10.0",
-    "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@fontsource-variable/quicksand": "^5.0.18",
-    "@fontsource/quicksand": "^5.0.18",
-    "@prisma/client": "^5.14.0",
-    "framer-motion": "^11.2.6",
-    "next": "^14.2.3",
-    "next-auth": "^4.24.7",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-icons": "^5.2.1",
-    "slick-carousel": "^1.8.1",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@next/third-parties": "^14.2.3",
-    "@types/node": "^20.12.11",
-    "@types/react": "^18.3.2",
-    "@types/react-dom": "^18",
-    "@types/react-slick": "^0.23.13",
-    "eslint": "^8",
-    "eslint-config-next": "^14.2.3",
-    "prisma": "^5.14.0",
-    "react-slick": "^0.30.2",
-    "typescript": "^5.4.5"
-  }
+	"name": "sarahkyoga-core",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build && next-sitemap",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@chakra-ui/icons": "^2.1.1",
+		"@chakra-ui/next-js": "^2.2.0",
+		"@chakra-ui/pro-theme": "^0.10.0",
+		"@chakra-ui/react": "^2.8.2",
+		"@emotion/react": "^11.11.4",
+		"@emotion/styled": "^11.11.5",
+		"@fontsource-variable/quicksand": "^5.0.18",
+		"@fontsource/quicksand": "^5.0.18",
+		"@prisma/client": "^5.14.0",
+		"framer-motion": "^11.2.6",
+		"next": "^14.2.3",
+		"next-auth": "^4.24.7",
+		"next-sitemap": "^4.2.3",
+		"react": "^18",
+		"react-dom": "^18",
+		"react-icons": "^5.2.1",
+		"slick-carousel": "^1.8.1",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@next/third-parties": "^14.2.3",
+		"@types/node": "^20.12.11",
+		"@types/react": "^18.3.2",
+		"@types/react-dom": "^18",
+		"@types/react-slick": "^0.23.13",
+		"eslint": "^8",
+		"eslint-config-next": "^14.2.3",
+		"prisma": "^5.14.0",
+		"react-slick": "^0.30.2",
+		"typescript": "^5.4.5"
+	}
 }
