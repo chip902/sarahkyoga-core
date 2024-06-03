@@ -44,7 +44,11 @@
 		"eslint": "^8",
 		"eslint-config-next": "^14.2.3",
 		"next": "^14.2.3",
+<<<<<<< HEAD
 		"prisma": "^5.17.0",
+=======
+		"prisma": "^5.14.0",
+>>>>>>> 44b394d (Adding start of booking component and Google Cal apis)
 		"react-slick": "^0.30.2",
 		"typescript": "^5.4.5"
 	}
