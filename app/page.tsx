@@ -11,9 +11,9 @@ export default function Home() {
 			description: (
 				<Wrap>
 					Hey there! I&apos;m working to make this site even better for you. Thank you for your patience while we wait for the saw dust to clear. If
-					you want to reach me for a Private class,{" "}
+					you want to reach me for a Private class,
 					<NextLink href="/contact" passHref legacyBehavior>
-						<Button variant="outline">contact me here!</Button>
+						<Button variant="outline"> contact me here!</Button>
 					</NextLink>
 				</Wrap>
 			),
