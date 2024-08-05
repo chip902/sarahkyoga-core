@@ -22,7 +22,7 @@ const Register = () => {
 			});
 
 			if (response.status === 200) {
-				router.push("/auth/login");
+				router.push("/login");
 			}
 		} catch (error) {
 			console.error(error);
@@ -37,16 +37,16 @@ const Register = () => {
 				</Stack>
 			</Stack>
 			<Stack spacing="6" direction={{ base: "column", md: "row" }}>
-				<FormControl id="skyName">
+				<FormControl id="name">
 					<FormLabel>Name</FormLabel>
 					<Input defaultValue="Name" onChange={(e) => setName(e.target.value)} value={name} />
 				</FormControl>
-				<FormControl id="skyEmail">
+				<FormControl id="email">
 					<FormLabel>Email</FormLabel>
 					<Input defaultValue="Email" onChange={(e) => setEmail(e.target.value)} value={email} />
 				</FormControl>
 			</Stack>
-			<FormControl id="skyPassword">
+			<FormControl id="password">
 				<FormLabel>Password</FormLabel>
 				<Input defaultValue="Password" onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
 			</FormControl>
