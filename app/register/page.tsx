@@ -37,16 +37,16 @@ const Register = () => {
 				</Stack>
 			</Stack>
 			<Stack spacing="6" direction={{ base: "column", md: "row" }}>
-				<FormControl id="name">
+				<FormControl id="skyName">
 					<FormLabel>Name</FormLabel>
 					<Input defaultValue="Name" onChange={(e) => setName(e.target.value)} value={name} />
 				</FormControl>
-				<FormControl id="email">
+				<FormControl id="skyEmail">
 					<FormLabel>Email</FormLabel>
 					<Input defaultValue="Email" onChange={(e) => setEmail(e.target.value)} value={email} />
 				</FormControl>
 			</Stack>
-			<FormControl id="password">
+			<FormControl id="skyPassword">
 				<FormLabel>Password</FormLabel>
 				<Input defaultValue="Password" onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
 			</FormControl>
