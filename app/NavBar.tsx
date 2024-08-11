@@ -19,18 +19,22 @@ import {
 	Menu,
 	MenuButton,
 	MenuList,
+	Spinner,
 	Stack,
 	VStack,
 	useDisclosure,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 import useResponsive from "./components/hooks/useResponsive";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
+	const { status } = useSession();
+	const isResponsive = useResponsive();
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -45,7 +49,11 @@ const NavBar = () => {
 		}, 80) as number;
 	};
 
-	if (!useResponsive()) {
+	const handleSignOut = () => {
+		signOut({ callbackUrl: "/" }); // Redirects to the homepage after signing out
+	};
+
+	if (!isResponsive) {
 		return (
 			<Box as="nav" position="fixed" width="100%" zIndex="10" bgColor="#000000" color="brand.100">
 				<Grid templateColumns="1fr auto 1fr" alignItems="center" gap={4} px={4} py={2}>
@@ -108,10 +116,41 @@ const NavBar = () => {
 								flex={1}
 								variant="linkNav"
 								mx={5}
-								marginRight={70}>
+								marginRight={35}>
 								Contact
 							</Button>
 						</NextLink>
+						{status === "loading" ? (
+							<Spinner size="lg" marginRight={70} />
+						) : status === "authenticated" ? (
+							<Button
+								height="100%"
+								lineHeight="1.2"
+								p={0}
+								backgroundColor="transparent"
+								flex={1}
+								variant="linkNav"
+								mx={5}
+								marginRight={70}
+								onClick={handleSignOut}>
+								Sign Out
+							</Button>
+						) : (
+							<NextLink href="/auth/login" passHref legacyBehavior>
+								<Button
+									as="a"
+									height="100%"
+									lineHeight="1.2"
+									p={0}
+									backgroundColor="transparent"
+									flex={1}
+									variant="linkNav"
+									mx={5}
+									marginRight={70}>
+									Sign In
+								</Button>
+							</NextLink>
+						)}
 					</Box>
 				</Grid>
 			</Box>
@@ -186,6 +225,19 @@ const NavBar = () => {
 											Contact
 										</Button>
 									</NextLink>
+									{status === "loading" ? (
+										<Spinner size="lg" marginRight={70} />
+									) : status === "authenticated" ? (
+										<Button variant="mobileMenu" onClick={handleSignOut}>
+											Sign Out
+										</Button>
+									) : (
+										<NextLink href="/auth/login" passHref legacyBehavior>
+											<Button variant="mobileMenu" onClick={onClose}>
+												Sign In
+											</Button>
+										</NextLink>
+									)}
 								</Stack>
 							</DrawerBody>
 						</DrawerContent>
@@ -195,5 +247,4 @@ const NavBar = () => {
 		);
 	}
 };
-
 export default NavBar;
