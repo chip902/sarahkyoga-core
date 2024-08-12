@@ -95,7 +95,7 @@ const NavBar = () => {
 											All Classes
 										</Button>
 									</NextLink>
-									<NextLink href="/" passHref legacyBehavior>
+									<NextLink href="/booking" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											Private Sessions
 										</Button>
@@ -209,7 +209,7 @@ const NavBar = () => {
 														All Classes
 													</Button>
 												</NextLink>
-												<NextLink href="/" passHref legacyBehavior>
+												<NextLink href="/booking" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Private Sessions
 													</Button>
