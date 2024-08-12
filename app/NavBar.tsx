@@ -18,6 +18,7 @@ import {
 	Image,
 	Menu,
 	MenuButton,
+	MenuItem,
 	MenuList,
 	Spinner,
 	Stack,
@@ -52,8 +53,6 @@ const NavBar = () => {
 	const handleSignOut = () => {
 		signOut({ callbackUrl: "/" });
 	};
-	console.log("Client-side session status:", status);
-	console.log("Client-side session data:", session);
 
 	if (!isResponsive) {
 		return (
@@ -124,6 +123,21 @@ const NavBar = () => {
 						</NextLink>
 						{status === "loading" ? (
 							<Spinner size="lg" marginRight={70} />
+						) : status === "authenticated" && session?.user.role === "admin" ? (
+							<Menu>
+								<MenuButton variant="linkNav" as={Button} rightIcon={<ChevronDownIcon />} marginRight={70}>
+									Admin
+								</MenuButton>
+								<MenuList>
+									<NextLink href="/admin/dashboard" passHref legacyBehavior>
+										<MenuItem>Dashboard</MenuItem>
+									</NextLink>
+									<NextLink href="/admin/users" passHref legacyBehavior>
+										<MenuItem>Manage Users</MenuItem>
+									</NextLink>
+									<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
+								</MenuList>
+							</Menu>
 						) : status === "authenticated" ? (
 							<Button
 								height="100%"
