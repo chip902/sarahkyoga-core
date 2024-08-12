@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { Box, Button, Slide, Text, useDisclosure } from "@chakra-ui/react";
 import NextLink from "next/link";
