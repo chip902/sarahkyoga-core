@@ -1,19 +1,29 @@
-import prisma from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/prisma/client";
+import bcrypt from "bcryptjs";
 import { z } from "zod";
 
-const schema = z.object({
-	first_name: z.string().min(1).max(255),
-	last_name: z.string().min(1).max(255),
-	email: z.string().email(),
-});
+export async function POST(req: NextRequest) {
+	const body = await req.json();
 
-export async function POST(request: NextRequest) {
-	const body = await request.json();
+	const schema = z.object({
+		name: z.string(),
+		email: z.string().email(),
+		password: z.string().min(8),
+	});
+
 	const validation = schema.safeParse(body);
 	if (!validation.success) return NextResponse.json(validation.error.errors, { status: 400 });
+
+	const hashedPassword = await bcrypt.hash(body.password, 10);
+
 	const newUser = await prisma.user.create({
-		data: { first_name: body.first_name, last_name: body.last_name, email: body.email },
+		data: {
+			name: body.name,
+			email: body.email,
+			password: hashedPassword,
+		},
 	});
+
 	return NextResponse.json(newUser, { status: 201 });
 }

@@ -18,7 +18,7 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import { signIn } from "next-auth/react";
-import { GoogleIcon } from "../../login/ProviderIcons";
+import { GoogleIcon } from "./ProviderIcons";
 
 const Login = () => {
 	// State to store email and password
