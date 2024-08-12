@@ -33,7 +33,7 @@ const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
-	const { status } = useSession();
+	const { status, data: session } = useSession();
 	const isResponsive = useResponsive();
 
 	const openMenu = () => {
@@ -50,8 +50,10 @@ const NavBar = () => {
 	};
 
 	const handleSignOut = () => {
-		signOut({ callbackUrl: "/" }); // Redirects to the homepage after signing out
+		signOut({ callbackUrl: "/" });
 	};
+	console.log("Client-side session status:", status);
+	console.log("Client-side session data:", session);
 
 	if (!isResponsive) {
 		return (
@@ -247,4 +249,5 @@ const NavBar = () => {
 		);
 	}
 };
+
 export default NavBar;

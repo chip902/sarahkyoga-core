@@ -22,7 +22,7 @@ const Register = () => {
 			});
 
 			if (response.status === 200) {
-				router.push("/login");
+				router.push("/auth/login");
 			}
 		} catch (error) {
 			console.error(error);
