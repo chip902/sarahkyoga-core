@@ -9,6 +9,9 @@ declare module "next-auth" {
 	interface User {
 		id: string;
 		role: string;
+		email: string;
+		image?: string;
+		password?: string;
 	}
 
 	interface AdapterUser {
@@ -95,6 +98,25 @@ const authOptions: NextAuthOptions = {
 			}
 			console.log("Session callback - session:", session); // Debugging
 			return session;
+		},
+		async signIn({ user, account }) {
+			if (account?.provider === "google") {
+				const existingUser = await prisma.user.findUnique({
+					where: { email: user.email },
+				});
+
+				if (!existingUser) {
+					await prisma.user.create({
+						data: {
+							name: user.name,
+							email: user.email,
+							image: user.image ?? undefined,
+							role: user.role ?? "user",
+						},
+					});
+				}
+			}
+			return true;
 		},
 	},
 	debug: process.env.NODE_ENV === "development",
