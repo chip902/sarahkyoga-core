@@ -89,7 +89,7 @@ const NavBar = () => {
 							</MenuButton>
 							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
 								<VStack py="10px">
-									<NextLink href="/" passHref legacyBehavior>
+									<NextLink href="/classes" passHref legacyBehavior>
 										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 											All Classes
 										</Button>
@@ -218,7 +218,7 @@ const NavBar = () => {
 												<AccordionIcon />
 											</AccordionButton>
 											<AccordionPanel pb={4}>
-												<NextLink href="/" passHref legacyBehavior>
+												<NextLink href="/classes" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														All Classes
 													</Button>
