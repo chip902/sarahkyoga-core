@@ -8,13 +8,13 @@ export default function YogaClasses() {
 			left="50%"
 			transform="translate(-50%, -50%)"
 			bg="rgba(255, 255, 255, 0.7)"
-			boxShadow="xl"
+			boxShadow="2xl"
 			borderRadius="md"
 			p={8}
 			maxW="800px"
 			w="100%"
 			flexDirection="column"
-			mb={12}>
+			mb="80px">
 			<Stack spacing={10}>
 				{/* Sunday Class */}
 				<Box>
