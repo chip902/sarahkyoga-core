@@ -59,7 +59,7 @@ const authOptions: NextAuthOptions = {
 					where: { email: credentials.email },
 				});
 
-				if (user && bcrypt.compareSync(credentials.password, user.password)) {
+				if (user && user.password && bcrypt.compareSync(credentials.password, user.password)) {
 					console.log("Authentication successful for user:", user);
 
 					// Ensuring role is a string
