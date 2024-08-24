@@ -14,6 +14,8 @@ import {
 	DrawerHeader,
 	DrawerOverlay,
 	Grid,
+	HStack,
+	Icon,
 	IconButton,
 	Image,
 	Menu,
@@ -25,6 +27,7 @@ import {
 	VStack,
 	useDisclosure,
 } from "@chakra-ui/react";
+import { GiEmptyHourglass } from "react-icons/gi";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
@@ -99,11 +102,20 @@ const NavBar = () => {
 											Private Sessions
 										</Button>
 									</NextLink>
-									<NextLink href="/" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
-											Workshops
-										</Button>
-									</NextLink>
+									<HStack>
+										<NextLink href="/" passHref legacyBehavior>
+											<Button
+												as="a"
+												variant="linkNav"
+												onClick={onClose}
+												my={5}
+												isDisabled
+												_disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
+												Workshops
+											</Button>
+										</NextLink>
+										<Icon as={GiEmptyHourglass} color="gray.400" />
+									</HStack>
 								</VStack>
 							</MenuList>
 						</Menu>

@@ -12,7 +12,7 @@ const BookingPage = () => {
 	};
 
 	return (
-		<Container my="50vh">
+		<Container my="20vh">
 			<ReservationComponent onNext={handleNext} />
 		</Container>
 	);
