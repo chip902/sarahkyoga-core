@@ -13,17 +13,25 @@ const getAvailability = async (timeMin: string, timeMax: string) => {
 	});
 
 	const calendar = google.calendar({ version: "v3", auth });
+	try {
+		const calendarId = "r703c2gjeoakdo4fhb0l4cb2r8@group.calendar.google.com";
 
-	const response = await calendar.freebusy.query({
-		requestBody: {
-			timeMin,
-			timeMax,
-			items: [{ id: "primary" }], // Assuming the yoga instructor's calendar is the primary calendar
-		},
-	});
+		const response = await calendar.freebusy.query({
+			requestBody: {
+				timeMin,
+				timeMax,
+				items: [{ id: calendarId }],
+			},
+		});
 
-	const busyTimes = response.data.calendars?.primary?.busy ?? [];
-	return busyTimes.length === 0;
+		console.log("Google Calendar FreeBusy API response:", JSON.stringify(response.data, null, 2));
+
+		const busyTimes = response.data.calendars?.[calendarId]?.busy ?? [];
+		return busyTimes.length === 0; // Return true if the time slot is free
+	} catch (error) {
+		console.error("Google Calendar API error:", error);
+		throw new Error("Failed to check calendar availability.");
+	}
 };
 
 export async function POST(req: NextRequest) {
