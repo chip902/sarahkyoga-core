@@ -13,13 +13,7 @@ const BookingPage = () => {
 
 	return (
 		<Container my="20vh">
-			<ReservationComponent
-				onNext={(availableOptions, dateTime) => {
-					console.log("Available options:", availableOptions);
-					console.log("Selected Date/Time:", dateTime);
-					// Handle navigation or further logic here
-				}}
-			/>
+			<ReservationComponent onNext={handleNext} />
 		</Container>
 	);
 };
