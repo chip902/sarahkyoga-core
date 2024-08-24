@@ -1,4 +1,3 @@
-"use client";
 import { theme as proTheme } from "@chakra-ui/pro-theme";
 import { extendTheme } from "@chakra-ui/react";
 
@@ -93,7 +92,7 @@ const extension = {
 	},
 };
 
-const buttonLink = {
+const links = {
 	components: {
 		Link: {
 			baseStyle: {
@@ -108,6 +107,31 @@ const buttonLink = {
 					marginX: 5,
 					padding: 1,
 					fontSize: "lg",
+					position: "relative",
+					textDecoration: "none",
+					_hover: {
+						textDecoration: "none",
+						_after: {
+							width: "100%",
+							backgroundColor: "brand.100", // Ensuring the color is set on hover
+						},
+					},
+					_after: {
+						content: '""',
+						position: "absolute",
+						width: "0",
+						height: "3px",
+						backgroundColor: "brand.100", // Color of the underline
+						bottom: "-6px", // Adjusted for more spacing from the text
+						left: "0", // Start from the left edge
+						transform: "translateX(0%)", // Adjust transform to start the effect from the left
+						transition: "width 0.3s ease-out",
+					},
+				},
+				inlineNav: {
+					padding: 1,
+					fontSize: "xl",
+					fontWeight: "bold",
 					position: "relative",
 					textDecoration: "none",
 					_hover: {
@@ -160,6 +184,67 @@ const buttonLink = {
 				},
 				inline: {
 					fontSize: "md",
+					fontWeight: "bold",
+					position: "relative",
+					textDecoration: "none",
+					_hover: {
+						textDecoration: "none",
+						_after: {
+							width: "100%",
+							backgroundColor: "brand.100",
+						},
+					},
+					_after: {
+						content: '""',
+						position: "absolute",
+						width: "0",
+						height: "3px",
+						backgroundColor: "brand.100",
+						bottom: "-3px",
+						left: "0",
+						transform: "translateX(0%)",
+						transition: "width 0.3s ease-out",
+					},
+				},
+				outline: {
+					...extendTheme,
+					fontSize: "md",
+					color: "white",
+					position: "relative",
+					textDecoration: "none",
+				},
+			},
+		},
+		Text: {
+			variants: {
+				linkNav: {
+					marginX: 5,
+					padding: 1,
+					fontSize: "lg",
+					position: "relative",
+					textDecoration: "none",
+					_hover: {
+						textDecoration: "none",
+						_after: {
+							width: "100%",
+							backgroundColor: "brand.100", // Ensuring the color is set on hover
+						},
+					},
+					_after: {
+						content: '""',
+						position: "absolute",
+						width: "0",
+						height: "3px",
+						backgroundColor: "brand.100",
+						bottom: "-6px",
+						left: "0",
+						transform: "translateX(0%)",
+						transition: "width 0.3s ease-out",
+					},
+				},
+				inline: {
+					fontSize: "md",
+					fontWeight: "bold",
 					position: "relative",
 					textDecoration: "none",
 					_hover: {
@@ -195,7 +280,7 @@ const buttonLink = {
 
 const extendedConfig = extendTheme({
 	...extension,
-	...buttonLink,
+	...links,
 	...fontConfig,
 	breakpoints: {
 		sm: "30em",

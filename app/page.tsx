@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 export default function Home() {
 	const toast = useToast();
+	/*
 	useEffect(() => {
 		toast({
 			title: "Site Under Construction",
@@ -23,6 +24,6 @@ export default function Home() {
 			colorScheme: "orange",
 		});
 	}, [toast]);
-
+*/
 	return <></>;
 }

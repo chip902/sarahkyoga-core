@@ -85,7 +85,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 				{isOpen && (
 					<VStack spacing={4} flex={1} ml={8} transition="opacity 0.5s ease-in-out" opacity={isOpen ? 1 : 0}>
 						<Text fontSize="lg" mt={4}>
-							Select Time (in 30-minute increments)
+							Select Time (in 60-minute increments)
 						</Text>
 						<Select
 							options={timeSlots}
@@ -94,7 +94,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 							placeholder="Select a time"
 							value={timeSlots.find((slot) => slot.value === selectedTime)}
 						/>
-						{loading && <Spinner size="lg" color="grey.500" />}
+						{loading && <Spinner size="lg" color="teal.500" />}
 						{error && (
 							<Alert status="error">
 								<AlertIcon />
