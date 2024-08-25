@@ -10,7 +10,7 @@ const useCheckAvailability = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const checkAvailability = async (timeMin: string, timeMax: string) => {
+	const checkAvailability = async (timeMin: string, timeMax: string): Promise<AvailabilityState> => {
 		if (!session) {
 			throw new Error("User is not authenticated");
 		}
@@ -25,10 +25,14 @@ const useCheckAvailability = () => {
 				timeMax,
 			});
 
-			setAvailability(response.data.isAvailable ? "Available" : "Busy");
+			const availabilityState: AvailabilityState = response.data.isAvailable ? "Available" : "Busy";
+			setAvailability(availabilityState);
+			return availabilityState; // Return the availability result
 		} catch (error) {
 			console.error("Error checking availability:", error);
 			setError("Failed to check availability");
+			setAvailability("Failed to check availability");
+			return "Failed to check availability"; // Return the error state
 		} finally {
 			setLoading(false);
 		}
