@@ -23,6 +23,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import Select from "react-select";
 import useCheckAvailability from "../components/hooks/useCheckAvailability";
+import { BookNowButton } from "./BookNow";
 
 interface IReservationComponentProps {
 	onNext: (availableOptions: string[], dateTime: Date) => void;
@@ -84,12 +85,13 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			const zoomAvailability = await checkAvailability(finalDate.toISOString(), zoomTimeMax);
 			const inPersonAvailability = await checkAvailability(finalDate.toISOString(), inPersonTimeMax);
 
-			// Store the availability status for each type separately
 			setZoomAvailable(zoomAvailability);
 			setInPersonAvailable(inPersonAvailability);
 
 			if (zoomAvailability === "Available" || inPersonAvailability === "Available") {
 				setAvailability("Available");
+				// Call the onNext prop with available options and the selected date/time
+				onNext([zoomAvailability === "Available" ? "Zoom" : "", inPersonAvailability === "Available" ? "In-Person" : ""].filter(Boolean), finalDate);
 			} else {
 				alert("The selected time slot is unavailable for any session.");
 			}
@@ -103,6 +105,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			mt={{ base: 20, md: 80 }}
 			bgColor="brand.600"
 			borderRadius="md"
+			opacity="0.9"
 			display="flex"
 			flexDirection="column"
 			justifyContent="center"
@@ -172,7 +175,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 													<Text>Get a personalized 60-minute Zoom session for $80.</Text>
 												</CardBody>
 												<CardFooter>
-													<Button>Book Now</Button>
+													<BookNowButton productId="0" />
 												</CardFooter>
 											</Card>
 										)}
@@ -187,7 +190,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 														<Text>Enjoy a private 75-minute in-person session for $125.</Text>
 													</CardBody>
 													<CardFooter>
-														<Button>Book Now</Button>
+														<BookNowButton productId="1" />
 													</CardFooter>
 												</Card>
 												<Card>
@@ -198,7 +201,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 														<Text>Invite more people for a 75-minute in-person session for $175.</Text>
 													</CardBody>
 													<CardFooter>
-														<Button>Book Now</Button>
+														<BookNowButton productId="2" />
 													</CardFooter>
 												</Card>
 											</>
@@ -211,7 +214,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 
 					<HStack spacing={4} mt={4} alignItems="center">
 						<Button colorScheme="teal" isDisabled={!selectedDate || !selectedTime || loading || !!dateError} onClick={handleNextClick}>
-							Next
+							Check Time
 						</Button>
 					</HStack>
 				</VStack>
