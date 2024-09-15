@@ -66,3 +66,31 @@ a {
 		color-scheme: dark;
 	}
 }
+
+/* Map Quill font classes to actual fonts */
+.ql-font-Arial {
+	font-family: Arial, sans-serif !important;
+}
+
+.ql-font-Georgia {
+	font-family: Georgia, serif !important;
+}
+
+.ql-font-Impact {
+	font-family: Impact, sans-serif !important;
+}
+
+.ql-font-Tahoma {
+	font-family: Tahoma, sans-serif !important;
+}
+
+.ql-font-Times-New-Roman {
+	font-family: "Times New Roman", serif !important;
+}
+
+.ql-font-Verdana {
+	font-family: Verdana, sans-serif !important;
+}
+.ql-font-Quicksand {
+	font-family: "Quicksand", sans-serif !important;
+}
