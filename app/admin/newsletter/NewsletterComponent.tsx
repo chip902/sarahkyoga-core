@@ -1,105 +1,31 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
-import Quill from "quill";
-import "quill/dist/quill.bubble.css"; // Use the .snow or .bubble theme depending on your preference
+import React, { useEffect, useState, useRef } from "react";
 import Select from "react-select";
 import axios from "axios";
-// Dynamically import ReactQuill to avoid SSR issues
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import { Button, Spinner } from "@chakra-ui/react";
 
 interface UserOption {
 	value: string;
 	label: string;
 }
 
-// Define available fonts
-const fonts = ["arial", "georgia", "impact", "tahoma", "times-new-roman", "verdana", "quicksand"];
-
-// Register fonts with Quill
-if (typeof window !== "undefined") {
-	const Font = Quill.import("formats/font");
-	Font.whitelist = fonts;
-	Quill.register(Font, true);
-}
-
-// Define the toolbar options
-const toolbarOptions = [
-	[{ font: fonts }],
-	[{ header: [1, 2, 3, 4, 5, 6, false] }],
-	["bold", "italic", "underline", "strike"],
-	[{ color: [] }, { background: [] }],
-	[{ align: [] }],
-	["blockquote", "code-block"],
-	[{ list: "ordered" }, { list: "bullet" }],
-	["link", "image"],
-	["clean"],
+const fonts = [
+	{ value: "arial", label: "Arial" },
+	{ value: "georgia", label: "Georgia" },
+	{ value: "quicksand", label: "Quicksand" },
 ];
-
-// Configure the modules for ReactQuill
-const modules = {
-	toolbar: {
-		container: toolbarOptions,
-		handlers: {
-			image: imageHandler,
-		},
-	},
-};
-
-// Define the formats supported by ReactQuill
-const formats = [
-	"font",
-	"header",
-	"bold",
-	"italic",
-	"underline",
-	"strike",
-	"blockquote",
-	"code-block",
-	"color",
-	"background",
-	"list",
-	"bullet",
-	"indent",
-	"link",
-	"image",
-	"align",
-];
-
-// Implement the image handler
-function imageHandler(this: any) {
-	const input = document.createElement("input");
-	input.setAttribute("type", "file");
-	input.setAttribute("accept", "image/*");
-	input.click();
-
-	input.onchange = async () => {
-		const file = input.files ? input.files[0] : null;
-		if (file) {
-			const formData = new FormData();
-			formData.append("image", file);
-
-			try {
-				const response = await axios.post("/api/upload", formData, {
-					headers: {
-						"Content-Type": "multipart/form-data",
-					},
-				});
-				const imageUrl = response.data.url;
-				const range = this.quill.getSelection();
-				this.quill.insertEmbed(range.index, "image", imageUrl);
-			} catch (err) {
-				console.error(err);
-			}
-		}
-	};
-}
 
 const NewsletterWriter: React.FC = () => {
-	const [content, setContent] = useState<string>(""); // State for newsletter content
-	const [userOptions, setUserOptions] = useState<UserOption[]>([]); // Options for user selection
-	const [selectedUsers, setSelectedUsers] = useState<UserOption[]>([]); // Selected users
+	const [content, setContent] = useState<string>("");
+	const [userOptions, setUserOptions] = useState<UserOption[]>([]);
+	const [selectedUsers, setSelectedUsers] = useState<UserOption[]>([]);
+	const quillRef = useRef<any>(null);
+	const [ReactQuill, setReactQuill] = useState<any>(null);
+
+	// Define modules and formats here
+	const [modules, setModules] = useState<any>(null);
+	const [formats, setFormats] = useState<string[]>([]);
 
 	useEffect(() => {
 		// Fetch users from the API
@@ -116,6 +42,100 @@ const NewsletterWriter: React.FC = () => {
 			}
 		};
 		fetchUsers();
+
+		// Dynamically import ReactQuill and Quill
+		const importEditors = async () => {
+			if (typeof window !== "undefined") {
+				const { default: RQ } = await import("react-quill");
+				const Quill = (await import("quill")).default;
+
+				// Register fonts with Quill
+				const Font = Quill.import("formats/font");
+				const fontWhitelist = fonts.map((font) => font.value);
+				Font.whitelist = fontWhitelist;
+				Quill.register(Font, true);
+
+				console.log("Font whitelist:", Font.whitelist);
+
+				// Define the toolbar options
+				const toolbarOptions = [
+					[{ font: fonts.map((option) => option.value) }],
+					[{ header: [1, 2, 3, 4, 5, 6, false] }],
+					["bold", "italic", "underline", "strike"],
+					[{ color: [] }, { background: [] }],
+					[{ align: [] }],
+					["blockquote", "code-block"],
+					[{ list: "ordered" }, { list: "bullet" }],
+					["link", "image"],
+					["clean"],
+				];
+
+				// Implement the image handler
+				const imageHandler = () => {
+					const editor = quillRef.current.getEditor();
+
+					const input = document.createElement("input");
+					input.setAttribute("type", "file");
+					input.setAttribute("accept", "image/*");
+					input.click();
+
+					input.onchange = async () => {
+						const file = input.files ? input.files[0] : null;
+						if (file) {
+							const formData = new FormData();
+							formData.append("image", file);
+
+							try {
+								const response = await axios.post("/api/upload", formData, {
+									headers: {
+										"Content-Type": "multipart/form-data",
+									},
+								});
+								const imageUrl = response.data.url;
+								const range = editor.getSelection();
+								editor.insertEmbed(range.index, "image", imageUrl);
+							} catch (err) {
+								console.error(err);
+							}
+						}
+					};
+				};
+
+				// Set the modules and formats
+				setModules({
+					toolbar: {
+						container: toolbarOptions,
+						handlers: {
+							image: imageHandler,
+						},
+					},
+				});
+
+				setFormats([
+					"font",
+					"header",
+					"bold",
+					"italic",
+					"underline",
+					"strike",
+					"blockquote",
+					"code-block",
+					"color",
+					"background",
+					"list",
+					"bullet",
+					"indent",
+					"link",
+					"image",
+					"align",
+				]);
+
+				// Set ReactQuill after importing
+				setReactQuill(() => RQ);
+			}
+		};
+
+		importEditors();
 	}, []);
 
 	const handleSubmit = async () => {
@@ -134,16 +154,18 @@ const NewsletterWriter: React.FC = () => {
 		}
 	};
 
+	if (!ReactQuill || !modules || formats.length === 0) {
+		// Render a loader or nothing until modules are set
+		return <Spinner />;
+	}
+
 	return (
 		<div>
 			<h1>Compose Newsletter</h1>
-			{/* Rich text editor for newsletter content */}
-			<ReactQuill value={content} onChange={setContent} modules={modules} formats={formats} />
+			<ReactQuill ref={quillRef} value={content} onChange={setContent} modules={modules} formats={formats} />
 			<h2>Select Users</h2>
-			{/* User selection component */}
 			<Select isMulti options={userOptions} value={selectedUsers} onChange={(value) => setSelectedUsers(value as UserOption[])} />
-			{/* Submit button */}
-			<button onClick={handleSubmit}>Send Newsletter</button>
+			<Button onClick={handleSubmit}>Send Newsletter</Button>
 		</div>
 	);
 };
