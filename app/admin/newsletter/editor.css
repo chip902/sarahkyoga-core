@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@media print {
+	body {
+		margin: 0 !important;
+	}
+}
+
+.main-container {
+	font-family: "Lato";
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.ck-content {
+	font-family: "Lato";
+	line-height: 1.6;
+	word-break: break-word;
+}
+
+.editor-container_classic-editor .editor-container__editor {
+	min-width: 795px;
+	max-width: 795px;
+}
+
+.editor-container_include-block-toolbar {
+	margin-left: 42px;
+}
+/* Styles for CKEditor headings */
+.ck-heading_heading1 {
+	font-size: 2.5em;
+	font-weight: bold;
+	color: #333;
+	margin: 20px 0;
+}
+
+.ck-heading_heading2 {
+	font-size: 2em;
+	font-weight: bold;
+	color: #444;
+	margin: 18px 0;
+}
+
+.ck-heading_heading3 {
+	font-size: 1.75em;
+	font-weight: bold;
+	color: #555;
+	margin: 16px 0;
+}
+
+.ck-heading_heading4 {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #666;
+	margin: 14px 0;
+}
+
+.ck-heading_heading5 {
+	font-size: 1.25em;
+	font-weight: bold;
+	color: #777;
+	margin: 12px 0;
+}
+
+.ck-heading_heading6 {
+	font-size: 1em;
+	font-weight: bold;
+	color: #888;
+	margin: 10px 0;
+}

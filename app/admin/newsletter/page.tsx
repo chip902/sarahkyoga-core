@@ -1,11 +1,11 @@
 import React from "react";
-import NewsletterWriter from "./NewsletterComponent";
 import { Container } from "@chakra-ui/react";
+import NewsletterComponent from "./NewsletterComponent";
 
 const Newsletter = () => {
 	return (
-		<Container my="300px" bgColor="white">
-			<NewsletterWriter />
+		<Container my="300px" bgColor="white" padding="10px">
+			<NewsletterComponent />
 		</Container>
 	);
 };
