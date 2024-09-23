@@ -1,6 +1,5 @@
 import React from "react";
 import { Container } from "@chakra-ui/react";
-import NewsletterComponent from "./NewsletterComponent";
 import TextEditor from "./TextEditor";
 
 const Newsletter = () => {
