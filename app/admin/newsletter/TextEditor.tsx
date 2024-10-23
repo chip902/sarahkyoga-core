@@ -1,67 +1,77 @@
 "use client";
+
 import React, { useRef, useState, useEffect } from "react";
 import ContentEditable from "react-contenteditable";
-import { Box, Button, Select, HStack, IconButton, Tooltip } from "@chakra-ui/react";
-import { AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { Box, Button, useToast } from "@chakra-ui/react";
+import { convert } from "html-to-text";
+import TextEditorToolbar from "./TextEditorToolbar";
+import { TextStyle, TextHistory } from "@/types";
+
+const MAX_HISTORY = 100;
 
 export default function TextEditor() {
 	const textEditorRef = useRef<HTMLDivElement>(null);
 	const [text, setText] = useState("");
-	const [fontFamily, setFontFamily] = useState("Quicksand");
-	const [fontSize, setFontSize] = useState(16);
-	const [isBold, setIsBold] = useState(false);
-	const [isItalic, setIsItalic] = useState(false);
-	const [isUnderline, setIsUnderline] = useState(false);
-	const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
+	const [style, setStyle] = useState<TextStyle>({
+		fontFamily: "Quicksand",
+		fontSize: 16,
+		isBold: false,
+		isItalic: false,
+		isUnderline: false,
+		textAlign: "left",
+		textColor: "#000000",
+		backgroundColor: "#ffffff",
+	});
+
+	const [history, setHistory] = useState<TextHistory[]>([]);
+	const [historyIndex, setHistoryIndex] = useState(-1);
+	const toast = useToast();
 
 	useEffect(() => {
-		const saveSelection = () => {
-			const selection = window.getSelection();
-			if (selection?.rangeCount && textEditorRef.current?.contains(selection.anchorNode)) {
-				const range = selection.getRangeAt(0);
-				textEditorRef.current.setAttribute("data-selection-start", String(range.startOffset));
-				textEditorRef.current.setAttribute("data-selection-end", String(range.endOffset));
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+				e.preventDefault();
+				if (e.shiftKey) {
+					handleRedo();
+				} else {
+					handleUndo();
+				}
 			}
 		};
 
-		document.addEventListener("selectionchange", saveSelection);
-		return () => document.removeEventListener("selectionchange", saveSelection);
-	}, []);
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [history, historyIndex]);
 
-	const applyStyleToSelection = (styleProp: string, value: string) => {
-		if (!textEditorRef.current) return;
+	const addToHistory = (content: string) => {
+		const newHistory = history.slice(0, historyIndex + 1);
+		newHistory.push({ content, timestamp: new Date() });
 
-		const selection = window.getSelection();
-		if (!selection?.rangeCount) {
-			// No selection, apply style to cursor position
-			const span = document.createElement("span");
-			span.style[styleProp as any] = value;
-			span.appendChild(document.createTextNode("\u200B")); // Zero-width space
-			insertNodeAtCaret(span);
-		} else {
-			const range = selection.getRangeAt(0);
-			if (textEditorRef.current.contains(range.commonAncestorContainer)) {
-				const span = document.createElement("span");
-				span.style[styleProp as any] = value;
-
-				// Check if the range is collapsed (cursor position)
-				if (range.collapsed) {
-					span.appendChild(document.createTextNode("\u200B")); // Zero-width space
-					range.insertNode(span);
-					range.setStartAfter(span);
-				} else {
-					range.surroundContents(span);
-				}
-
-				selection.removeAllRanges();
-				selection.addRange(range);
-			}
+		if (newHistory.length > MAX_HISTORY) {
+			newHistory.shift();
 		}
 
-		updateText();
+		setHistory(newHistory);
+		setHistoryIndex(newHistory.length - 1);
 	};
 
-	const applyTextAlign = (align: "left" | "center" | "right") => {
+	const handleUndo = () => {
+		if (historyIndex > 0) {
+			const newIndex = historyIndex - 1;
+			setText(history[newIndex].content);
+			setHistoryIndex(newIndex);
+		}
+	};
+
+	const handleRedo = () => {
+		if (historyIndex < history.length - 1) {
+			const newIndex = historyIndex + 1;
+			setText(history[newIndex].content);
+			setHistoryIndex(newIndex);
+		}
+	};
+
+	const applyStyleToSelection = (newStyle: Partial<TextStyle>) => {
 		if (!textEditorRef.current) return;
 
 		const selection = window.getSelection();
@@ -69,146 +79,169 @@ export default function TextEditor() {
 
 		const range = selection.getRangeAt(0);
 		if (textEditorRef.current.contains(range.commonAncestorContainer)) {
-			let currentNode = range.startContainer;
-			while (currentNode !== textEditorRef.current) {
-				if (currentNode.nodeType === Node.ELEMENT_NODE) {
-					(currentNode as HTMLElement).style.textAlign = align;
+			const span = document.createElement("span");
+
+			Object.entries(newStyle).forEach(([key, value]) => {
+				switch (key) {
+					case "fontFamily":
+						if (typeof value === "string") {
+							span.style.fontFamily = value;
+						}
+						break;
+					case "fontSize":
+						if (typeof value === "number") {
+							span.style.fontSize = `${value}px`;
+						}
+						break;
+					case "isBold":
+						if (typeof value === "boolean") {
+							span.style.fontWeight = value ? "bold" : "normal";
+						}
+						break;
+					case "isItalic":
+						if (typeof value === "boolean") {
+							span.style.fontStyle = value ? "italic" : "normal";
+						}
+						break;
+					case "isUnderline":
+						if (typeof value === "boolean") {
+							span.style.textDecoration = value ? "underline" : "none";
+						}
+						break;
+					case "textAlign":
+						if (typeof value === "string") {
+							let node = range.commonAncestorContainer;
+							while (node && node !== textEditorRef.current) {
+								if (node.nodeType === Node.ELEMENT_NODE) {
+									(node as HTMLElement).style.textAlign = value;
+								}
+								node = node.parentNode as Node;
+							}
+						}
+						break;
+					case "textColor":
+						if (typeof value === "string") {
+							span.style.color = value;
+						}
+						break;
+					case "backgroundColor":
+						if (typeof value === "string") {
+							span.style.backgroundColor = value;
+						}
+						break;
 				}
-				currentNode = currentNode.parentNode as Node;
+			});
+
+			if (range.collapsed) {
+				span.appendChild(document.createTextNode("\u200B"));
+				range.insertNode(span);
+				range.setStartAfter(span);
+			} else {
+				range.surroundContents(span);
 			}
-		}
 
-		updateText();
-	};
-
-	const insertNodeAtCaret = (node: Node) => {
-		const selection = window.getSelection();
-		if (selection?.rangeCount) {
-			const range = selection.getRangeAt(0);
-			range.insertNode(node);
-			range.setStartAfter(node);
-			range.setEndAfter(node);
 			selection.removeAllRanges();
 			selection.addRange(range);
+
+			updateText();
 		}
 	};
 
 	const updateText = () => {
 		if (textEditorRef.current) {
-			setText(textEditorRef.current.innerHTML);
+			const newText = textEditorRef.current.innerHTML;
+			setText(newText);
+			addToHistory(newText);
 		}
 	};
 
-	const handleFontFamilyChange = (newFontFamily: string) => {
-		setFontFamily(newFontFamily);
-		applyStyleToSelection("fontFamily", newFontFamily);
-	};
-
-	const handleFontSizeChange = (newFontSize: number) => {
-		setFontSize(newFontSize);
-		applyStyleToSelection("fontSize", `${newFontSize}px`);
-	};
-
-	const toggleStyle = (style: "bold" | "italic" | "underline") => {
-		const styleMap = {
-			bold: { prop: "fontWeight", value: "bold", default: "normal" },
-			italic: { prop: "fontStyle", value: "italic", default: "normal" },
-			underline: { prop: "textDecoration", value: "underline", default: "none" },
-		};
-
-		const { prop, value, default: defaultValue } = styleMap[style];
-		const newState = !eval(`is${style.charAt(0).toUpperCase() + style.slice(1)}`);
-		eval(`setIs${style.charAt(0).toUpperCase() + style.slice(1)}(${newState})`);
-		applyStyleToSelection(prop, newState ? value : defaultValue);
-	};
-
-	const handleTextAlign = (align: "left" | "center" | "right") => {
-		setTextAlign(align);
-		applyTextAlign(align);
+	const handleStyleChange = (newStyle: Partial<TextStyle>) => {
+		setStyle({ ...style, ...newStyle });
+		applyStyleToSelection(newStyle);
 	};
 
 	const handleChange = (evt: React.FormEvent<HTMLDivElement>) => {
-		setText(evt.currentTarget.innerHTML);
+		const newText = evt.currentTarget.innerHTML;
+		setText(newText);
+		addToHistory(newText);
+	};
+
+	const handleCopy = async () => {
+		const plainText = convert(text, {
+			wordwrap: 130,
+			preserveNewlines: true,
+		});
+
+		try {
+			await navigator.clipboard.writeText(plainText);
+			toast({
+				title: "Copied to clipboard",
+				status: "success",
+				duration: 2000,
+			});
+		} catch (err) {
+			toast({
+				title: "Failed to copy",
+				status: "error",
+				duration: 2000,
+			});
+		}
+	};
+
+	const handleClear = () => {
+		setText("");
+		addToHistory("");
+	};
+
+	const handleSave = () => {
+		// TODO: Implement save functionality
+		console.log(text);
+		toast({
+			title: "Content saved",
+			status: "success",
+			duration: 2000,
+		});
 	};
 
 	return (
-		<>
-			<Box>
-				<HStack spacing={4} mb={4}>
-					<Select value={fontFamily} onChange={(e) => handleFontFamilyChange(e.target.value)}>
-						<option value="Arial">Arial</option>
-						<option value="Courier New">Courier New</option>
-						<option value="Quicksand">Quicksand</option>
-						<option value="Times New Roman">Times New Roman</option>
-					</Select>
+		<Box bg="white" p={6} borderRadius="lg" boxShadow="lg">
+			<TextEditorToolbar
+				style={style}
+				onStyleChange={handleStyleChange}
+				onUndo={handleUndo}
+				onRedo={handleRedo}
+				onCopy={handleCopy}
+				onClear={handleClear}
+				canUndo={historyIndex > 0}
+				canRedo={historyIndex < history.length - 1}
+			/>
 
-					<Select value={fontSize} onChange={(e) => handleFontSizeChange(Number(e.target.value))}>
-						{[12, 14, 16, 18, 20, 24, 30].map((size) => (
-							<option key={size} value={size}>
-								{size}
-							</option>
-						))}
-					</Select>
-
-					<Button onClick={() => toggleStyle("bold")} variant={isBold ? "solid" : "ghost"} colorScheme="orange">
-						Bold
-					</Button>
-					<Button onClick={() => toggleStyle("italic")} variant={isItalic ? "solid" : "ghost"} colorScheme="orange">
-						Italic
-					</Button>
-					<Button onClick={() => toggleStyle("underline")} variant={isUnderline ? "solid" : "ghost"} colorScheme="orange">
-						Underline
-					</Button>
-					<Tooltip label="Align Left">
-						<IconButton
-							aria-label="Align Left"
-							icon={<AlignLeft />}
-							onClick={() => handleTextAlign("left")}
-							variant={textAlign === "left" ? "solid" : "ghost"}
-							colorScheme="blue"
-						/>
-					</Tooltip>
-					<Tooltip label="Align Center">
-						<IconButton
-							aria-label="Align Center"
-							icon={<AlignCenter />}
-							onClick={() => handleTextAlign("center")}
-							variant={textAlign === "center" ? "solid" : "ghost"}
-							colorScheme="blue"
-						/>
-					</Tooltip>
-					<Tooltip label="Align Right">
-						<IconButton
-							aria-label="Align Right"
-							icon={<AlignRight />}
-							onClick={() => handleTextAlign("right")}
-							variant={textAlign === "right" ? "solid" : "ghost"}
-							colorScheme="blue"
-						/>
-					</Tooltip>
-				</HStack>
-
+			<Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="md" mt={4}>
 				<ContentEditable
 					html={text}
 					onChange={handleChange}
 					tagName="div"
 					style={{
-						minHeight: "200px",
-						border: "1px solid #ccc",
-						padding: "8px",
+						minHeight: "300px",
+						padding: "16px",
+						outline: "none",
+						backgroundColor: "#ffffff",
+						color: "#000000",
+						fontFamily: style.fontFamily,
+						fontSize: `${style.fontSize}px`,
 					}}
 					innerRef={textEditorRef}
 				/>
-
-				<Button mt={4} colorScheme="blue" onClick={() => console.log(text)}>
-					Save Text
-				</Button>
 			</Box>
 
-			<Box mt={4}>
-				<h2>Preview</h2>
-				<div dangerouslySetInnerHTML={{ __html: text }} />
+			<Button mt={4} colorScheme="blue" onClick={handleSave}>
+				Save Content
+			</Button>
+
+			<Box mt={6} p={4} borderRadius="md" bg="white">
+				<h2 className="text-xl font-semibold mb-2 text-gray-900">Preview</h2>
+				<div className="prose max-w-none text-gray-900 text-editor-content" dangerouslySetInnerHTML={{ __html: text }} />
 			</Box>
-		</>
+		</Box>
 	);
 }
