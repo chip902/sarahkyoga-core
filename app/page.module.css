@@ -169,6 +169,24 @@
 	.logo {
 		filter: invert(1) drop-shadow(0 0 0.3rem #ffffff70);
 	}
+
+	.text-editor-content,
+	.preview-content {
+		color: #000000 !important;
+		background-color: #ffffff !important;
+	}
+
+	.preview-content * {
+		color: #000000 !important;
+	}
+
+	.chakra-select__wrapper,
+	.chakra-button,
+	.chakra-input,
+	.chakra-popover__content {
+		color-scheme: light !important;
+	}
+}
 }
 
 @keyframes rotate {

@@ -18,6 +18,7 @@ model User {
   emailVerified  DateTime?
   password       String?
   role           String?         @default("user")
+  type           String?
   image          String?
   accounts       Account[]
   sessions       Session[]
@@ -43,6 +44,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map(name: "Accounts")
 }
 
 model Session {
@@ -129,11 +131,14 @@ model OrderItem {
 }
 
 model Newsletter {
-  id       Int       @id @default(autoincrement())
-  content  String
-  subject  String?
-  sentDate DateTime?
-  status   Status    @default(DRAFT)
+  id          String    @id @default(cuid())
+  title       String
+  content     String    @db.Text
+  style       Json
+  isDraft     Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
 }
 
 enum Status {

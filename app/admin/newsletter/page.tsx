@@ -1,13 +1,14 @@
-import React from "react";
-import { Container } from "@chakra-ui/react";
-import TextEditor from "./TextEditor";
+"use client";
 
-const Newsletter = () => {
+import NewsletterDashboard from "@/app/components/newsletter/NewsletterDashboard";
+import { Box, Container } from "@chakra-ui/react";
+
+export default function NewsletterPage() {
 	return (
-		<Container my="300px" bgColor="white" padding={9}>
-			<TextEditor />
+		<Container maxW="container.xl" my="300px">
+			<Box bg="white" p={6} borderRadius="lg" shadow="sm">
+				<NewsletterDashboard />
+			</Box>
 		</Container>
 	);
-};
-
-export default Newsletter;
+}

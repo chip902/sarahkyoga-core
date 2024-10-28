@@ -61,8 +61,11 @@ const fontConfig = {
 	},
 };
 
-// Custom theme extensions
 const extension = {
+	config: {
+		initialColorMode: "light",
+		useSystemColorMode: false,
+	},
 	styles: {
 		global: {
 			body: {
@@ -71,6 +74,7 @@ const extension = {
 				backgroundPosition: "center",
 				backgroundRepeat: "no-repeat",
 				fontFamily: "var(--font-quicksand)",
+				color: "grey.800",
 			},
 		},
 		variants: {
@@ -93,101 +97,268 @@ const extension = {
 	},
 };
 
-const buttonLink = {
-	components: {
-		Link: {
-			baseStyle: {
+const components = {
+	Link: {
+		baseStyle: {
+			position: "relative",
+			textDecoration: "none",
+			_hover: {
+				textDecoration: "none",
+			},
+		},
+		variants: {
+			linkNav: {
+				marginX: 5,
+				padding: 1,
+				fontSize: "lg",
 				position: "relative",
 				textDecoration: "none",
 				_hover: {
 					textDecoration: "none",
+					_after: {
+						width: "100%",
+						backgroundColor: "brand.100",
+					},
+				},
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-6px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
 				},
 			},
-			variants: {
-				linkNav: {
-					marginX: 5,
-					padding: 1,
-					fontSize: "lg",
-					position: "relative",
+			inlineNav: {
+				padding: 1,
+				fontSize: "xl",
+				fontWeight: "bold",
+				position: "relative",
+				textDecoration: "none",
+				_hover: {
 					textDecoration: "none",
-					_hover: {
-						textDecoration: "none",
-						_after: {
-							width: "100%",
-							backgroundColor: "brand.100", // Ensuring the color is set on hover
-						},
-					},
 					_after: {
-						content: '""',
-						position: "absolute",
-						width: "0",
-						height: "3px",
-						backgroundColor: "brand.100", // Color of the underline
-						bottom: "-6px", // Adjusted for more spacing from the text
-						left: "0", // Start from the left edge
-						transform: "translateX(0%)", // Adjust transform to start the effect from the left
-						transition: "width 0.3s ease-out",
+						width: "100%",
+						backgroundColor: "brand.100",
+					},
+				},
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-6px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
+				},
+			},
+		},
+	},
+	Button: {
+		variants: {
+			linkNav: {
+				marginX: 5,
+				padding: 1,
+				fontSize: "lg",
+				position: "relative",
+				textDecoration: "none",
+				backgroundColor: "transparent",
+				color: "brand.100",
+				_hover: {
+					backgroundColor: "transparent",
+					textDecoration: "none",
+					_after: {
+						width: "100%",
+						backgroundColor: "brand.100",
+					},
+				},
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-6px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
+				},
+			},
+			inline: {
+				fontSize: "md",
+				fontWeight: "bold",
+				position: "relative",
+				textDecoration: "none",
+				_hover: {
+					textDecoration: "none",
+					_after: {
+						width: "100%",
+						backgroundColor: "brand.100",
+					},
+				},
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-3px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
+				},
+			},
+			outline: {
+				fontSize: "md",
+				color: "white",
+				position: "relative",
+				textDecoration: "none",
+			},
+		},
+	},
+	Tabs: {
+		variants: {
+			enclosed: {
+				tab: {
+					color: "gray.600",
+					bg: "gray.50",
+					borderColor: "gray.200",
+					marginBottom: "-1px",
+					_selected: {
+						color: "brand.100",
+						bg: "white",
+						borderColor: "gray.200",
+						borderBottomColor: "white",
+					},
+					_hover: {
+						color: "brand.100",
+					},
+				},
+				tablist: {
+					borderBottom: "1px solid",
+					borderColor: "gray.200",
+				},
+				tabpanel: {
+					bg: "white",
+					borderX: "1px solid",
+					borderBottom: "1px solid",
+					borderColor: "gray.200",
+					pt: 4,
+				},
+			},
+		},
+	},
+	Input: {
+		variants: {
+			outline: {
+				field: {
+					bg: "white",
+					color: "gray.800",
+					borderColor: "gray.200",
+					_placeholder: {
+						color: "gray.400",
+					},
+					_hover: {
+						borderColor: "gray.300",
+					},
+					_focus: {
+						borderColor: "brand.100",
+						boxShadow: `0 0 0 1px #cc7152`,
 					},
 				},
 			},
 		},
-		Button: {
-			variants: {
-				linkNav: {
-					marginX: 5,
-					padding: 1,
-					fontSize: "lg",
-					position: "relative",
+		defaultProps: {
+			variant: "outline",
+		},
+	},
+	Menu: {
+		baseStyle: {
+			list: {
+				bg: "white",
+				boxShadow: "lg",
+				color: "brand.100",
+				borderRadius: "md",
+				border: "none",
+				padding: 2,
+				minW: "200px",
+			},
+			item: {
+				bg: "transparent",
+				color: "brand.100",
+				_hover: {
+					bg: "gray.50",
+				},
+				_focus: {
+					bg: "gray.50",
+				},
+			},
+		},
+	},
+	Text: {
+		baseStyle: {
+			color: "gray.800",
+		},
+		variants: {
+			linkNav: {
+				marginX: 5,
+				padding: 1,
+				fontSize: "lg",
+				position: "relative",
+				textDecoration: "none",
+				_hover: {
 					textDecoration: "none",
-					_hover: {
-						textDecoration: "none",
-						_after: {
-							width: "100%",
-							backgroundColor: "brand.100", // Ensuring the color is set on hover
-						},
-					},
 					_after: {
-						content: '""',
-						position: "absolute",
-						width: "0",
-						height: "3px",
+						width: "100%",
 						backgroundColor: "brand.100",
-						bottom: "-6px",
-						left: "0",
-						transform: "translateX(0%)",
-						transition: "width 0.3s ease-out",
 					},
 				},
-				inline: {
-					fontSize: "md",
-					position: "relative",
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-6px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
+				},
+			},
+			inline: {
+				fontSize: "md",
+				fontWeight: "bold",
+				position: "relative",
+				textDecoration: "none",
+				_hover: {
 					textDecoration: "none",
-					_hover: {
-						textDecoration: "none",
-						_after: {
-							width: "100%",
-							backgroundColor: "brand.100",
-						},
-					},
 					_after: {
-						content: '""',
-						position: "absolute",
-						width: "0",
-						height: "3px",
+						width: "100%",
 						backgroundColor: "brand.100",
-						bottom: "-3px",
-						left: "0",
-						transform: "translateX(0%)",
-						transition: "width 0.3s ease-out",
 					},
 				},
-				outline: {
-					...extendTheme,
-					fontSize: "md",
-					color: "white",
-					position: "relative",
-					textDecoration: "none",
+				_after: {
+					content: '""',
+					position: "absolute",
+					width: "0",
+					height: "3px",
+					backgroundColor: "brand.100",
+					bottom: "-3px",
+					left: "0",
+					transform: "translateX(0%)",
+					transition: "width 0.3s ease-out",
 				},
+			},
+			outline: {
+				fontSize: "md",
+				color: "white",
+				position: "relative",
+				textDecoration: "none",
 			},
 		},
 	},
@@ -195,7 +366,7 @@ const buttonLink = {
 
 const extendedConfig = extendTheme({
 	...extension,
-	...buttonLink,
+	components,
 	...fontConfig,
 	breakpoints: {
 		sm: "30em",
