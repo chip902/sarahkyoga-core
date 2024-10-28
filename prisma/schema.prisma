@@ -134,11 +134,20 @@ model Newsletter {
   id          String    @id @default(cuid())
   title       String
   content     String    @db.Text
-  style       Json
+  style       Json?
   isDraft     Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   publishedAt DateTime?
+  sentDate    DateTime?
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  active    Boolean  @default(true)
 }
 
 enum Status {

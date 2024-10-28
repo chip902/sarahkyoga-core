@@ -6,6 +6,17 @@ import TextEditor from "../text-editor/TextEditor";
 import NewsletterList from "./NewsletterList";
 import { TextStyle } from "../text-editor/types";
 
+const DEFAULT_STYLE: TextStyle = {
+	fontFamily: "Quicksand",
+	fontSize: 16,
+	isBold: false,
+	isItalic: false,
+	isUnderline: false,
+	textAlign: "left",
+	textColor: "#000000",
+	backgroundColor: "#ffffff",
+};
+
 interface Newsletter {
 	id: string;
 	title: string;
@@ -18,6 +29,7 @@ interface Newsletter {
 const NewsletterDashboard: React.FC = () => {
 	const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
 	const [editingNewsletter, setEditingNewsletter] = useState<Newsletter | null>(null);
+	const [activeTab, setActiveTab] = useState(0);
 	const toast = useToast();
 
 	useEffect(() => {
@@ -33,6 +45,7 @@ const NewsletterDashboard: React.FC = () => {
 				data.map((newsletter: any) => ({
 					...newsletter,
 					createdAt: new Date(newsletter.createdAt),
+					style: newsletter.style || DEFAULT_STYLE,
 				}))
 			);
 		} catch (error) {
@@ -48,8 +61,12 @@ const NewsletterDashboard: React.FC = () => {
 
 	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
 		try {
-			const response = await fetch("/api/newsletter", {
-				method: "POST",
+			const endpoint = editingNewsletter ? `/api/newsletter/${editingNewsletter.id}` : "/api/newsletter";
+
+			const method = editingNewsletter ? "PUT" : "POST";
+
+			const response = await fetch(endpoint, {
+				method,
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					title: data.subject,
@@ -62,8 +79,17 @@ const NewsletterDashboard: React.FC = () => {
 			if (!response.ok) throw new Error("Failed to save newsletter");
 
 			const savedNewsletter = await response.json();
-			savedNewsletter.createdAt = new Date(savedNewsletter.createdAt);
-			setNewsletters([savedNewsletter, ...newsletters]);
+
+			if (editingNewsletter) {
+				setNewsletters(
+					newsletters.map((n) => (n.id === savedNewsletter.id ? { ...savedNewsletter, createdAt: new Date(savedNewsletter.createdAt) } : n))
+				);
+			} else {
+				setNewsletters([{ ...savedNewsletter, createdAt: new Date(savedNewsletter.createdAt) }, ...newsletters]);
+			}
+
+			setEditingNewsletter(null);
+			setActiveTab(data.isDraft ? 2 : 1); // Switch to appropriate tab after saving
 
 			toast({
 				title: `Newsletter ${data.isDraft ? "saved as draft" : "published"}`,
@@ -82,8 +108,47 @@ const NewsletterDashboard: React.FC = () => {
 		}
 	};
 
-	const handleEdit = (newsletter: Newsletter) => {
-		setEditingNewsletter(newsletter);
+	const handleEdit = async (newsletter: Newsletter) => {
+		try {
+			const response = await fetch(`/api/newsletter/${newsletter.id}`);
+			if (!response.ok) throw new Error("Failed to fetch newsletter");
+			const fullNewsletter = await response.json();
+
+			// Ensure we're setting all required fields
+			setEditingNewsletter({
+				...fullNewsletter,
+				createdAt: new Date(fullNewsletter.createdAt),
+				style: fullNewsletter.style || DEFAULT_STYLE,
+				title: fullNewsletter.title || "",
+				content: fullNewsletter.content || "",
+				isDraft: Boolean(fullNewsletter.isDraft),
+			});
+
+			// Force a re-render of the TextEditor by setting activeTab after a short delay
+			setActiveTab(0);
+
+			toast({
+				title: "Newsletter loaded for editing",
+				status: "success",
+				duration: 2000,
+				isClosable: true,
+			});
+		} catch (error) {
+			toast({
+				title: "Error loading newsletter",
+				description: error instanceof Error ? error.message : "Unknown error occurred",
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		}
+	};
+
+	const handleTabChange = (index: number) => {
+		if (index === 0) {
+			setEditingNewsletter(null); // Clear editing state when switching to create tab
+		}
+		setActiveTab(index);
 	};
 
 	return (
@@ -91,26 +156,27 @@ const NewsletterDashboard: React.FC = () => {
 			<Heading mb={6} color="brand.100">
 				Newsletter Dashboard
 			</Heading>
-			<Tabs variant="enclosed">
-				<TabList>
-					<Tab _selected={{ color: "brand.100", bg: "white" }}>Create Newsletter</Tab>
-					<Tab _selected={{ color: "brand.100", bg: "white" }}>Published</Tab>
-					<Tab _selected={{ color: "brand.100", bg: "white" }}>Drafts</Tab>
+			<Tabs index={activeTab} onChange={handleTabChange} variant="enclosed" colorScheme="brand">
+				<TabList mb={4}>
+					<Tab>{editingNewsletter ? "Edit Newsletter" : "Create Newsletter"}</Tab>
+					<Tab>Published</Tab>
+					<Tab>Drafts</Tab>
 				</TabList>
 				<TabPanels>
-					<TabPanel bg="white">
+					<TabPanel>
 						<TextEditor
+							key={editingNewsletter?.id || "new"}
 							onSave={handleSave}
-							initialContent={editingNewsletter?.content}
-							initialStyle={editingNewsletter?.style}
-							initialSubject={editingNewsletter?.title}
+							initialContent={editingNewsletter?.content || ""}
+							initialStyle={editingNewsletter?.style || DEFAULT_STYLE}
+							initialSubject={editingNewsletter?.title || ""}
 							newsletterId={editingNewsletter?.id}
 						/>
 					</TabPanel>
-					<TabPanel bg="white">
+					<TabPanel>
 						<NewsletterList newsletters={newsletters.filter((n) => !n.isDraft)} onEdit={handleEdit} />
 					</TabPanel>
-					<TabPanel bg="white">
+					<TabPanel>
 						<NewsletterList newsletters={newsletters.filter((n) => n.isDraft)} onEdit={handleEdit} />
 					</TabPanel>
 				</TabPanels>

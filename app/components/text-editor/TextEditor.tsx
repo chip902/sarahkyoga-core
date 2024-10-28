@@ -6,6 +6,7 @@ import { Box, Button, Input, HStack, useToast } from "@chakra-ui/react";
 import TextEditorToolbar from "./TextEditorToolbar";
 import { TextStyle, TextHistory } from "./types";
 import { convert } from "html-to-text";
+import PublishConfirmDialog from "../newsletter/PublishConfirmDialoge";
 
 const DEFAULT_STYLE: TextStyle = {
 	fontFamily: "Quicksand",
@@ -36,7 +37,19 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 	const [history, setHistory] = useState<TextHistory[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [isSaving, setIsSaving] = useState(false);
+	const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
 	const toast = useToast();
+
+	useEffect(() => {
+		setContent(initialContent);
+		setSubject(initialSubject);
+		if (textEditorRef.current) {
+			textEditorRef.current.innerHTML = initialContent;
+		}
+		// Reset history when editing a new newsletter
+		setHistory([{ content: initialContent, timestamp: new Date() }]);
+		setHistoryIndex(0);
+	}, [initialContent, initialSubject]);
 
 	useEffect(() => {
 		if (history.length === 0) {
@@ -161,7 +174,10 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 			});
 			return;
 		}
-
+		if (!isDraft) {
+			setIsPublishDialogOpen(true);
+			return;
+		}
 		setIsSaving(true);
 		try {
 			if (onSave) {
@@ -276,6 +292,15 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 					}}
 				/>
 			</Box>
+			<PublishConfirmDialog
+				isOpen={isPublishDialogOpen}
+				onClose={() => setIsPublishDialogOpen(false)}
+				newsletter={{
+					id: newsletterId || "",
+					title: subject,
+				}}
+				onConfirm={() => handleSave(false)}
+			/>
 		</Box>
 	);
 }

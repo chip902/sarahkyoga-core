@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, VStack, useToast } from "@chakra-ui/react";
+import { Box, VStack, useToast } from "@chakra-ui/react";
 import TextEditor from "../text-editor/TextEditor";
 import { TextStyle } from "../text-editor/types";
 
