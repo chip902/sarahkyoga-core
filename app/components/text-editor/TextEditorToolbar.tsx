@@ -11,7 +11,7 @@ const ColorPicker = dynamic(() => import("./ColorPicker"), {
 	ssr: false,
 });
 
-const FONT_FAMILIES = ["Arial", "Courier New", "Georgia", "Quicksand", "Times New Roman"];
+const FONT_FAMILIES = ["Quicksand", "Arial", "Courier New", "Georgia", "Times New Roman"];
 const FONT_SIZES = [12, 14, 16, 18, 20, 24, 30];
 
 interface TextEditorToolbarProps {
@@ -27,13 +27,13 @@ interface TextEditorToolbarProps {
 
 export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo, onCopy, onClear, canUndo, canRedo }: TextEditorToolbarProps) {
 	const getButtonStyles = (isActive: boolean) => ({
-		bg: isActive ? "blue.500" : "gray.100",
+		bg: isActive ? "#cc7152" : "gray.100",
 		color: isActive ? "white" : "gray.800",
 		_hover: {
-			bg: isActive ? "blue.600" : "gray.200",
+			bg: isActive ? "#b86447" : "gray.200",
 		},
 		_active: {
-			bg: isActive ? "blue.700" : "gray.300",
+			bg: isActive ? "#a55a40" : "gray.300",
 		},
 	});
 
@@ -46,7 +46,12 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 					width="150px"
 					size="sm"
 					bg="white"
-					color="gray.800">
+					color="gray.800"
+					borderColor="gray.200"
+					_focus={{
+						borderColor: "#cc7152",
+						boxShadow: "0 0 0 1px #cc7152",
+					}}>
 					{FONT_FAMILIES.map((font) => (
 						<option key={font} value={font}>
 							{font}
@@ -60,7 +65,12 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 					width="80px"
 					size="sm"
 					bg="white"
-					color="gray.800">
+					color="gray.800"
+					borderColor="gray.200"
+					_focus={{
+						borderColor: "#cc7152",
+						boxShadow: "0 0 0 1px #cc7152",
+					}}>
 					{FONT_SIZES.map((size) => (
 						<option key={size} value={size}>
 							{size}

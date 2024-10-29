@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useToast, Box, Button, FormControl, FormLabel, Input, Textarea, VStack } from "@chakra-ui/react";
+import { useToast, Box, Button, FormControl, FormLabel, Input, Textarea, VStack, Heading } from "@chakra-ui/react";
 
 const ContactForm = () => {
 	const toast = useToast();
@@ -66,22 +66,25 @@ const ContactForm = () => {
 	};
 
 	return (
-		<Box p={8} maxW="800px" mx="auto">
+		<Box p={8} maxW="800px" mx="auto" bg="rgba(255, 255, 255, 0.9)">
+			<Heading fontFamily="inherit" color="brand.100">
+				Get in touch
+			</Heading>
 			<form onSubmit={handleSubmit}>
 				<VStack spacing={4}>
 					<FormControl id="name" isRequired>
-						<FormLabel>Name</FormLabel>
+						<FormLabel color="brand.100">Name</FormLabel>
 						<Input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Your Name" />
 					</FormControl>
 					<FormControl id="email" isRequired>
-						<FormLabel>Email</FormLabel>
+						<FormLabel color="brand.100">Email</FormLabel>
 						<Input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Your Email" />
 					</FormControl>
 					<FormControl id="message" isRequired>
-						<FormLabel>Message</FormLabel>
+						<FormLabel color="brand.100">Message</FormLabel>
 						<Textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your Message" />
 					</FormControl>
-					<Button type="submit" variant="outline" size="lg" mt={4}>
+					<Button type="submit" variant="outline" size="lg" mt={4} color="brand.100">
 						Send Message
 					</Button>
 				</VStack>

@@ -7,9 +7,32 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export async function POST(request: Request) {
+	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";
+	const origin =
+		process.env.NODE_ENV === "production"
+			? "https://sarahkyoga.com"
+			: frontendDomain.includes("localhost")
+			? "http://localhost:3001"
+			: `https://${frontendDomain}`;
+	const res = NextResponse.next();
+	res.headers.set("Access-Control-Allow-Origin", origin);
+	res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+	res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+	// Handle OPTIONS request for CORS preflight
+	if (request.method === "OPTIONS") {
+		return new NextResponse(null, { status: 200 });
+	}
 	try {
+		// First, fetch subscribers from the API
+		const subscribersResponse = await fetch("/api/newsletter/subscribers");
+		if (!subscribersResponse.ok) {
+			throw new Error("Failed to fetch subscribers");
+		}
+		const subscribers = await subscribersResponse.json();
+
 		const body = await request.json();
-		const { newsletterId, subscribers } = body;
+		const { newsletterId } = body;
 
 		// Fetch the newsletter
 		const newsletter = await prisma.newsletter.findUnique({
@@ -26,7 +49,7 @@ export async function POST(request: Request) {
 		const emailPromises = subscribers.map((subscriber: string) => {
 			const msg = {
 				to: subscriber,
-				from: process.env.SENDGRID_FROM_EMAIL as string,
+				from: "Sarah K. Yoga",
 				subject: newsletter.title,
 				html: newsletter.content,
 			};

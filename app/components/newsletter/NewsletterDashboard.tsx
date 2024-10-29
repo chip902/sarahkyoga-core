@@ -153,7 +153,7 @@ const NewsletterDashboard: React.FC = () => {
 
 	return (
 		<Box>
-			<Heading mb={6} color="brand.100">
+			<Heading mb={6} color="brand.100" fontFamily={"inherit"}>
 				Newsletter Dashboard
 			</Heading>
 			<Tabs index={activeTab} onChange={handleTabChange} variant="enclosed" colorScheme="brand">

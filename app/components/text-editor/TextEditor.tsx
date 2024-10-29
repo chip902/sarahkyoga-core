@@ -58,6 +58,62 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 		}
 	}, [initialContent]);
 
+	useEffect(() => {
+		// Add paste event listener to handle image centering
+		const handlePaste = (e: ClipboardEvent) => {
+			if (!textEditorRef.current) return;
+
+			const items = e.clipboardData?.items;
+			if (!items) return;
+
+			for (let i = 0; i < items.length; i++) {
+				if (items[i].type.indexOf("image") !== -1) {
+					e.preventDefault();
+					const file = items[i].getAsFile();
+					if (!file) continue;
+
+					const reader = new FileReader();
+					reader.onload = (event) => {
+						const img = document.createElement("img");
+						img.src = event.target?.result as string;
+						img.style.display = "block";
+						img.style.margin = "0 auto";
+						img.style.maxWidth = "100%";
+
+						// Insert the centered image at cursor position
+						const selection = window.getSelection();
+						if (selection && selection.rangeCount > 0) {
+							const range = selection.getRangeAt(0);
+							range.deleteContents();
+							range.insertNode(img);
+							// Move cursor after image
+							range.setStartAfter(img);
+							range.setEndAfter(img);
+							selection.removeAllRanges();
+							selection.addRange(range);
+						} else {
+							textEditorRef.current?.appendChild(img);
+						}
+
+						updateHistory();
+					};
+					reader.readAsDataURL(file);
+				}
+			}
+		};
+
+		const editor = textEditorRef.current;
+		if (editor) {
+			editor.addEventListener("paste", handlePaste);
+		}
+
+		return () => {
+			if (editor) {
+				editor.removeEventListener("paste", handlePaste);
+			}
+		};
+	}, []);
+
 	const updateHistory = () => {
 		if (!textEditorRef.current) return;
 
@@ -175,6 +231,7 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 			return;
 		}
 		if (!isDraft) {
+			setIsSaving(true);
 			setIsPublishDialogOpen(true);
 			return;
 		}
@@ -190,7 +247,7 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 			} else {
 				const endpoint = newsletterId ? `/api/newsletter/${newsletterId}` : "/api/newsletter";
 
-				const method = newsletterId ? "PUT" : "POST";
+				const method = newsletterId ? "PATCH" : "POST";
 
 				const response = await fetch(endpoint, {
 					method,

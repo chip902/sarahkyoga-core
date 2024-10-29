@@ -1,4 +1,5 @@
 // components/Newsletter/PublishConfirmDialog.tsx
+
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Text, VStack, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -24,7 +25,6 @@ export default function PublishConfirmDialog({ isOpen, onClose, newsletter, onCo
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					newsletterId: newsletter.id,
-					subscribers: [], // TODO: Add subscriber list functionality
 				}),
 			});
 
@@ -49,6 +49,7 @@ export default function PublishConfirmDialog({ isOpen, onClose, newsletter, onCo
 				duration: 5000,
 				isClosable: true,
 			});
+			setIsPublishing(false);
 		} finally {
 			setIsPublishing(false);
 			onClose();
@@ -56,7 +57,7 @@ export default function PublishConfirmDialog({ isOpen, onClose, newsletter, onCo
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose}>
+		<Modal isOpen={isOpen} onClose={onClose} colorScheme="brand">
 			<ModalOverlay />
 			<ModalContent>
 				<ModalHeader>Confirm Publication</ModalHeader>

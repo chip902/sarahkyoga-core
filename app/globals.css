@@ -28,6 +28,8 @@ a {
 	padding: 1rem;
 	border: 1px solid #e2e8f0;
 	border-radius: 0.375rem;
+	font-family: "Quicksand", sans-serif !important;
+	font-size: 16px !important;
 }
 
 .text-editor-content[contenteditable="true"] {
@@ -35,8 +37,8 @@ a {
 }
 
 .text-editor-content:focus {
-	border-color: #3182ce;
-	box-shadow: 0 0 0 1px #3182ce;
+	border-color: #cc7152;
+	box-shadow: 0 0 0 1px #cc7152;
 }
 
 .preview-content {
@@ -46,18 +48,63 @@ a {
 	border: 1px solid #e2e8f0;
 	border-radius: 0.375rem;
 	margin-top: 1rem;
+	font-family: "Quicksand", sans-serif !important;
 }
 
 .preview-content * {
 	color: inherit !important;
 }
 
-/* Force light mode for editor components */
-.chakra-select__wrapper,
-.chakra-button,
-.chakra-input,
-.chakra-popover__content {
-	color-scheme: light !important;
+/* Newsletter Modal Specific Styles */
+.chakra-modal__content {
+	background-color: white !important;
+	border-radius: 0.375rem !important;
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+	font-family: "Quicksand", sans-serif !important;
+}
+
+.chakra-modal__header {
+	color: #cc7152 !important;
+	font-size: 24px !important;
+	font-weight: 500 !important;
+	border-bottom: 1px solid #edf2f7 !important;
+	padding-bottom: 1rem !important;
+}
+
+.chakra-modal__body {
+	padding: 1.5rem 1.5rem !important;
+}
+
+.chakra-modal__footer {
+	border-top: 1px solid #edf2f7 !important;
+	padding-top: 1rem !important;
+}
+
+.chakra-modal__close-btn {
+	color: #4a5568 !important;
+}
+
+.chakra-modal__close-btn:hover {
+	color: #1a202c !important;
+}
+
+.chakra-button[data-variant="ghost"] {
+	background-color: transparent !important;
+	color: #4a5568 !important;
+}
+
+.chakra-button[data-variant="ghost"]:hover {
+	background-color: #f7fafc !important;
+}
+
+.chakra-button[data-variant="solid"] {
+	background-color: #cc7152 !important;
+	color: white !important;
+	font-weight: 500 !important;
+}
+
+.chakra-button[data-variant="solid"]:hover {
+	background-color: #b86447 !important;
 }
 
 /* Override any dark mode styles */
@@ -72,10 +119,7 @@ a {
 		color: #000000 !important;
 	}
 
-	.chakra-select__wrapper,
-	.chakra-button,
-	.chakra-input,
-	.chakra-popover__content {
+	.newsletter-modal .chakra-modal__content {
 		color-scheme: light !important;
 	}
 }
