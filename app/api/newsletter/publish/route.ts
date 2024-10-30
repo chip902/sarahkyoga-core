@@ -1,36 +1,26 @@
-// app/api/newsletters/publish/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/prisma/client";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
 export async function POST(request: Request) {
 	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";
-	const origin =
-		process.env.NODE_ENV === "production"
-			? "https://sarahkyoga.com"
-			: frontendDomain.includes("localhost")
-			? "http://localhost:3001"
-			: `https://${frontendDomain}`;
-	const res = NextResponse.next();
-	res.headers.set("Access-Control-Allow-Origin", origin);
-	res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-	res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	const origin = process.env.NODE_ENV === "production" ? "https://sarahkyoga.com" : `http://localhost:3000`;
 
-	// Handle OPTIONS request for CORS preflight
-	if (request.method === "OPTIONS") {
-		return new NextResponse(null, { status: 200 });
-	}
 	try {
 		// First, fetch subscribers from the API
-		const subscribersResponse = await fetch("/api/newsletter/subscribers");
-		if (!subscribersResponse.ok) {
+		const subscribersResponse = await axios.get(`${origin}/api/newsletter/subscribers`);
+		if (!subscribersResponse) {
 			throw new Error("Failed to fetch subscribers");
 		}
-		const subscribers = await subscribersResponse.json();
-
+		const subscribers = await subscribersResponse.data;
+		const res = NextResponse.next();
+		res.headers.set("Access-Control-Allow-Origin", origin);
+		res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		res.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 		const body = await request.json();
 		const { newsletterId } = body;
 
@@ -49,12 +39,17 @@ export async function POST(request: Request) {
 		const emailPromises = subscribers.map((subscriber: string) => {
 			const msg = {
 				to: subscriber,
-				from: "Sarah K. Yoga",
+				from: "Sarah K. Yoga <noreply@sarahkyoga.com>",
 				subject: newsletter.title,
 				html: newsletter.content,
 			};
 
-			return sgMail.send(msg);
+			console.log(`Sending email to: ${subscriber}`); // Add logging statement
+
+			return sgMail.send(msg).catch((error) => {
+				console.error(`Error sending email to ${subscriber}:`, error); // Add logging statement
+				throw error;
+			});
 		});
 
 		await Promise.all(emailPromises);
@@ -70,7 +65,7 @@ export async function POST(request: Request) {
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
-		console.error("Error publishing newsletter:", error);
+		console.error("Error publishing newsletter:", error); // Add logging statement
 		return NextResponse.json({ error: "Failed to publish newsletter" }, { status: 500 });
 	}
 }

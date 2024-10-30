@@ -19,6 +19,22 @@ const DEFAULT_STYLE: TextStyle = {
 	backgroundColor: "#ffffff",
 };
 
+const DEFAULT_CONTENT = `
+
+<style>
+  .container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    text-align: center;
+  }
+</style>
+  <div class="container">
+    <img alt="Logo" src="http://sarahkyoga.com/sky_banner.webp" style="max-width: 100%; height: auto; display: block; margin: auto;">
+    <div><br></div>
+  </div>
+`;
+
 const MAX_HISTORY = 100;
 
 interface TextEditorProps {
@@ -29,7 +45,13 @@ interface TextEditorProps {
 	onSave?: (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => Promise<void>;
 }
 
-export default function TextEditor({ initialContent = "", initialStyle = DEFAULT_STYLE, initialSubject = "", newsletterId, onSave }: TextEditorProps) {
+export default function TextEditor({
+	initialContent = DEFAULT_CONTENT,
+	initialStyle = DEFAULT_STYLE,
+	initialSubject = "",
+	newsletterId,
+	onSave,
+}: TextEditorProps) {
 	const textEditorRef = useRef<HTMLDivElement>(null);
 	const [subject, setSubject] = useState(initialSubject);
 	const [content, setContent] = useState(initialContent);
@@ -247,7 +269,7 @@ export default function TextEditor({ initialContent = "", initialStyle = DEFAULT
 			} else {
 				const endpoint = newsletterId ? `/api/newsletter/${newsletterId}` : "/api/newsletter";
 
-				const method = newsletterId ? "PATCH" : "POST";
+				const method = newsletterId ? "PUT" : "POST";
 
 				const response = await fetch(endpoint, {
 					method,

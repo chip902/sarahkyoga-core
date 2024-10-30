@@ -6,6 +6,7 @@ import { HStack, Select, IconButton, Tooltip, Popover, PopoverTrigger, PopoverCo
 import type { ColorResult } from "react-color";
 import { AlignLeft, AlignCenter, AlignRight, Type, Bold, Italic, Underline, Palette, RotateCcw, RotateCw, Copy, Trash2 } from "lucide-react";
 import { TextStyle } from "./types";
+import { ImageUploadButton } from "./ImageUpload";
 
 const ColorPicker = dynamic(() => import("./ColorPicker"), {
 	ssr: false,
@@ -178,6 +179,10 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 						{...getButtonStyles(false)}
 						opacity={canRedo ? 1 : 0.5}
 					/>
+				</Tooltip>
+
+				<Tooltip label="Upload an Image">
+					<ImageUploadButton />
 				</Tooltip>
 
 				<Tooltip label="Copy">
