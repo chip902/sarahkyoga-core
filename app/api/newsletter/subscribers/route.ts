@@ -8,7 +8,6 @@ export async function GET() {
 				active: true,
 			},
 		});
-		console.log("SUBSCRIBERS ARE: ", subscribers);
 		return NextResponse.json(subscribers.map((sub) => sub.email));
 	} catch (error) {
 		console.error("Error fetching subscribers:", error);

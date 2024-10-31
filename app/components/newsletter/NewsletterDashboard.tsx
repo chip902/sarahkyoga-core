@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Box, Heading, Tabs, TabList, TabPanels, Tab, TabPanel, useToast } from "@chakra-ui/react";
 import TextEditor from "../text-editor/TextEditor";
 import NewsletterList from "./NewsletterList";
@@ -35,11 +35,7 @@ const NewsletterDashboard: React.FC = () => {
 	const [newsletterToDelete, setNewsletterToDelete] = useState<Newsletter | null>(null);
 	const toast = useToast();
 
-	useEffect(() => {
-		fetchNewsletters();
-	}, []);
-
-	const fetchNewsletters = async () => {
+	const fetchNewsletters = useCallback(async () => {
 		try {
 			const response = await fetch("/api/newsletter");
 			if (!response.ok) throw new Error("Failed to fetch newsletters");
@@ -60,7 +56,11 @@ const NewsletterDashboard: React.FC = () => {
 				isClosable: true,
 			});
 		}
-	};
+	}, [toast]);
+
+	useEffect(() => {
+		fetchNewsletters();
+	}, [fetchNewsletters]);
 
 	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
 		try {

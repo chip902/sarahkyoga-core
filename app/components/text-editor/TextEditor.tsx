@@ -81,7 +81,7 @@ export default function TextEditor({
 			setHistory([{ content: initialContent, timestamp: new Date() }]);
 			setHistoryIndex(0);
 		}
-	}, [initialContent]);
+	}, [initialContent, history.length]);
 
 	const updateHistory = () => {
 		if (!textEditorRef.current) return;
