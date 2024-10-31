@@ -3,6 +3,15 @@ import prisma from "@/prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
+export async function GET(request: NextRequest) {
+	try {
+		const users = await prisma.user.findMany();
+		return NextResponse.json(users);
+	} catch (error) {
+		console.error(error);
+		return new NextResponse("Error fetching users", { status: 500 });
+	}
+}
 export async function POST(req: NextRequest) {
 	const body = await req.json();
 

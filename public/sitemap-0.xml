@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://sarahkyoga.com/admin/users</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/auth/logout</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/classes</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/privacy-policy</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/dashboard</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/about</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/register</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/booking</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/auth/login</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com/contact</loc><lastmod>2024-08-23T04:24:51.127Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://sarahkyoga.com</loc><lastmod>2024-08-23T04:24:51.128Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/about</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/admin/newsletter</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/auth/login</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/contact</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/booking</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/classes</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/admin/users</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/api/newsletter/subscribers</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/privacy-policy</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/dashboard</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/auth/logout</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sarahkyoga.com/register</loc><lastmod>2024-10-31T04:33:57.740Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>
