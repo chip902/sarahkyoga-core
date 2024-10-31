@@ -65,7 +65,7 @@ const NewsletterDashboard: React.FC = () => {
 	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
 		try {
 			const endpoint = editingNewsletter ? `/api/newsletter/${editingNewsletter.id}` : "/api/newsletter";
-			const method = editingNewsletter ? "PUT" : "POST";
+			const method = editingNewsletter ? "PATCH" : "POST";
 
 			const response = await fetch(endpoint, {
 				method,

@@ -1,6 +1,7 @@
 // components/Newsletter/PublishConfirmDialog.tsx
 
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Text, VStack, useToast } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface PublishConfirmDialogProps {
@@ -16,6 +17,7 @@ interface PublishConfirmDialogProps {
 export default function PublishConfirmDialog({ isOpen, onClose, newsletter, onConfirm }: PublishConfirmDialogProps) {
 	const [isPublishing, setIsPublishing] = useState(false);
 	const toast = useToast();
+	const router = useRouter();
 
 	const handlePublish = async () => {
 		setIsPublishing(true);
@@ -52,6 +54,7 @@ export default function PublishConfirmDialog({ isOpen, onClose, newsletter, onCo
 			setIsPublishing(false);
 		} finally {
 			setIsPublishing(false);
+			router.push("/admin/newsletter");
 			onClose();
 		}
 	};

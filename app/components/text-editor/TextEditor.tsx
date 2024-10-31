@@ -87,6 +87,7 @@ export default function TextEditor({
 		if (!textEditorRef.current) return;
 
 		const newContent = textEditorRef.current.innerHTML;
+		setContent(newContent);
 		setHistory((prev) => {
 			const newHistory = [...prev.slice(0, historyIndex + 1), { content: newContent, timestamp: new Date() }].slice(-MAX_HISTORY);
 			setHistoryIndex(newHistory.length - 1);
@@ -94,46 +95,46 @@ export default function TextEditor({
 		});
 	};
 
+	const handleChange = (evt: React.FormEvent<HTMLDivElement>) => {
+		const newContent = evt.currentTarget.innerHTML;
+		setContent(newContent);
+		updateHistory();
+	};
+
 	const handleImageInsertion = (imageHtml: string) => {
 		if (!textEditorRef.current) return;
 
 		const selection = window.getSelection();
-		const range = selection?.getRangeAt(0);
-
-		if (range) {
-			// Create a temporary container
+		if (!selection || !selection.rangeCount) {
+			// If no selection, find the content area and append
+			const contentArea = textEditorRef.current.querySelector(".content-area");
+			if (contentArea) {
+				contentArea.innerHTML += imageHtml;
+			} else {
+				textEditorRef.current.innerHTML += imageHtml;
+			}
+		} else {
+			const range = selection.getRangeAt(0);
 			const tempDiv = document.createElement("div");
 			tempDiv.innerHTML = imageHtml.trim();
 
-			// Get the image container
-			const imageContainer = tempDiv.firstChild as Node;
+			const imageContainer = tempDiv.firstChild as HTMLElement;
+			const newParagraph = document.createElement("p");
+			newParagraph.innerHTML = "<br>";
 
-			if (imageContainer) {
-				// Insert at cursor position
-				range.deleteContents();
-				range.insertNode(imageContainer);
+			range.deleteContents();
+			range.insertNode(imageContainer);
+			range.insertNode(newParagraph);
 
-				// Move cursor after the inserted image
-				range.setStartAfter(imageContainer);
-				range.setEndAfter(imageContainer);
-				selection?.removeAllRanges();
-				selection?.addRange(range);
-
-				// Update content and history
-				setContent(textEditorRef.current.innerHTML);
-				updateHistory();
-			}
-		} else {
-			// If no selection, append to the end
-			textEditorRef.current.innerHTML += imageHtml;
-			setContent(textEditorRef.current.innerHTML);
-			updateHistory();
+			range.selectNodeContents(newParagraph);
+			range.collapse(true);
+			selection.removeAllRanges();
+			selection.addRange(range);
 		}
-	};
 
-	const handleChange = (evt: React.FormEvent<HTMLDivElement>) => {
-		setContent(evt.currentTarget.innerHTML);
+		setContent(textEditorRef.current.innerHTML);
 		updateHistory();
+		textEditorRef.current.focus();
 	};
 
 	const handleStyleChange = (newStyle: Partial<TextStyle>) => {
@@ -319,21 +320,13 @@ export default function TextEditor({
 				mt={4}
 				className="editor-container"
 				sx={{
-					".text-editor-content": {
-						minHeight: "400px",
-						padding: "1rem",
+					".newsletter-content": {
+						minHeight: "500px",
 						border: "1px solid",
 						borderColor: "gray.200",
 						borderRadius: "md",
+						padding: "20px",
 						backgroundColor: "white",
-						overflowY: "auto",
-						"& img": {
-							maxWidth: "100%",
-							height: "auto",
-						},
-						"& div": {
-							maxWidth: "100%",
-						},
 					},
 				}}>
 				<ContentEditable
@@ -347,7 +340,7 @@ export default function TextEditor({
 						fontWeight: style.isBold ? "bold" : "normal",
 						fontStyle: style.isItalic ? "italic" : "normal",
 						textDecoration: style.isUnderline ? "underline" : "none",
-						textAlign: style.textAlign,
+						textAlign: style.textAlign as any,
 						color: style.textColor,
 						backgroundColor: style.backgroundColor,
 					}}
@@ -378,12 +371,18 @@ export default function TextEditor({
 
 			<PublishConfirmDialog
 				isOpen={isPublishDialogOpen}
-				onClose={() => setIsPublishDialogOpen(false)}
+				onClose={() => {
+					setIsPublishDialogOpen(false);
+					setIsSaving(false);
+				}}
 				newsletter={{
 					id: newsletterId || "",
 					title: subject,
 				}}
-				onConfirm={() => handleSave(false)}
+				onConfirm={() => {
+					handleSave(false);
+					setIsSaving(false);
+				}}
 			/>
 		</Box>
 	);
