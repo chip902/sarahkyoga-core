@@ -1,29 +1,27 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_PRISMA_URL") // uses connection pooling
-  directUrl = env("DATABASE_URL_NON_POOLING") // uses a direct connection
+  url       = env("DATABASE_PRISMA_URL")
+  directUrl = env("DATABASE_URL_NON_POOLING")
 }
 
 model User {
-  id             String          @id @default(uuid())
-  name           String?
   email          String          @unique
   emailVerified  DateTime?
   password       String?
+  name           String?
+  id             String          @id @default(uuid())
   role           String?         @default("user")
   image          String?
+  type           String?
   accounts       Account[]
-  sessions       Session[]
   authenticators Authenticator[]
-  carts          Cart[] // Relationship with Cart
-  orders         Order[] // Relationship with Order
+  carts          Cart[]
+  orders         Order[]
+  sessions       Session[]
 }
 
 model Account {
@@ -39,19 +37,18 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("Accounts")
 }
 
 model Session {
-  id           Int      @id @default(autoincrement())
   sessionToken String   @unique
-  userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -62,13 +59,11 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Optional for WebAuthn support
 model Authenticator {
   id     Int    @id @default(autoincrement())
-  userId String
   secret String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -76,54 +71,79 @@ model Product {
   name           String
   description    String?
   price          Float
-  duration       Int // In minutes (e.g., 60 or 75)
+  duration       Int
   availableSlots Int
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
+  imageUrl       String
   CartItem       CartItem[]
   OrderItem      OrderItem[]
-  imageUrl       String
 }
 
 model Cart {
   id        String     @id @default(uuid())
   userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
 }
 
 model CartItem {
   id        String   @id @default(uuid())
   cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Order {
   id        String      @id @default(uuid())
   userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     OrderItem[]
   total     Float
-  status    String      @default("pending") // Could be "pending", "paid", "shipped", etc.
+  status    String      @default("pending")
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     OrderItem[]
 }
 
 model OrderItem {
   id        String   @id @default(uuid())
   orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int      @default(1)
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Newsletter {
+  id          String    @id @default(cuid())
+  content     String
+  createdAt   DateTime  @default(now())
+  isDraft     Boolean   @default(true)
+  publishedAt DateTime?
+  style       Json?
+  title       String
+  updatedAt   DateTime  @updatedAt
+  sentDate    DateTime?
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  active    Boolean  @default(true)
+}
+
+enum Status {
+  DRAFT
+  SENT
 }

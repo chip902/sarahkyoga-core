@@ -21,7 +21,7 @@ const Register = () => {
 				name,
 			});
 
-			if (response.status === 200) {
+			if (response.status === 201) {
 				router.push("/auth/login");
 			}
 		} catch (error) {

@@ -60,8 +60,11 @@ const fontConfig = {
 	},
 };
 
-// Custom theme extensions
 const extension = {
+	config: {
+		initialColorMode: "light",
+		useSystemColorMode: false,
+	},
 	styles: {
 		global: {
 			body: {
@@ -70,6 +73,7 @@ const extension = {
 				backgroundPosition: "center",
 				backgroundRepeat: "no-repeat",
 				fontFamily: "var(--font-quicksand)",
+				color: "grey.800",
 			},
 		},
 		variants: {

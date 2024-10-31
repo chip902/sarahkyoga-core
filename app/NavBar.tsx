@@ -147,6 +147,9 @@ const NavBar = () => {
 									<NextLink href="/admin/users" passHref legacyBehavior>
 										<MenuItem>Manage Users</MenuItem>
 									</NextLink>
+									<NextLink href="/admin/newsletter" passHref legacyBehavior>
+										<MenuItem>Newsletter</MenuItem>
+									</NextLink>
 									<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
 								</MenuList>
 							</Menu>
