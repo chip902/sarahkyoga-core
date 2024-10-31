@@ -20,7 +20,6 @@ const DEFAULT_STYLE: TextStyle = {
 };
 
 const DEFAULT_CONTENT = `
-
 <style>
   .container {
     max-width: 600px;
@@ -28,11 +27,16 @@ const DEFAULT_CONTENT = `
     padding: 20px;
     text-align: center;
   }
+  .editor-image {
+    max-width: 100%;
+    display: inline-block;
+    margin: 1em 0;
+  }
 </style>
-  <div class="container">
-    <img alt="Logo" src="http://sarahkyoga.com/sky_banner.webp" style="max-width: 100%; height: auto; display: block; margin: auto;">
-    <div><br></div>
-  </div>
+<div class="container">
+  <img alt="Logo" src="http://sarahkyoga.com/sky_banner.webp" style="max-width: 100%; height: auto; display: block; margin: auto;">
+  <div><br></div>
+</div>
 `;
 
 const MAX_HISTORY = 100;
@@ -68,7 +72,6 @@ export default function TextEditor({
 		if (textEditorRef.current) {
 			textEditorRef.current.innerHTML = initialContent;
 		}
-		// Reset history when editing a new newsletter
 		setHistory([{ content: initialContent, timestamp: new Date() }]);
 		setHistoryIndex(0);
 	}, [initialContent, initialSubject]);
@@ -80,62 +83,6 @@ export default function TextEditor({
 		}
 	}, [initialContent]);
 
-	useEffect(() => {
-		// Add paste event listener to handle image centering
-		const handlePaste = (e: ClipboardEvent) => {
-			if (!textEditorRef.current) return;
-
-			const items = e.clipboardData?.items;
-			if (!items) return;
-
-			for (let i = 0; i < items.length; i++) {
-				if (items[i].type.indexOf("image") !== -1) {
-					e.preventDefault();
-					const file = items[i].getAsFile();
-					if (!file) continue;
-
-					const reader = new FileReader();
-					reader.onload = (event) => {
-						const img = document.createElement("img");
-						img.src = event.target?.result as string;
-						img.style.display = "block";
-						img.style.margin = "0 auto";
-						img.style.maxWidth = "100%";
-
-						// Insert the centered image at cursor position
-						const selection = window.getSelection();
-						if (selection && selection.rangeCount > 0) {
-							const range = selection.getRangeAt(0);
-							range.deleteContents();
-							range.insertNode(img);
-							// Move cursor after image
-							range.setStartAfter(img);
-							range.setEndAfter(img);
-							selection.removeAllRanges();
-							selection.addRange(range);
-						} else {
-							textEditorRef.current?.appendChild(img);
-						}
-
-						updateHistory();
-					};
-					reader.readAsDataURL(file);
-				}
-			}
-		};
-
-		const editor = textEditorRef.current;
-		if (editor) {
-			editor.addEventListener("paste", handlePaste);
-		}
-
-		return () => {
-			if (editor) {
-				editor.removeEventListener("paste", handlePaste);
-			}
-		};
-	}, []);
-
 	const updateHistory = () => {
 		if (!textEditorRef.current) return;
 
@@ -145,6 +92,43 @@ export default function TextEditor({
 			setHistoryIndex(newHistory.length - 1);
 			return newHistory;
 		});
+	};
+
+	const handleImageInsertion = (imageHtml: string) => {
+		if (!textEditorRef.current) return;
+
+		const selection = window.getSelection();
+		const range = selection?.getRangeAt(0);
+
+		if (range) {
+			// Create a temporary container
+			const tempDiv = document.createElement("div");
+			tempDiv.innerHTML = imageHtml.trim();
+
+			// Get the image container
+			const imageContainer = tempDiv.firstChild as Node;
+
+			if (imageContainer) {
+				// Insert at cursor position
+				range.deleteContents();
+				range.insertNode(imageContainer);
+
+				// Move cursor after the inserted image
+				range.setStartAfter(imageContainer);
+				range.setEndAfter(imageContainer);
+				selection?.removeAllRanges();
+				selection?.addRange(range);
+
+				// Update content and history
+				setContent(textEditorRef.current.innerHTML);
+				updateHistory();
+			}
+		} else {
+			// If no selection, append to the end
+			textEditorRef.current.innerHTML += imageHtml;
+			setContent(textEditorRef.current.innerHTML);
+			updateHistory();
+		}
 	};
 
 	const handleChange = (evt: React.FormEvent<HTMLDivElement>) => {
@@ -235,8 +219,8 @@ export default function TextEditor({
 
 	const handleClear = () => {
 		if (textEditorRef.current) {
-			textEditorRef.current.innerHTML = "";
-			setContent("");
+			textEditorRef.current.innerHTML = DEFAULT_CONTENT;
+			setContent(DEFAULT_CONTENT);
 			setStyle(DEFAULT_STYLE);
 			updateHistory();
 		}
@@ -268,7 +252,6 @@ export default function TextEditor({
 				});
 			} else {
 				const endpoint = newsletterId ? `/api/newsletter/${newsletterId}` : "/api/newsletter";
-
 				const method = newsletterId ? "PUT" : "POST";
 
 				const response = await fetch(endpoint, {
@@ -329,9 +312,30 @@ export default function TextEditor({
 				onClear={handleClear}
 				canUndo={historyIndex > 0}
 				canRedo={historyIndex < history.length - 1}
+				onImageInsert={handleImageInsertion}
 			/>
 
-			<Box mt={4}>
+			<Box
+				mt={4}
+				className="editor-container"
+				sx={{
+					".text-editor-content": {
+						minHeight: "400px",
+						padding: "1rem",
+						border: "1px solid",
+						borderColor: "gray.200",
+						borderRadius: "md",
+						backgroundColor: "white",
+						overflowY: "auto",
+						"& img": {
+							maxWidth: "100%",
+							height: "auto",
+						},
+						"& div": {
+							maxWidth: "100%",
+						},
+					},
+				}}>
 				<ContentEditable
 					innerRef={textEditorRef}
 					html={content}
@@ -371,6 +375,7 @@ export default function TextEditor({
 					}}
 				/>
 			</Box>
+
 			<PublishConfirmDialog
 				isOpen={isPublishDialogOpen}
 				onClose={() => setIsPublishDialogOpen(false)}

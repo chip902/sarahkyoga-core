@@ -59,8 +59,16 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 		}
 
 		if (selectedImage) {
-			const alignClass = alignment !== "none" ? `float-${alignment} mr-4 mb-4` : "";
-			const imageHtml = `<img src="${selectedImage}" alt="Uploaded image" class="${alignClass} max-w-full" style="width: ${imageWidth}px;" />`;
+			const alignClass = alignment !== "none" ? `float-${alignment}` : "";
+			const imageHtml = `<div class="image-container" style="text-align: center; margin: 1em 0;" contenteditable="true">
+			<img 
+			  src="${selectedImage}" 
+			  alt="Uploaded image" 
+			  class="${alignClass}" 
+			  style="max-width: 100%; width: ${imageWidth}px; display: inline-block;"
+			/>
+		  </div>`;
+
 			onImageInsert(imageHtml);
 			setIsOpen(false);
 			setSelectedImage(null);

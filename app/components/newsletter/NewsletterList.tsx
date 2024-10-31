@@ -15,9 +15,10 @@ interface Newsletter {
 interface NewsletterListProps {
 	newsletters: Newsletter[];
 	onEdit: (newsletter: Newsletter) => void;
+	onDelete: (newsletter: Newsletter) => void;
 }
 
-const NewsletterList: React.FC<NewsletterListProps> = ({ newsletters, onEdit }) => {
+const NewsletterList: React.FC<NewsletterListProps> = ({ newsletters, onEdit, onDelete }) => {
 	return (
 		<VStack spacing={4} align="stretch">
 			{newsletters.map((newsletter) => (
@@ -36,6 +37,9 @@ const NewsletterList: React.FC<NewsletterListProps> = ({ newsletters, onEdit }) 
 						</Box>
 						<Button colorScheme={newsletter.isDraft ? "blue" : "gray"} onClick={() => onEdit(newsletter)} ml={4}>
 							{newsletter.isDraft ? "Edit" : "View"}
+						</Button>
+						<Button colorScheme={"red"} onClick={() => onDelete(newsletter)} ml={4}>
+							Delete
 						</Button>
 					</Flex>
 				</Box>

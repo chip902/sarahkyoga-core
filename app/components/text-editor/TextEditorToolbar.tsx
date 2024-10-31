@@ -24,9 +24,10 @@ interface TextEditorToolbarProps {
 	onClear: () => void;
 	canUndo: boolean;
 	canRedo: boolean;
+	onImageInsert?: (imageHtml: string) => void;
 }
 
-export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo, onCopy, onClear, canUndo, canRedo }: TextEditorToolbarProps) {
+export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo, onCopy, onClear, canUndo, canRedo, onImageInsert }: TextEditorToolbarProps) {
 	const getButtonStyles = (isActive: boolean) => ({
 		bg: isActive ? "#cc7152" : "gray.100",
 		color: isActive ? "white" : "gray.800",
@@ -182,7 +183,7 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 				</Tooltip>
 
 				<Tooltip label="Upload an Image">
-					<ImageUploadButton />
+					<ImageUploadButton onImageInsert={onImageInsert} />
 				</Tooltip>
 
 				<Tooltip label="Copy">

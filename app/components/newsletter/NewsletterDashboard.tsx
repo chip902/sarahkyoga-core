@@ -5,6 +5,7 @@ import { Box, Heading, Tabs, TabList, TabPanels, Tab, TabPanel, useToast } from 
 import TextEditor from "../text-editor/TextEditor";
 import NewsletterList from "./NewsletterList";
 import { TextStyle } from "../text-editor/types";
+import { DeleteConfirmDialog } from "./DeleteConfirmDialoge";
 
 const DEFAULT_STYLE: TextStyle = {
 	fontFamily: "Quicksand",
@@ -30,6 +31,8 @@ const NewsletterDashboard: React.FC = () => {
 	const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
 	const [editingNewsletter, setEditingNewsletter] = useState<Newsletter | null>(null);
 	const [activeTab, setActiveTab] = useState(0);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [newsletterToDelete, setNewsletterToDelete] = useState<Newsletter | null>(null);
 	const toast = useToast();
 
 	useEffect(() => {
@@ -62,7 +65,6 @@ const NewsletterDashboard: React.FC = () => {
 	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
 		try {
 			const endpoint = editingNewsletter ? `/api/newsletter/${editingNewsletter.id}` : "/api/newsletter";
-
 			const method = editingNewsletter ? "PUT" : "POST";
 
 			const response = await fetch(endpoint, {
@@ -89,7 +91,7 @@ const NewsletterDashboard: React.FC = () => {
 			}
 
 			setEditingNewsletter(null);
-			setActiveTab(data.isDraft ? 2 : 1); // Switch to appropriate tab after saving
+			setActiveTab(data.isDraft ? 2 : 1);
 
 			toast({
 				title: `Newsletter ${data.isDraft ? "saved as draft" : "published"}`,
@@ -114,7 +116,6 @@ const NewsletterDashboard: React.FC = () => {
 			if (!response.ok) throw new Error("Failed to fetch newsletter");
 			const fullNewsletter = await response.json();
 
-			// Ensure we're setting all required fields
 			setEditingNewsletter({
 				...fullNewsletter,
 				createdAt: new Date(fullNewsletter.createdAt),
@@ -124,7 +125,6 @@ const NewsletterDashboard: React.FC = () => {
 				isDraft: Boolean(fullNewsletter.isDraft),
 			});
 
-			// Force a re-render of the TextEditor by setting activeTab after a short delay
 			setActiveTab(0);
 
 			toast({
@@ -144,9 +144,18 @@ const NewsletterDashboard: React.FC = () => {
 		}
 	};
 
+	const handleDelete = (newsletter: Newsletter) => {
+		setNewsletterToDelete(newsletter);
+		setIsDeleteDialogOpen(true);
+	};
+
+	const handleDeleteConfirm = () => {
+		fetchNewsletters();
+	};
+
 	const handleTabChange = (index: number) => {
 		if (index === 0) {
-			setEditingNewsletter(null); // Clear editing state when switching to create tab
+			setEditingNewsletter(null);
 		}
 		setActiveTab(index);
 	};
@@ -174,13 +183,28 @@ const NewsletterDashboard: React.FC = () => {
 						/>
 					</TabPanel>
 					<TabPanel>
-						<NewsletterList newsletters={newsletters.filter((n) => !n.isDraft)} onEdit={handleEdit} />
+						<NewsletterList newsletters={newsletters.filter((n) => !n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
 					</TabPanel>
 					<TabPanel>
-						<NewsletterList newsletters={newsletters.filter((n) => n.isDraft)} onEdit={handleEdit} />
+						<NewsletterList newsletters={newsletters.filter((n) => n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
 					</TabPanel>
 				</TabPanels>
 			</Tabs>
+
+			{newsletterToDelete && (
+				<DeleteConfirmDialog
+					isOpen={isDeleteDialogOpen}
+					onClose={() => {
+						setIsDeleteDialogOpen(false);
+						setNewsletterToDelete(null);
+					}}
+					newsletter={{
+						id: newsletterToDelete.id,
+						title: newsletterToDelete.title,
+					}}
+					onConfirm={handleDeleteConfirm}
+				/>
+			)}
 		</Box>
 	);
 };
