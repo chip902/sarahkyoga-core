@@ -2,19 +2,22 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-import { Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Stack } from "@chakra-ui/react";
+import { Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [name, setName] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
+	const toast = useToast();
 
 	const handleRegister = async (e: any) => {
 		e.preventDefault();
 
 		try {
+			setIsLoading(true);
 			const response = await axios.post("/api/auth/new-user", {
 				email,
 				password,
@@ -22,10 +25,19 @@ const Register = () => {
 			});
 
 			if (response.status === 201) {
-				router.push("/auth/login");
+				setIsLoading(false);
+				router.push("/dashboard");
 			}
 		} catch (error) {
 			console.error(error);
+			toast({
+				title: "Error creating account!",
+				description: (error instanceof Error ? error.message : "Unknown error occurred") + ". Please try again",
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+			setIsLoading(false);
 		}
 	};
 
@@ -53,7 +65,9 @@ const Register = () => {
 
 			<Divider />
 			<Flex direction="row-reverse" py="4" px={{ base: "4", md: "6" }}>
-				<Button type="submit">Submit</Button>
+				<Button type="submit" disabled={isLoading}>
+					Submit{isLoading && <Spinner />}
+				</Button>
 			</Flex>
 		</Container>
 	);

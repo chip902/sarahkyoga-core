@@ -44,8 +44,6 @@ export async function POST(request: Request) {
 				html: newsletter.content,
 			};
 
-			console.log(`Sending email to: ${subscriber}`); // Add logging statement
-
 			return sgMail.send(msg).catch((error) => {
 				console.error(`Error sending email to ${subscriber}:`, error); // Add logging statement
 				throw error;
