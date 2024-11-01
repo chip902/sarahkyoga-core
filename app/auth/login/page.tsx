@@ -82,7 +82,7 @@ const Login = () => {
 					</Stack>
 					<HStack justify="space-between">
 						<Checkbox defaultChecked>Remember me</Checkbox>
-						<Link color="black" href="/forgot-password">
+						<Link color="black" href="/auth/forgot-password">
 							Forgot Password?
 						</Link>
 					</HStack>

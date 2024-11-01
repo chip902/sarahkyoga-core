@@ -9,19 +9,21 @@ datasource db {
 }
 
 model User {
-  email          String          @unique
-  emailVerified  DateTime?
-  password       String?
-  name           String?
-  id             String          @id @default(uuid())
-  role           String?         @default("user")
-  image          String?
-  type           String?
-  accounts       Account[]
-  authenticators Authenticator[]
-  carts          Cart[]
-  orders         Order[]
-  sessions       Session[]
+  email            String          @unique
+  emailVerified    DateTime?
+  password         String?
+  name             String?
+  id               String          @id @default(uuid())
+  role             String?         @default("user")
+  image            String?
+  type             String?
+  resetToken       String?         @unique
+  resetTokenExpiry DateTime?
+  accounts         Account[]
+  authenticators   Authenticator[]
+  carts            Cart[]
+  orders           Order[]
+  sessions         Session[]
 }
 
 model Account {
