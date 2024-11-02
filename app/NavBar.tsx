@@ -31,7 +31,7 @@ import { GiEmptyHourglass } from "react-icons/gi";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import useResponsive from "./components/hooks/useResponsive";
+import useResponsive from "./hooks/useResponsive";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();

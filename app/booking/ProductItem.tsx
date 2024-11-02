@@ -1,43 +1,28 @@
-import { AspectRatio, Flex, Image, Select, Stack, Text, useColorModeValue } from "@chakra-ui/react";
+// ProductItem.tsx
+import { Card, CardHeader, CardBody, CardFooter, Heading, Text } from "@chakra-ui/react";
+import { BookNowButton } from "./BookNow";
 
 interface Product {
 	id: string;
-	name: string;
+	title: string;
+	description: string;
 	price: number;
-	imageUrl: string; // Ensure your database has this field
 }
 
-interface Props {
-	product: Product;
-}
-
-export const ProductItem = (props: Props) => {
-	const { product } = props;
+const ProductItem = ({ product }: { product: Product }) => {
 	return (
-		<Flex justify="space-between" key={product.id}>
-			<Stack direction="row" spacing="5">
-				<AspectRatio ratio={1} width="92px">
-					<Image src={product.imageUrl} alt={product.name} borderRadius="md" />
-				</AspectRatio>
-				<Stack spacing="3">
-					<Stack spacing="1">
-						<Text fontWeight="semibold">{product.name}</Text>
-						<Text color={useColorModeValue("gray.600", "gray.300")}>Size: 20</Text>
-					</Stack>
-					<Select
-						aria-label="Select quantity"
-						maxW="16"
-						size="sm"
-						borderRadius="md"
-						focusBorderColor={useColorModeValue("purple.500", "purple.200")}
-						bg={useColorModeValue("white", "gray.700")}>
-						<option>1</option>
-						<option>2</option>
-						<option>3</option>
-					</Select>
-				</Stack>
-			</Stack>
-			<Text fontWeight="medium">${product.price.toFixed(2)}</Text>
-		</Flex>
+		<Card>
+			<CardHeader>
+				<Heading size="md">{product.title}</Heading>
+			</CardHeader>
+			<CardBody>
+				<Text>{product.description}</Text>
+			</CardBody>
+			<CardFooter>
+				<BookNowButton productId={product.id} />
+			</CardFooter>
+		</Card>
 	);
 };
+
+export default ProductItem;

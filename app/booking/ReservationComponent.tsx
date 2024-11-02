@@ -16,14 +16,19 @@ import {
 	CardHeader,
 	Heading,
 	SimpleGrid,
+	Stack,
+	Flex,
+	Collapse,
+	IconButton,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Calendar } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import Select from "react-select";
-import useCheckAvailability from "../components/hooks/useCheckAvailability";
+import useCheckAvailability from "../hooks/useCheckAvailability";
 import { BookNowButton } from "./BookNow";
+import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
 
 interface IReservationComponentProps {
 	onNext: (availableOptions: string[], dateTime: Date) => void;
@@ -36,6 +41,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	const [zoomAvailable, setZoomAvailable] = useState<string | null>();
 	const [inPersonAvailable, setInPersonAvailable] = useState<string | null>();
 	const { isOpen, onOpen } = useDisclosure();
+	const [showZoomClassInfo, setShowZoomClassInfo] = useState(false);
 	const { checkAvailability, loading, error } = useCheckAvailability();
 	const [dateError, setDateError] = useState<string | null>(null);
 
@@ -61,14 +67,19 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	}, [selectedDate]);
 
 	const handleDateSelect = (date: Date) => {
+		setShowZoomClassInfo(false);
+		if (!date || !(date instanceof Date)) {
+			return;
+		}
+
 		const now = new Date();
 		if (date.getTime() < now.setHours(0, 0, 0, 0)) {
 			setDateError("You cannot select a date in the past.");
 			return;
-		} else {
-			setDateError(null);
-			setSelectedDate(date);
 		}
+		onOpen();
+		setAvailability(null);
+		setSelectedDate(date);
 	};
 
 	const handleNextClick = async () => {
@@ -113,7 +124,39 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			textAlign="center"
 			transition="max-width 0.5s ease-in-out">
 			<VStack spacing={4} alignItems="center" width="100%">
-				<Text fontSize={{ base: "lg", md: "xl" }}>Select your preferred day</Text>
+				<Box as="section" pt={{ base: "4", md: "8" }} pb={{ base: "12", md: "24" }}>
+					<Container>
+						<Box px="4" py="5" bg="brand.700" opacity="0.8" borderRadius="lg">
+							<Flex justifyContent="space-between" alignItems="center">
+								<Stack spacing="1">
+									<Text textStyle="lg" fontWeight="medium" color="brand.200">
+										Looking for my Sunday Zoom Class?
+									</Text>
+									<Collapse in={showZoomClassInfo}>
+										<Text textStyle="sm" color="brand.400">
+											Click below to get on my next Sunday Zoom Class!
+										</Text>
+										<Button bg="brand.600" variant="cta">
+											Reserve Your Spot!
+										</Button>
+									</Collapse>
+								</Stack>
+								<Flex padding={5}>
+									<IconButton
+										size="sm"
+										bg="brand.600"
+										onClick={() => setShowZoomClassInfo(!showZoomClassInfo)}
+										icon={showZoomClassInfo ? <ChevronUpIcon /> : <ChevronDownIcon />}
+										aria-label="Toggle update info"
+									/>
+								</Flex>
+							</Flex>
+						</Box>
+					</Container>
+				</Box>
+				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "xl" }}>
+					Select your preferred day
+				</Heading>
 				<Box width="100%">
 					<Calendar
 						date={selectedDate}
@@ -167,12 +210,16 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 									<SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
 										{/* Conditionally Render the Cards Based on Availability */}
 										{zoomAvailable && (
-											<Card>
+											<Card variant="productCard">
 												<CardHeader>
-													<Heading size="md">60-Min Zoom Session</Heading>
+													<Heading fontFamily="inherit" size="md">
+														60-Min Zoom Session
+													</Heading>
 												</CardHeader>
 												<CardBody>
-													<Text>Get a personalized 60-minute Zoom session for $80.</Text>
+													<Text color="white" fontFamily="inherit">
+														Get a personalized 60-minute Zoom session for $80.
+													</Text>
 												</CardBody>
 												<CardFooter>
 													<BookNowButton productId="0" />
@@ -182,23 +229,31 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 
 										{inPersonAvailable && (
 											<>
-												<Card>
+												<Card variant="productCard">
 													<CardHeader>
-														<Heading size="md">75-Min In-Person (1-2 People)</Heading>
+														<Heading fontFamily="inherit" size="md">
+															75-Min In-Person (1-2 People)
+														</Heading>
 													</CardHeader>
 													<CardBody>
-														<Text>Enjoy a private 75-minute in-person session for $125.</Text>
+														<Text color="white" fontFamily="inherit">
+															Enjoy a private 75-minute in-person session for $125.
+														</Text>
 													</CardBody>
 													<CardFooter>
 														<BookNowButton productId="1" />
 													</CardFooter>
 												</Card>
-												<Card>
+												<Card variant="productCard">
 													<CardHeader>
-														<Heading size="md">75-Min In-Person (3+ People)</Heading>
+														<Heading fontFamily="inherit" size="md">
+															75-Min In-Person (3+ People)
+														</Heading>
 													</CardHeader>
 													<CardBody>
-														<Text>Invite more people for a 75-minute in-person session for $175.</Text>
+														<Text color="white" fontFamily="inherit">
+															Invite more people for a 75-minute in-person session for $175.
+														</Text>
 													</CardBody>
 													<CardFooter>
 														<BookNowButton productId="2" />
@@ -213,9 +268,11 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 					)}
 
 					<HStack spacing={4} mt={4} alignItems="center">
-						<Button colorScheme="teal" isDisabled={!selectedDate || !selectedTime || loading || !!dateError} onClick={handleNextClick}>
-							Check Time
-						</Button>
+						{!availability && (
+							<Button colorScheme="teal" isDisabled={!selectedDate || !selectedTime || loading || !!dateError} onClick={handleNextClick}>
+								Check Time
+							</Button>
+						)}
 					</HStack>
 				</VStack>
 			)}
