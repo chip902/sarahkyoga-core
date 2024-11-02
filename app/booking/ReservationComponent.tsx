@@ -20,6 +20,7 @@ import {
 	Flex,
 	Collapse,
 	IconButton,
+	useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Calendar } from "react-date-range";
@@ -44,6 +45,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	const [showZoomClassInfo, setShowZoomClassInfo] = useState(false);
 	const { checkAvailability, loading, error } = useCheckAvailability();
 	const [dateError, setDateError] = useState<string | null>(null);
+	const toast = useToast();
 
 	// Define the time slots array
 	const timeSlots = Array.from({ length: 10 }, (_, index) => {
@@ -104,7 +106,13 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 				// Call the onNext prop with available options and the selected date/time
 				onNext([zoomAvailability === "Available" ? "Zoom" : "", inPersonAvailability === "Available" ? "In-Person" : ""].filter(Boolean), finalDate);
 			} else {
-				alert("The selected time slot is unavailable for any session.");
+				toast({
+					title: "Availabilty Issue",
+					description: "There are no slots available for the selected date and time. Try another selection.",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
 			}
 		}
 	};
@@ -136,9 +144,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 										<Text textStyle="sm" color="brand.400">
 											Click below to get on my next Sunday Zoom Class!
 										</Text>
-										<Button bg="brand.600" variant="cta">
-											Reserve Your Spot!
-										</Button>
+										<BookNowButton productId="0" />
 									</Collapse>
 								</Stack>
 								<Flex padding={5}>
@@ -188,6 +194,10 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 								...provided,
 								width: "100%",
 								color: "black",
+							}),
+							option: (provided, state) => ({
+								...provided,
+								color: state.isSelected ? "white" : "black", // adjust these colors according to your theme
 							}),
 						}}
 					/>
