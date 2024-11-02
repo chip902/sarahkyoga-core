@@ -1,44 +1,100 @@
 // app/api/cart/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/prisma/client"; // Adjust the path to your Prisma client
 
-export async function POST(req: NextRequest) {
+import { NextResponse } from "next/server";
+import prisma from "@/prisma/client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../../lib/auth"; // Adjust the path to your auth options
+
+export async function POST(request: Request) {
 	try {
+		const { productId } = await request.json();
 		const session = await getServerSession(authOptions);
-		if (!session) {
-			return NextResponse.json({ error: "You must be logged in." }, { status: 401 });
+
+		if (!session || !session.user) {
+			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 		}
 
-		const { productId } = await req.json();
+		const userId = session.user.id;
 
-		// Find or create the user's cart
+		// Get or create the cart for the user
 		let cart = await prisma.cart.findFirst({
-			where: {
-				userId: session.user.id,
-			},
+			where: { userId },
 		});
 
 		if (!cart) {
 			cart = await prisma.cart.create({
 				data: {
-					userId: session.user.id,
+					userId,
 				},
 			});
 		}
 
-		// Add the product to the cart
-		await prisma.cartItem.create({
-			data: {
+		// Check if the product is already in the cart
+		const existingCartItem = await prisma.cartItem.findFirst({
+			where: {
 				cartId: cart.id,
 				productId,
 			},
 		});
 
-		return NextResponse.json({ message: "Product added to cart" });
+		if (existingCartItem) {
+			// If the product is already in the cart, increase the quantity
+			const updatedCartItem = await prisma.cartItem.update({
+				where: {
+					id: existingCartItem.id,
+				},
+				data: {
+					quantity: existingCartItem.quantity + 1,
+				},
+			});
+			return NextResponse.json(updatedCartItem, { status: 200 });
+		} else {
+			// Create a new CartItem
+			const cartItem = await prisma.cartItem.create({
+				data: {
+					cartId: cart.id,
+					productId,
+					quantity: 1,
+				},
+			});
+			return NextResponse.json(cartItem, { status: 200 });
+		}
 	} catch (error) {
-		console.error("Error in /api/cart:", error); // Log the actual error
-		return NextResponse.json({ error: "Failed to add product to cart" }, { status: 500 });
+		console.error("Error adding product to cart:", error);
+		return NextResponse.json({ error: "Error adding product to cart" }, { status: 500 });
+	}
+}
+
+// Add a GET method to fetch cart items
+export async function GET(request: Request) {
+	try {
+		const session = await getServerSession(authOptions);
+
+		if (!session || !session.user) {
+			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+		}
+
+		const userId = session.user.id;
+
+		// Retrieve the user's cart items
+		const cart = await prisma.cart.findFirst({
+			where: { userId },
+			include: {
+				items: {
+					include: {
+						product: true,
+					},
+				},
+			},
+		});
+
+		if (!cart || cart.items.length === 0) {
+			return NextResponse.json({ items: [] }, { status: 200 });
+		}
+
+		return NextResponse.json({ items: cart.items }, { status: 200 });
+	} catch (error) {
+		console.error("Error fetching cart items:", error);
+		return NextResponse.json({ error: "Error fetching cart items" }, { status: 500 });
 	}
 }

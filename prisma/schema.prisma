@@ -73,11 +73,11 @@ model Product {
   name           String
   description    String?
   price          Float
-  duration       Int
-  availableSlots Int
+  duration       Int?
+  availableSlots Int?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
-  imageUrl       String
+  imageUrl       String?
   CartItem       CartItem[]
   OrderItem      OrderItem[]
 }

@@ -1,20 +1,19 @@
 // ProductItem.tsx
 import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Center } from "@chakra-ui/react";
 import { BookNowButton } from "./BookNow";
+import { Product } from "@prisma/client";
 
-interface Product {
-	id: string;
-	title: string;
-	description: string;
-	price: number;
+interface ProductItemProps {
+	product: Product;
+	quantity: number;
 }
 
-const ProductItem = ({ product }: { product: Product }) => {
+const ProductItem = ({ product }: ProductItemProps) => {
 	return (
 		<Card>
 			<Center>
 				<CardHeader>
-					<Heading size="md">{product.title}</Heading>
+					<Heading size="md">{product.name}</Heading>
 				</CardHeader>
 				<CardBody>
 					<Text>{product.description}</Text>
