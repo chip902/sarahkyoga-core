@@ -1,7 +1,7 @@
 "use client";
 import { Button, Divider, Heading, HStack, Icon, Input, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 import { HiOutlineChat, HiOutlineMail, HiOutlinePhone } from "react-icons/hi";
-import { ProductItem } from "../ProductItem";
+import ProductItem from "../ProductItem";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Product } from "@prisma/client";

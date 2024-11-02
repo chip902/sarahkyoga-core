@@ -18,6 +18,7 @@ export const authOptions: NextAuthOptions = {
 				},
 			},
 		}),
+
 		CredentialsProvider({
 			name: "Credentials",
 			credentials: {
@@ -26,25 +27,36 @@ export const authOptions: NextAuthOptions = {
 			},
 			async authorize(credentials) {
 				if (!credentials?.email || !credentials?.password) {
+					console.error("Missing email or password", credentials);
 					throw new Error("Email and password are required");
 				}
 
+				console.log("Received credentials:", credentials);
+
 				const user = await prisma.user.findUnique({
-					where: { email: credentials.email ?? "" },
+					where: { email: credentials.email },
 				});
 
-				if (!user || !user.password || !bcrypt.compareSync(credentials.password, user.password)) {
+				if (user && user.password && bcrypt.compareSync(credentials.password, user.password)) {
+					console.log("Authentication successful for user:", user);
+
+					// Ensuring role is a string
+					return {
+						id: user.id,
+						name: user.name,
+						email: user.email,
+						role: user.role ?? "user",
+					};
+				} else {
+					console.error("Invalid email or password");
 					throw new Error("Invalid email or password");
 				}
-
-				// Ensure role is defined
-				const role = user.role ?? "user";
-				return { ...user, role };
 			},
 		}),
 	],
 	pages: {
 		signIn: "/auth/login",
+		signOut: "/auth/logout",
 	},
 	session: {
 		strategy: "jwt",

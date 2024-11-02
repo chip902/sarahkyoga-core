@@ -1,16 +1,22 @@
 // app/pages/auth/reset-password.tsx
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Box, Button, Input, Text, FormLabel, useToast } from "@chakra-ui/react";
 import useResetPassword from "@/app/hooks/useResetPassword";
 
 const ResetPassword = () => {
 	const router = useRouter();
 	const toast = useToast();
-	const pathname = document.location.pathname; // Use location directly in client component
+	const pathname = useParams()?.token;
+	let parts: string | string[] = [];
 
-	let parts = pathname?.split("/");
+	if (typeof pathname === "string") {
+		parts = pathname.split("/");
+	} else if (Array.isArray(pathname)) {
+		parts = pathname as Array<string>;
+	}
+
 	const token = parts[parts?.length - 1] || "";
 
 	const [newPassword, setNewPassword] = useState("");

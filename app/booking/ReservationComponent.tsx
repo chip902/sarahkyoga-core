@@ -187,6 +187,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 							control: (provided) => ({
 								...provided,
 								width: "100%",
+								color: "black",
 							}),
 						}}
 					/>
