@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import { Button, useToast } from "@chakra-ui/react";
+import { Button, ButtonGroup, useToast } from "@chakra-ui/react";
 
 const addToCart = async (productId: string, toast: any) => {
 	try {
@@ -35,15 +35,22 @@ export const BookNowButton = ({ productId }: { productId: string }) => {
 	const { data: session } = useSession();
 	const toast = useToast();
 
+	if (productId === "0") {
+		return (
+			<Button onClick={() => addToCart(productId, toast)} bg="brand.600" variant="cta">
+				Book Now!
+			</Button>
+		);
+	}
+
 	if (!session) {
 		return (
-			<Button variant="ghost" isDisabled>
+			<Button variant="cta" isDisabled>
 				Login to book
 			</Button>
 		);
 	}
 
-	// Pass the `toast` object to `addToCart`
 	return (
 		<Button onClick={() => addToCart(productId, toast)} bg="brand.600" variant="cta">
 			Book Now

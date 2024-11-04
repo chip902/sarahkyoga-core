@@ -18,3 +18,15 @@ export interface TextHistory {
 	content: string;
 	timestamp: Date;
 }
+
+export interface CartItem {
+	id: string;
+	quantity: number;
+	product: {
+		id: string;
+		name: string;
+		price: number;
+		description?: string;
+		// Add any other product fields you need
+	};
+}

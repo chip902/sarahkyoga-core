@@ -6,6 +6,7 @@ import {
 	AccordionIcon,
 	AccordionItem,
 	AccordionPanel,
+	Badge,
 	Box,
 	Button,
 	Drawer,
@@ -32,6 +33,8 @@ import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import useResponsive from "./hooks/useResponsive";
+import useCart from "./hooks/useCart";
+import { MdShoppingCart } from "react-icons/md";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,6 +42,7 @@ const NavBar = () => {
 	const closeTimeoutRef = useRef<number | null>(null);
 	const { status, data: session } = useSession();
 	const isResponsive = useResponsive();
+	const { cartItemsCount, setCartItemsCount } = useCart();
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -55,6 +59,17 @@ const NavBar = () => {
 
 	const handleSignOut = () => {
 		signOut({ callbackUrl: "/" });
+	};
+
+	const handleCartClick = async () => {
+		try {
+			const response = await fetch("/api/cart");
+			if (!response.ok) throw new Error("Failed to fetch cart items.");
+			const data = await response.json();
+			setCartItemsCount(data.items.length);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	if (!isResponsive) {
@@ -182,6 +197,15 @@ const NavBar = () => {
 								</Button>
 							</NextLink>
 						)}
+						<NextLink href="#">
+							<IconButton aria-label="Shopping cart" onClick={handleCartClick} icon={<MdShoppingCart />}>
+								{cartItemsCount > 0 && (
+									<Badge colorScheme="red" position="absolute" top="-1px" right="-1px">
+										{cartItemsCount}
+									</Badge>
+								)}
+							</IconButton>
+						</NextLink>
 					</Box>
 				</Grid>
 			</Box>

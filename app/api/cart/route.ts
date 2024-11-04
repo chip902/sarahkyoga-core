@@ -1,34 +1,59 @@
 // app/api/cart/route.ts
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../lib/auth"; // Adjust the path to your auth options
-
-export async function POST(request: Request) {
+import { authOptions } from "@/lib/auth";
+import { v4 as uuidv4 } from "uuid";
+import { cookies } from "next/headers";
+export async function POST(request: NextRequest) {
 	try {
 		const { productId } = await request.json();
 		const session = await getServerSession(authOptions);
+		const cookiesStore = cookies();
 
-		if (!session || !session.user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-		}
+		let cart;
 
-		const userId = session.user.id;
+		if (session && session.user) {
+			const userId = session.user.id;
 
-		// Get or create the cart for the user
-		let cart = await prisma.cart.findFirst({
-			where: { userId },
-		});
-
-		if (!cart) {
-			cart = await prisma.cart.create({
-				data: {
-					userId,
-				},
+			// Get or create the cart for the authenticated user
+			cart = await prisma.cart.findFirst({
+				where: { userId },
 			});
+
+			if (!cart) {
+				cart = await prisma.cart.create({
+					data: {
+						userId,
+					},
+				});
+			}
+		} else {
+			// For guest users
+			let cartId = (await cookiesStore).get("cartId")?.value;
+
+			if (!cartId) {
+				// Generate a new cartId and set it in the cookie
+				cartId = uuidv4();
+				(await cookiesStore).set("cartId", cartId, { httpOnly: true, path: "/" });
+			}
+
+			// Get or create the cart for the guest user using cartId
+			cart = await prisma.cart.findFirst({
+				where: { id: cartId },
+			});
+
+			if (!cart) {
+				cart = await prisma.cart.create({
+					data: {
+						id: cartId,
+					},
+				});
+			}
 		}
 
+		// Now, add the item to the cart
 		// Check if the product is already in the cart
 		const existingCartItem = await prisma.cartItem.findFirst({
 			where: {
@@ -66,27 +91,48 @@ export async function POST(request: Request) {
 }
 
 // Add a GET method to fetch cart items
-export async function GET(request: Request) {
+
+export async function GET(request: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
+		const cookiesStore = await cookies();
 
-		if (!session || !session.user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-		}
+		let cart;
 
-		const userId = session.user.id;
+		if (session && session.user) {
+			const userId = session.user.id;
 
-		// Retrieve the user's cart items
-		const cart = await prisma.cart.findFirst({
-			where: { userId },
-			include: {
-				items: {
-					include: {
-						product: true,
+			// Retrieve the user's cart
+			cart = await prisma.cart.findFirst({
+				where: { userId },
+				include: {
+					items: {
+						include: {
+							product: true, // Include product details
+						},
 					},
 				},
-			},
-		});
+			});
+		} else {
+			// For guest users
+			const cartId = cookiesStore.get("cartId")?.value;
+
+			if (!cartId) {
+				return NextResponse.json({ items: [] }, { status: 200 });
+			}
+
+			// Retrieve the guest's cart
+			cart = await prisma.cart.findFirst({
+				where: { id: cartId },
+				include: {
+					items: {
+						include: {
+							product: true, // Include product details
+						},
+					},
+				},
+			});
+		}
 
 		if (!cart || cart.items.length === 0) {
 			return NextResponse.json({ items: [] }, { status: 200 });

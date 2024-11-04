@@ -1,0 +1,239 @@
+"use client";
+
+import { getStripe } from "@/lib/stripe";
+import { useColorModeValue, Box, Heading, Flex, Text, Stack, Divider, FormControl, FormLabel, Input, Button, Checkbox, Skeleton } from "@chakra-ui/react";
+import { CartItem, Product } from "@prisma/client";
+import { Elements } from "@stripe/react-stripe-js";
+import { StripeElementsOptions } from "@stripe/stripe-js";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import PaymentForm from "./PaymentForm";
+
+interface CartItemWithProduct extends CartItem {
+	product: Product;
+}
+
+const CheckoutPage = () => {
+	const { data: session } = useSession();
+	const [regState, setRegState] = useState(false);
+	const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
+	const [registrationData, setRegistrationData] = useState({
+		email: "",
+		password: "",
+		name: "",
+	});
+	const [isLoading, setIsLoading] = useState(false);
+	const [clientSecret, setClientSecret] = useState("");
+	const [billingDetails, setBillingDetails] = useState({
+		name: "",
+		email: "",
+		address: {
+			line1: "",
+			city: "",
+			state: "",
+			postal_code: "",
+			country: "US",
+		},
+	});
+
+	// Fetch cart items and create Payment Intent
+	useEffect(() => {
+		const fetchCartItems = async () => {
+			try {
+				const response = await axios.get("/api/cart");
+				const data: { items: CartItemWithProduct[] } = response.data;
+
+				setCartItems(data.items);
+
+				// Create Payment Intent
+				const total = data.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+				const paymentIntentResponse = await axios.post("/api/payment/intent", {
+					amount: total * 100, // Convert to cents
+				});
+				setClientSecret(paymentIntentResponse.data.clientSecret);
+			} catch (error) {
+				console.error("Error fetching cart items or creating payment intent:", error);
+			}
+		};
+		fetchCartItems();
+	}, []);
+
+	// Calculate total
+	const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+
+	const handlePlaceOrder = async () => {
+		setIsLoading(true);
+		const data = session
+			? {} // No registration data needed
+			: { registrationData }; // Include registration data for guest users
+
+		try {
+			const response = await axios.post("/api/checkout-sessions", data);
+
+			if (response.status === 200) {
+				const { sessionId } = response.data;
+				// Redirect to Stripe Checkout
+				const stripe = await getStripe();
+				await stripe!.redirectToCheckout({ sessionId });
+			} else {
+				console.error("Error creating Stripe Checkout Session");
+			}
+		} catch (error) {
+			console.error("Error placing order:", error);
+		}
+		setIsLoading(false);
+	};
+	// Get the stripePromise from getStripe
+	const stripePromise = getStripe();
+	// Stripe Elements options
+	const options: StripeElementsOptions = {
+		clientSecret,
+	};
+
+	// Styling variables
+	const bgColor = useColorModeValue("white", "brand.600");
+	const boxShadow = useColorModeValue("lg", "dark-lg");
+
+	if (!clientSecret) {
+		return (
+			<Box maxW="800px" mx="auto" my={300} px={4}>
+				<Skeleton w="800px" h="1200px" />
+			</Box>
+		);
+	}
+
+	return (
+		<Box maxW="800px" mx="auto" my={300} px={4}>
+			<Flex direction={{ base: "column", md: "row" }} bg={bgColor} boxShadow={boxShadow} borderRadius="md" p={8}>
+				{/* Order Summary */}
+				<Box flex="1" mr={{ md: 8 }}>
+					<Heading fontFamily="inherit" size="lg" mb={6}>
+						Order Summary
+					</Heading>
+					{cartItems.length > 0 ? (
+						<Stack spacing={4}>
+							{cartItems.map((item) => (
+								<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
+									<Text fontWeight="bold" fontSize="lg">
+										{item.product.name}
+									</Text>
+									<Text>Quantity: {item.quantity}</Text>
+									<Text>Price: ${item.product.price.toFixed(2)} each</Text>
+								</Box>
+							))}
+							<Divider />
+							<Text fontWeight="bold" fontSize="xl">
+								Total: ${total.toFixed(2)}
+							</Text>
+						</Stack>
+					) : (
+						<Text>Your cart is empty.</Text>
+					)}
+				</Box>
+
+				{/* Payment and Billing Details */}
+
+				<Heading fontFamily="inherit" size="md" mb={6}>
+					Billing Details
+				</Heading>
+				<Stack spacing={4}>
+					{/* Billing Address Form */}
+					<FormControl isRequired>
+						<FormLabel fontFamily="inherit">Name</FormLabel>
+						<Input type="text" value={billingDetails.name} onChange={(e) => setBillingDetails({ ...billingDetails, name: e.target.value })} />
+					</FormControl>
+					<FormControl isRequired>
+						<FormLabel fontFamily="inherit">Email</FormLabel>
+						<Input type="email" value={billingDetails.email} onChange={(e) => setBillingDetails({ ...billingDetails, email: e.target.value })} />
+					</FormControl>
+
+					<Checkbox isChecked={regState} onChange={() => setRegState(!regState)}>
+						Would you like to make an account?
+					</Checkbox>
+					{regState && (
+						<FormControl isRequired>
+							<FormLabel>Password</FormLabel>
+							<Input
+								type="password"
+								value={registrationData.password}
+								onChange={(e) =>
+									setRegistrationData({
+										...registrationData,
+										password: e.target.value,
+									})
+								}
+							/>
+						</FormControl>
+					)}
+					<FormControl isRequired>
+						<FormLabel fontFamily="inherit">Address Line 1</FormLabel>
+						<Input
+							type="text"
+							value={billingDetails.address.line1}
+							onChange={(e) =>
+								setBillingDetails({
+									...billingDetails,
+									address: { ...billingDetails.address, line1: e.target.value },
+								})
+							}
+						/>
+					</FormControl>
+					<FormControl>
+						<FormLabel fontFamily="inherit">City</FormLabel>
+						<Input
+							type="text"
+							value={billingDetails.address.city}
+							onChange={(e) =>
+								setBillingDetails({
+									...billingDetails,
+									address: { ...billingDetails.address, city: e.target.value },
+								})
+							}
+						/>
+					</FormControl>
+					<FormControl>
+						<FormLabel fontFamily="inherit">State</FormLabel>
+						<Input
+							type="text"
+							value={billingDetails.address.state}
+							onChange={(e) =>
+								setBillingDetails({
+									...billingDetails,
+									address: { ...billingDetails.address, state: e.target.value },
+								})
+							}
+						/>
+					</FormControl>
+					<FormControl isRequired>
+						<FormLabel fontFamily="inherit">Postal Code</FormLabel>
+						<Input
+							type="text"
+							value={billingDetails.address.postal_code}
+							onChange={(e) =>
+								setBillingDetails({
+									...billingDetails,
+									address: { ...billingDetails.address, postal_code: e.target.value },
+								})
+							}
+						/>
+					</FormControl>
+					{/* Payment Form */}
+					{clientSecret && (
+						<Elements stripe={stripePromise} options={options}>
+							<PaymentForm
+								isLoading={isLoading}
+								setIsLoading={setIsLoading}
+								billingDetails={billingDetails}
+								registrationData={!session ? registrationData : null}
+								clientSecret={clientSecret}
+							/>
+						</Elements>
+					)}
+				</Stack>
+			</Flex>
+		</Box>
+	);
+};
+
+export default CheckoutPage;

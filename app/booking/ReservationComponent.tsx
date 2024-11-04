@@ -197,7 +197,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 							}),
 							option: (provided, state) => ({
 								...provided,
-								color: state.isSelected ? "white" : "black", // adjust these colors according to your theme
+								color: state.isSelected ? "white" : "black",
 							}),
 						}}
 					/>
@@ -228,12 +228,12 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 													</Heading>
 												</CardHeader>
 												<CardBody>
-													<Text color="white" fontFamily="inherit">
+													<Text color="inherit" fontFamily="inherit">
 														Get a personalized 60-minute Zoom session for $80.
 													</Text>
 												</CardBody>
 												<CardFooter>
-													<BookNowButton productId="0" />
+													<BookNowButton productId="1" />
 												</CardFooter>
 											</Card>
 										)}
@@ -247,12 +247,12 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 														</Heading>
 													</CardHeader>
 													<CardBody>
-														<Text color="white" fontFamily="inherit">
+														<Text color="inherit" fontFamily="inherit">
 															Enjoy a private 75-minute in-person session for $125.
 														</Text>
 													</CardBody>
 													<CardFooter>
-														<BookNowButton productId="1" />
+														<BookNowButton productId="2" />
 													</CardFooter>
 												</Card>
 												<Card variant="productCard">
@@ -262,12 +262,12 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 														</Heading>
 													</CardHeader>
 													<CardBody>
-														<Text color="white" fontFamily="inherit">
+														<Text color="inherit" fontFamily="inherit">
 															Invite more people for a 75-minute in-person session for $175.
 														</Text>
 													</CardBody>
 													<CardFooter>
-														<BookNowButton productId="2" />
+														<BookNowButton productId="3" />
 													</CardFooter>
 												</Card>
 											</>
