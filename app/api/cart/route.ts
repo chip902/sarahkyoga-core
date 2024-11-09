@@ -91,19 +91,16 @@ export async function POST(request: NextRequest) {
 }
 
 // Add a GET method to fetch cart items
-
 export async function GET(request: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
 		const cookiesStore = await cookies();
-
-		let cart;
+		let cartItems = []; // Change variable name to 'cartItems' to reflect that it holds an array of items
 
 		if (session && session.user) {
 			const userId = session.user.id;
-
-			// Retrieve the user's cart
-			cart = await prisma.cart.findFirst({
+			// Retrieve all carts for the authenticated user
+			const carts = await prisma.cart.findMany({
 				where: { userId },
 				include: {
 					items: {
@@ -113,16 +110,18 @@ export async function GET(request: NextRequest) {
 					},
 				},
 			});
+
+			// Flatten the carts array into a single array of cart items
+			cartItems = carts.flatMap((cart) => cart.items);
 		} else {
 			// For guest users
 			const cartId = cookiesStore.get("cartId")?.value;
-
 			if (!cartId) {
-				return NextResponse.json({ items: [] }, { status: 200 });
+				return NextResponse.json([], { status: 200 });
 			}
 
-			// Retrieve the guest's cart
-			cart = await prisma.cart.findFirst({
+			// Retrieve all carts for the guest user using cartId
+			const carts = await prisma.cart.findMany({
 				where: { id: cartId },
 				include: {
 					items: {
@@ -132,15 +131,61 @@ export async function GET(request: NextRequest) {
 					},
 				},
 			});
+
+			// Flatten the carts array into a single array of cart items
+			cartItems = carts.flatMap((cart) => cart.items);
 		}
 
-		if (!cart || cart.items.length === 0) {
-			return NextResponse.json({ items: [] }, { status: 200 });
+		if (!cartItems || cartItems.length === 0) {
+			return NextResponse.json([], { status: 200 });
 		}
 
-		return NextResponse.json({ items: cart.items }, { status: 200 });
+		// Return the entire array of cart items in the JSON response
+		return NextResponse.json(cartItems, { status: 200 });
 	} catch (error) {
 		console.error("Error fetching cart items:", error);
 		return NextResponse.json({ error: "Error fetching cart items" }, { status: 500 });
+	}
+}
+
+export async function DELETE(request: NextRequest) {
+	try {
+		const { cartItemId, quantityToDecrease = 1 } = await request.json();
+		// Validate input data here if needed...
+
+		const existingCartItem = await prisma.cartItem.findUnique({
+			where: {
+				id: cartItemId,
+			},
+		});
+
+		if (!existingCartItem) {
+			return NextResponse.json({ error: "Cart item not found" }, { status: 404 });
+		}
+
+		const newQuantity = existingCartItem.quantity - quantityToDecrease;
+		if (newQuantity <= 0) {
+			// Delete cart item if the quantity is less than or equal to zero
+			await prisma.cartItem.delete({
+				where: {
+					id: cartItemId,
+				},
+			});
+			return NextResponse.json({ message: "Cart item removed" }, { status: 200 });
+		} else {
+			// Update cart item quantity
+			const updatedCartItem = await prisma.cartItem.update({
+				where: {
+					id: cartItemId,
+				},
+				data: {
+					quantity: newQuantity,
+				},
+			});
+			return NextResponse.json(updatedCartItem, { status: 200 });
+		}
+	} catch (error) {
+		console.error("Error updating cart item:", error);
+		return NextResponse.json({ error: "Error updating cart item" }, { status: 500 });
 	}
 }

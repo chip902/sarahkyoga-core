@@ -19,14 +19,24 @@ export interface TextHistory {
 	timestamp: Date;
 }
 
+// Extend the CartItem type to include product data
 export interface CartItem {
 	id: string;
+	cartId: string;
+	productId?: string;
 	quantity: number;
-	product: {
-		id: string;
-		name: string;
-		price: number;
-		description?: string;
-		// Add any other product fields you need
-	};
+	createdAt?: Date;
+	updatedAt?: Date;
+	product: Product;
+}
+export interface Product {
+	id: string;
+	name: string;
+	description?: string | null;
+	price: number;
+	duration?: number | null;
+	availableSlots?: number | null;
+	createdAt: Date;
+	updatedAt: Date;
+	imageUrl?: string | null;
 }

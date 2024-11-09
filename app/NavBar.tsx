@@ -35,6 +35,7 @@ import { signOut, useSession } from "next-auth/react";
 import useResponsive from "./hooks/useResponsive";
 import useCart from "./hooks/useCart";
 import { MdShoppingCart } from "react-icons/md";
+import ShoppingCartPopout from "./components/ShoppingCartPopout";
 
 const NavBar = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -42,7 +43,6 @@ const NavBar = () => {
 	const closeTimeoutRef = useRef<number | null>(null);
 	const { status, data: session } = useSession();
 	const isResponsive = useResponsive();
-	const { cartItemsCount, setCartItemsCount } = useCart();
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -61,17 +61,6 @@ const NavBar = () => {
 		signOut({ callbackUrl: "/" });
 	};
 
-	const handleCartClick = async () => {
-		try {
-			const response = await fetch("/api/cart");
-			if (!response.ok) throw new Error("Failed to fetch cart items.");
-			const data = await response.json();
-			setCartItemsCount(data.items.length);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	if (!isResponsive) {
 		return (
 			<Box as="nav" position="fixed" width="100%" zIndex="10" bgColor="#000000" color="brand.100">
@@ -80,7 +69,7 @@ const NavBar = () => {
 					<Box display="flex">
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
-					<Box display="flex" justifyContent="flex-end" alignItems="center">
+					<Box display="flex" justifyContent="flex-end" alignItems="center" px={10}>
 						<NextLink href="/" passHref legacyBehavior>
 							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
@@ -197,7 +186,8 @@ const NavBar = () => {
 								</Button>
 							</NextLink>
 						)}
-						<NextLink href="#">
+						<ShoppingCartPopout />
+						{/* <NextLink href="#">
 							<IconButton aria-label="Shopping cart" onClick={handleCartClick} icon={<MdShoppingCart />}>
 								{cartItemsCount > 0 && (
 									<Badge colorScheme="red" position="absolute" top="-1px" right="-1px">
@@ -205,7 +195,7 @@ const NavBar = () => {
 									</Badge>
 								)}
 							</IconButton>
-						</NextLink>
+						</NextLink> */}
 					</Box>
 				</Grid>
 			</Box>
