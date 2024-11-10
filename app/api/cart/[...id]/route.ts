@@ -190,9 +190,9 @@ export async function PATCH(request: NextRequest) {
 	try {
 		const { cartItemId, quantityToDecrease = 1 } = await request.json();
 		// Validate input data here if needed...
-		const existingCartItem = await prisma.cartItem.findUnique({
+		const existingCartItem = await prisma.cartItem.findFirst({
 			where: {
-				id: cartItemId,
+				cartId: cartItemId,
 			},
 		});
 		if (!existingCartItem) {
@@ -203,7 +203,7 @@ export async function PATCH(request: NextRequest) {
 			// Delete cart item if the quantity is less than or equal to zero
 			await prisma.cartItem.delete({
 				where: {
-					id: cartItemId,
+					id: existingCartItem.id,
 				},
 			});
 			return NextResponse.json({ message: "Cart item removed" }, { status: 201 });
@@ -211,7 +211,7 @@ export async function PATCH(request: NextRequest) {
 			// Update cart item quantity
 			const updatedCartItem = await prisma.cartItem.update({
 				where: {
-					id: cartItemId,
+					id: existingCartItem.id,
 				},
 				data: {
 					quantity: newQuantity,

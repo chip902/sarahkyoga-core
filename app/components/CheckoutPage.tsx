@@ -9,6 +9,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import PaymentForm from "./PaymentForm";
+import useCart from "../hooks/useCart";
 
 interface CartItemWithProduct extends CartItem {
 	product: Product;
@@ -17,7 +18,8 @@ interface CartItemWithProduct extends CartItem {
 const CheckoutPage = () => {
 	const { data: session } = useSession();
 	const [regState, setRegState] = useState(false);
-	const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
+	const { cartItems } = useCart();
+	//const [cartItems, setCartItems] = useState<CartItemWithProduct[]>([]);
 	const [registrationData, setRegistrationData] = useState({
 		email: "",
 		password: "",
@@ -39,51 +41,21 @@ const CheckoutPage = () => {
 
 	// Fetch cart items and create Payment Intent
 	useEffect(() => {
-		const fetchCartItems = async () => {
-			try {
-				const response = await axios.get("/api/cart");
-				const data: { items: CartItemWithProduct[] } = response.data;
-
-				setCartItems(data.items);
-
-				// Create Payment Intent
-				const total = data.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-				const paymentIntentResponse = await axios.post("/api/payment/intent", {
+		if (Array.isArray(cartItems) && cartItems.length > 0) {
+			const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			// Create Payment Intent
+			axios
+				.post("/api/payment/intent", {
 					amount: total * 100, // Convert to cents
-				});
-				setClientSecret(paymentIntentResponse.data.clientSecret);
-			} catch (error) {
-				console.error("Error fetching cart items or creating payment intent:", error);
-			}
-		};
-		fetchCartItems();
-	}, []);
+				})
+				.then((response) => setClientSecret(response.data.clientSecret))
+				.catch((error) => console.error("Error creating payment intent:", error));
+		}
+	}, [cartItems]);
 
 	// Calculate total
-	const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+	const total = cartItems?.length ? cartItems.reduce((acc: number, item: CartItemWithProduct) => acc + item.product.price * item.quantity, 0) : 0;
 
-	const handlePlaceOrder = async () => {
-		setIsLoading(true);
-		const data = session
-			? {} // No registration data needed
-			: { registrationData }; // Include registration data for guest users
-
-		try {
-			const response = await axios.post("/api/checkout-sessions", data);
-
-			if (response.status === 200) {
-				const { sessionId } = response.data;
-				// Redirect to Stripe Checkout
-				const stripe = await getStripe();
-				await stripe!.redirectToCheckout({ sessionId });
-			} else {
-				console.error("Error creating Stripe Checkout Session");
-			}
-		} catch (error) {
-			console.error("Error placing order:", error);
-		}
-		setIsLoading(false);
-	};
 	// Get the stripePromise from getStripe
 	const stripePromise = getStripe();
 	// Stripe Elements options
@@ -113,7 +85,7 @@ const CheckoutPage = () => {
 					</Heading>
 					{cartItems.length > 0 ? (
 						<Stack spacing={4}>
-							{cartItems.map((item) => (
+							{cartItems.map((item: CartItemWithProduct) => (
 								<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
 									<Text fontWeight="bold" fontSize="lg">
 										{item.product.name}

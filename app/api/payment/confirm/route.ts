@@ -3,12 +3,14 @@ import prisma from "@/prisma/client";
 import Stripe from "stripe";
 import bcrypt from "bcryptjs";
 import axios from "axios";
-
+import { cookies } from "next/headers";
+import url from "url";
 export async function POST(request: Request) {
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_DEV!);
+	const cookiesStore = cookies();
 
 	try {
-		const { paymentIntentId, registrationData, clientSecret } = await request.json();
+		const { paymentIntentId, registrationData } = await request.json();
 
 		// Retrieve the Payment Intent to confirm status
 		const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Payment not completed" }, { status: 400 });
 		}
 
-		let userId;
+		let userId, guestCart;
 		if (registrationData) {
 			const { email, password, name } = registrationData;
 
@@ -49,7 +51,7 @@ export async function POST(request: Request) {
 
 		// Retrieve the user's cart and cart items
 		const cart = await prisma.cart.findFirst({
-			where: { userId },
+			where: { userId: userId },
 			include: {
 				items: {
 					include: {
@@ -60,11 +62,24 @@ export async function POST(request: Request) {
 		});
 
 		if (!cart || cart.items.length === 0) {
-			return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+			let cartId = (await cookiesStore).get("cartId")?.value;
+			guestCart = await prisma.cart.findFirst({
+				where: { id: cartId },
+				include: {
+					items: {
+						include: {
+							product: true,
+						},
+					},
+				},
+			});
 		}
 
 		// Create an order
-		const total = cart.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+		const total =
+			cart?.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0) ||
+			guestCart?.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0) ||
+			0;
 
 		if (userId) {
 			await prisma.order.create({
@@ -73,7 +88,7 @@ export async function POST(request: Request) {
 					total,
 					status: "completed",
 					items: {
-						create: cart.items.map((item) => ({
+						create: cart!.items.map((item) => ({
 							productId: item.productId,
 							quantity: item.quantity,
 							price: item.product.price,
@@ -88,10 +103,23 @@ export async function POST(request: Request) {
 		if (!paymentIntentId) {
 			return NextResponse.json({ error: "Payment Intent ID not provided" }, { status: 400 });
 		}
+		// Clear the cart items
+		try {
+			await prisma.cartItem.deleteMany({
+				where: { cartId: cart!.id },
+			});
+		} catch (cartError) {
+			console.error("Failed to clear cart items:", cartError);
+			// Optionally handle the error
+		}
 
 		// Send confirmation email
 		try {
-			const emailResponse = await axios.post("/api/send-email", {
+			const currentUrl = new URL(request?.url || "", "https://sarahkyoga.com");
+			console.log("CURENT_URL VALUE: ", currentUrl);
+			const sendEmailEndpoint = url.resolve(currentUrl.origin, "/api/send-email");
+			console.log("sendEmailEndpoint: ", sendEmailEndpoint);
+			await axios.post(sendEmailEndpoint, {
 				body: JSON.stringify({
 					to: paymentIntent.receipt_email || registrationData?.email,
 					from: "no-reply@sarahkyoga.com",
@@ -102,16 +130,6 @@ export async function POST(request: Request) {
 			});
 		} catch (emailError) {
 			console.error("Failed to send email:", emailError);
-			// Optionally handle the error
-		}
-
-		// Clear the cart items
-		try {
-			await prisma.cartItem.deleteMany({
-				where: { cartId: cart.id },
-			});
-		} catch (cartError) {
-			console.error("Failed to clear cart items:", cartError);
 			// Optionally handle the error
 		}
 

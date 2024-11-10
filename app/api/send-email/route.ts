@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 		process.env.NODE_ENV === "production"
 			? "https://sarahkyoga.com"
 			: frontendDomain.includes("localhost")
-			? "http://localhost:3000"
+			? "http://localhost:3001"
 			: `https://${frontendDomain}`;
 
 	const res = NextResponse.next();

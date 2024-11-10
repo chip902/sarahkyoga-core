@@ -33,8 +33,6 @@ import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import useResponsive from "./hooks/useResponsive";
-import useCart from "./hooks/useCart";
-import { MdShoppingCart } from "react-icons/md";
 import ShoppingCartPopout from "./components/ShoppingCartPopout";
 
 const NavBar = () => {
