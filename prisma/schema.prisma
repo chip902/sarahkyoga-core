@@ -6,21 +6,9 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_PRISMA_URL")
   directUrl = env("DATABASE_URL_NON_POOLING")
-  url       = env("DATABASE_PRISMA_URL")
-  directUrl = env("DATABASE_URL_NON_POOLING")
 }
 
 model User {
-  email            String          @unique
-  emailVerified    DateTime?
-  password         String?
-  name             String?
-  id               String          @id @default(uuid())
-  role             String?         @default("user")
-  image            String?
-  type             String?
-  resetToken       String?         @unique
-  resetTokenExpiry DateTime?
   accounts         Account[]
   authenticators   Authenticator[]
   carts            Cart[]
@@ -36,11 +24,6 @@ model User {
   type             String?
   resetToken       String?         @unique
   resetTokenExpiry DateTime?
-  accounts         Account[]
-  authenticators   Authenticator[]
-  carts            Cart[]
-  orders           Order[]
-  sessions         Session[]
 }
 
 model Account {
@@ -57,21 +40,16 @@ model Account {
   id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@map("Accounts")
   @@map("Accounts")
 }
 
 model Session {
   sessionToken String   @unique
   expires      DateTime
-  sessionToken String   @unique
-  expires      DateTime
   id           Int      @id @default(autoincrement())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -85,7 +63,6 @@ model VerificationToken {
 
 model Authenticator {
   id     Int    @id @default(autoincrement())
-  secret String
   secret String
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
