@@ -8,7 +8,7 @@ dotenv.config();
 
 export async function POST(request: Request) {
 	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";
-	const origin = process.env.NODE_ENV === "production" ? "https://sarahkyoga.com" : `http://localhost:3000`;
+	const origin = process.env.NODE_ENV === "production" ? "https://sarahkyoga.com" : `http://localhost:3001`;
 
 	try {
 		// First, fetch subscribers from the API

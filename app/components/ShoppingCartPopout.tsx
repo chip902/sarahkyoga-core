@@ -3,7 +3,7 @@ import { Popover, PopoverTrigger, PopoverContent, Stack, Box, Text, Button, Badg
 import useCart from "../hooks/useCart";
 import { MdShoppingCart } from "react-icons/md";
 import { useEffect, useState } from "react";
-import { CartItem } from "@/types";
+import { CartItem, ShoppingCartPopoutProps } from "@/types";
 import { QueryClient } from "@tanstack/react-query";
 import NextLink from "next/link";
 
@@ -11,7 +11,7 @@ type LoadingState = {
 	[key: string]: boolean;
 };
 
-const ShoppingCartPopout = () => {
+const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 	const { cartItems, addItemToCart, decreaseQuantity, isLoading } = useCart();
 	const [cartItemsCount, setCartItemsCount] = useState(0);
 	const [loadingStates, setLoadingStates] = useState<LoadingState>({});
@@ -29,7 +29,7 @@ const ShoppingCartPopout = () => {
 
 	return (
 		<Box position="relative">
-			<Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement="bottom-end">
+			<Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement={isResponsive ? "bottom-end" : "right-start"}>
 				<PopoverTrigger>
 					<IconButton aria-label="Shopping cart" icon={<MdShoppingCart />}></IconButton>
 				</PopoverTrigger>

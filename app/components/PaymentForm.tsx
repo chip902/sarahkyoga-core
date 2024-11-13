@@ -12,9 +12,10 @@ interface PaymentFormProps {
 	billingDetails: any;
 	registrationData: any;
 	clientSecret: string;
+	handleError: (error: string | null) => void;
 }
 
-const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData, clientSecret }: PaymentFormProps) => {
+const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData, clientSecret, handleError }: PaymentFormProps) => {
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
@@ -30,37 +31,49 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 
 		const cardElement = elements.getElement(CardElement);
 
-		const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-			payment_method: {
-				card: cardElement!,
-				billing_details: {
-					name: billingDetails.name,
-					email: billingDetails.email,
-					address: billingDetails.address,
+		try {
+			const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+				payment_method: {
+					card: cardElement!,
+					billing_details: {
+						name: billingDetails.name,
+						email: billingDetails.email,
+						address: billingDetails.address,
+					},
 				},
-			},
-		});
+			});
 
-		if (error) {
-			console.error("Payment error:", error);
+			if (error) {
+				console.error("Payment error:", error);
+				handleError(`Payment Error: ${error.message}`);
+			}
+			// } else if (paymentIntent && paymentIntent.status === "succeeded") {
+			// 	// Handle successful payment here
+			// 	try {
+			// 		let response;
+			// 		if (registrationData.password) {
+			// 			response = await axios.post("/api/payment/confirm", {
+			// 				paymentIntentId: paymentIntent.id,
+			// 				registrationData,
+			// 				clientSecret,
+			// 			});
+			// 		} else {
+			// 			response = await axios.post("/api/payment/confirm", {
+			// 				paymentIntentId: paymentIntent.id,
+			// 				clientSecret,
+			// 			});
+			// 		}
+			// 		// use the response as needed...
+			// 	} catch (err) {
+			// 		console.error("API Error:", err);
+			// 		handleError(`Server Error - Payment Confirmation Failed: ${err}`);
+			// 	}
+			// }
+		} catch (error) {
+			console.error("Stripe confirmation error:", error);
+			handleError(`Stripe Payment Confirmation Failed: ${error}`);
+		} finally {
 			setIsLoading(false);
-		} else if (paymentIntent && paymentIntent.status === "succeeded" && registrationData.password) {
-			// Handle successful payment here
-			await axios.post("/api/payment/confirm", {
-				paymentIntentId: paymentIntent.id,
-				registrationData,
-				clientSecret,
-			});
-
-			// Redirect or display success message
-			router.push("/booking/success");
-		} else if (paymentIntent && paymentIntent.status === "succeeded") {
-			await axios.post("/api/payment/confirm", {
-				paymentIntentId: paymentIntent.id,
-				clientSecret,
-			});
-
-			// Redirect or display success message
 			router.push("/booking/success");
 		}
 	};

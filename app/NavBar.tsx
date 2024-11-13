@@ -6,7 +6,6 @@ import {
 	AccordionIcon,
 	AccordionItem,
 	AccordionPanel,
-	Badge,
 	Box,
 	Button,
 	Drawer,
@@ -32,15 +31,17 @@ import { GiEmptyHourglass } from "react-icons/gi";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import useResponsive from "./hooks/useResponsive";
 import ShoppingCartPopout from "./components/ShoppingCartPopout";
 
-const NavBar = () => {
+interface NavBarProps {
+	isResponsive: boolean;
+}
+
+const NavBar = ({ isResponsive }: NavBarProps) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
 	const { status, data: session } = useSession();
-	const isResponsive = useResponsive();
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -184,16 +185,7 @@ const NavBar = () => {
 								</Button>
 							</NextLink>
 						)}
-						<ShoppingCartPopout />
-						{/* <NextLink href="#">
-							<IconButton aria-label="Shopping cart" onClick={handleCartClick} icon={<MdShoppingCart />}>
-								{cartItemsCount > 0 && (
-									<Badge colorScheme="red" position="absolute" top="-1px" right="-1px">
-										{cartItemsCount}
-									</Badge>
-								)}
-							</IconButton>
-						</NextLink> */}
+						<ShoppingCartPopout isResponsive={isResponsive} />
 					</Box>
 				</Grid>
 			</Box>

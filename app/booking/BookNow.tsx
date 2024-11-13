@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { useState } from "react";
 import { Button, Spinner, useToast } from "@chakra-ui/react";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const addToCart = async (productId: string, toast: any) => {
 	try {

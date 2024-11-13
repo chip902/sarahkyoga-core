@@ -40,3 +40,6 @@ export interface Product {
 	updatedAt: Date;
 	imageUrl?: string | null;
 }
+export interface ShoppingCartPopoutProps {
+	isResponsive: boolean;
+}
