@@ -65,10 +65,6 @@ const extension = {
 		initialColorMode: "light",
 		useSystemColorMode: false,
 	},
-	config: {
-		initialColorMode: "light",
-		useSystemColorMode: false,
-	},
 	styles: {
 		global: {
 			body: {
@@ -77,7 +73,6 @@ const extension = {
 				backgroundPosition: "center",
 				backgroundRepeat: "no-repeat",
 				fontFamily: "var(--font-quicksand)",
-				color: "grey.800",
 				color: "grey.800",
 			},
 		},
@@ -400,7 +395,6 @@ const components = {
 
 const extendedConfig = extendTheme({
 	...extension,
-	components,
 	components,
 	...fontConfig,
 	breakpoints: {
