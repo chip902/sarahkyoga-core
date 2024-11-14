@@ -14,7 +14,6 @@ import {
 	Input,
 	Checkbox,
 	Skeleton,
-	Center,
 	Container,
 	useToast,
 } from "@chakra-ui/react";
@@ -47,7 +46,8 @@ const CheckoutPage = () => {
 
 	const [clientSecret, setClientSecret] = useState("");
 	const [billingDetails, setBillingDetails] = useState({
-		name: "",
+		firstName: "",
+		lastName: "",
 		email: "",
 		address: {
 			line1: "",
@@ -134,16 +134,24 @@ const CheckoutPage = () => {
 					</Heading>
 					<Stack spacing={4}>
 						{/* Billing Address Form */}
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl isRequired>
-								<FormLabel fontFamily="inherit">Name</FormLabel>
+						<Flex mb={{ base: 4, md: 2 }} justifyContent="space-between">
+							<FormControl isRequired width="50%" mr={2}>
+								<FormLabel fontFamily="inherit">First Name</FormLabel>
 								<Input
 									type="text"
-									value={billingDetails.name}
-									onChange={(e) => setBillingDetails({ ...billingDetails, name: e.target.value })}
+									value={billingDetails.firstName}
+									onChange={(e) => setBillingDetails({ ...billingDetails, firstName: e.target.value })}
 								/>
 							</FormControl>
-						</Box>
+							<FormControl isRequired width="50%" ml={2}>
+								<FormLabel fontFamily="inherit">Last Name</FormLabel>
+								<Input
+									type="text"
+									value={billingDetails.lastName}
+									onChange={(e) => setBillingDetails({ ...billingDetails, lastName: e.target.value })}
+								/>
+							</FormControl>
+						</Flex>
 						<Box mb={{ base: 4, md: 2 }}>
 							<FormControl isRequired>
 								<FormLabel fontFamily="inherit">Email</FormLabel>

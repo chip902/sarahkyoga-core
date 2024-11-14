@@ -150,42 +150,56 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
 	try {
-		const { cartItemId, quantityToDecrease = 1 } = await request.json();
-		// Validate input data here if needed...
-		const existingCartItem = await prisma.cartItem.findUnique({
-			where: {
-				id: cartItemId,
-			},
-		});
-		if (!existingCartItem) {
-			return NextResponse.json({ error: "Cart item not found" }, { status: 404 });
-		}
-		const newQuantity = existingCartItem.quantity - quantityToDecrease;
-		if (newQuantity <= 0) {
-			// Delete cart item if the quantity is less than or equal to zero
-			await prisma.cartItem.delete({
+		const session = await getServerSession(authOptions);
+		const cookiesStore = await cookies();
+		let cart;
+		if (session && session.user) {
+			const userId = session.user.id;
+
+			// Get or create the cart for the authenticated user
+			cart = await prisma.cart.findFirst({
+				where: { userId },
+			});
+
+			await prisma.cart.deleteMany({
 				where: {
-					id: cartItemId,
+					userId,
 				},
 			});
-			return NextResponse.json({ message: "Cart item removed" }, { status: 201 });
 		} else {
-			// Update cart item quantity
-			const updatedCartItem = await prisma.cartItem.update({
+			// For guest users
+			let cartId = (await cookiesStore).get("cartId")?.value;
+
+			await prisma.cart.delete({
 				where: {
-					id: cartItemId,
-				},
-				data: {
-					quantity: newQuantity,
+					id: cartId,
 				},
 			});
-			return NextResponse.json(updatedCartItem, { status: 200 });
+		}
+
+		const url = new URL(request.url);
+		if (url.searchParams.has("cartItemId")) {
+			// Delete a single CartItem from the cart based on cartItemId
+			const cartItemId = url.searchParams.get("cartItemId") || undefined;
+			const deletionResult = await prisma.cartItem.delete({
+				where: { id: cartItemId },
+			});
+			return new Response(JSON.stringify({ message: "Cart item removed", deletedItemsCount: deletionResult ? 1 : 0 }), { status: 201 });
+		} else {
+			// Correctly fetch cartId value from URL search params
+			const cartId = url.searchParams.get("cartId") || undefined;
+			// Delete all CartItems associated with a specific cartId
+			if (!cartId) {
+				return new Response(JSON.stringify({ error: "Missing cartId" }), { status: 400 });
+			}
+			const deletionResult = await prisma.cartItem.deleteMany({ where: { cartId } });
+			return new Response(JSON.stringify({ message: "Cart cleared", deletedItemsCount: deletionResult.count }), { status: 201 });
 		}
 	} catch (error) {
-		console.error("Error updating cart item:", error);
-		return NextResponse.json({ error: "Error updating cart item" }, { status: 500 });
+		return new Response(JSON.stringify({ error: "Error occurred while clearing cart" }), { status: 500 });
 	}
 }
+
 export async function PATCH(request: NextRequest) {
 	try {
 		const { cartItemId, quantityToDecrease = 1 } = await request.json();

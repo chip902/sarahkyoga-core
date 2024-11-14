@@ -70,7 +70,8 @@ const authOptions: NextAuthOptions = {
 					// Ensuring role is a string
 					return {
 						id: user.id,
-						name: user.name,
+						firstName: user.firstName,
+						lastName: user.lastName,
 						email: user.email,
 						role: user.role ?? "user",
 					};
@@ -114,7 +115,6 @@ const authOptions: NextAuthOptions = {
 				if (!existingUser) {
 					await prisma.user.create({
 						data: {
-							name: user.name,
 							email: user.email,
 							image: user.image ?? undefined,
 							role: user.role ?? "user",

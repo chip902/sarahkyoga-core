@@ -5,13 +5,14 @@ import bcrypt from "bcryptjs";
 import axios from "axios";
 import { cookies } from "next/headers";
 import url from "url";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_DEV!);
 	const cookiesStore = cookies();
 
 	try {
-		const { paymentIntentId, registrationData } = await request.json();
+		const { paymentIntentId, registrationData, billingDetails } = await request.json();
 
 		// Retrieve the Payment Intent to confirm status
 		const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -19,11 +20,12 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Payment not completed" }, { status: 400 });
 		}
 
-		let userId: string | null = null;
+		let userId = uuidv4();
 		let cartId: string | null = null;
 
 		// Check if the email is already registered
 		let existingUser;
+
 		try {
 			existingUser = await prisma.user.findUnique({ where: { email: registrationData?.email } });
 		} catch (err) {
@@ -31,30 +33,33 @@ export async function POST(request: Request) {
 		}
 
 		if (existingUser) {
-			return NextResponse.json({ warning: "Email is already registered" }, { status: 200 });
-		}
+			//return NextResponse.json({ warning: "Email is already registered" }, { status: 401 });
+		} else if (registrationData.password) {
+			// Hash the password
+			const hashedPassword = await bcrypt.hash(registrationData?.password, 10);
 
-		// Hash the password
-		const hashedPassword = await bcrypt.hash(registrationData?.password, 10);
+			// Create a new user
+			const newUser = await prisma.user.create({
+				data: {
+					email: registrationData?.email,
+					password: hashedPassword,
+					firstName: registrationData?.firstName,
+					lastName: registrationData?.lastName,
+				},
+			});
 
-		// Create a new user
-		const newUser = await prisma.user.create({
-			data: {
-				email: registrationData?.email,
-				password: hashedPassword,
-				name: registrationData?.name,
-			},
-		});
-
-		userId = newUser.id;
-
-		// Retrieve the user ID from paymentIntent metadata or session
-		if (!userId) {
-			try {
-				userId = paymentIntent.metadata.userId;
-			} catch (err) {
-				console.error("Failed to retrieve user ID from paymentIntent metadata", err);
-			}
+			userId = newUser.id;
+		} else {
+			// GUEST USER
+			const anonymousUserId = uuidv4();
+			const guestUser = await prisma.user.create({
+				data: {
+					id: anonymousUserId,
+					email: billingDetails.email,
+					role: "guest",
+				},
+			});
+			userId = guestUser.id;
 		}
 
 		// Get the cart ID from the cookie
@@ -96,15 +101,6 @@ export async function POST(request: Request) {
 				return NextResponse.json({ error: "Order not created" }, { status: 500 });
 			}
 
-			// Clear the cart items
-			try {
-				await prisma.cartItem.deleteMany({
-					where: { id: { in: cartItems.map((item) => item.id) } },
-				});
-			} catch (err) {
-				console.error("Failed to clear cart items", err);
-			}
-
 			// Send confirmation email
 			try {
 				const currentUrl = new URL(request?.url || "", "https://sarahkyoga.com");
@@ -123,7 +119,7 @@ export async function POST(request: Request) {
 				console.error("Failed to send email", emailError);
 			}
 
-			return NextResponse.json({ message: "Payment confirmed and order created" }, { status: 200 });
+			return NextResponse.json({ message: "Payment confirmed and order created", cartId: cartId }, { status: 201 });
 		} catch (err) {
 			console.error("Error confirming payment", err);
 			return NextResponse.json({ error: "An unexpected error occurred while confirming the payment" }, { status: 500 });

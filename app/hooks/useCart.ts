@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { CartItem } from "@/types/index";
+import { Cart } from "@prisma/client";
+import { cookies } from "next/headers";
 
 const useCart = () => {
 	const queryClient = useQueryClient();
@@ -59,6 +61,12 @@ const useCart = () => {
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
 		},
 	});
+
+	const { mutate: clearCart } = useMutation({
+		mutationFn: () => axios.delete(`/api/cart/`),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] }),
+	});
+
 	useState(() => {
 		if (Array.isArray(cartItems)) setCartItemsCount(cartItems.length);
 	});
@@ -72,7 +80,7 @@ const useCart = () => {
 		removeFromCartMutation.mutate(item);
 	};
 
-	return { cartItems, cartItemsCount, isLoading, isError, addItemToCart, removeItemFromCart, decreaseQuantity };
+	return { cartItems, cartItemsCount, isLoading, isError, addItemToCart, clearCart, removeItemFromCart, decreaseQuantity };
 };
 
 export default useCart;

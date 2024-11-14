@@ -5,6 +5,8 @@ import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { FormControl, FormLabel, Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import useCart from "../hooks/useCart";
 
 interface PaymentFormProps {
 	isLoading: boolean;
@@ -19,6 +21,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
+	const { clearCart } = useCart();
 
 	const handleSubmit = async (event: any) => {
 		event.preventDefault();
@@ -46,34 +49,35 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 			if (error) {
 				console.error("Payment error:", error);
 				handleError(`Payment Error: ${error.message}`);
+			} else if (paymentIntent && paymentIntent.status === "succeeded") {
+				// Handle successful payment here
+				try {
+					let response;
+					if (registrationData) {
+						response = await axios.post("/api/payment/confirm", {
+							paymentIntentId: paymentIntent.id,
+							registrationData,
+							clientSecret,
+						});
+					} else {
+						response = await axios.post("/api/payment/confirm", {
+							paymentIntentId: paymentIntent.id,
+							clientSecret,
+							billingDetails,
+						});
+					}
+					// use the response as needed...
+				} catch (err) {
+					console.error("API Error:", err);
+					handleError(`Server Error - Payment Confirmation Failed: ${err}`);
+				}
 			}
-			// } else if (paymentIntent && paymentIntent.status === "succeeded") {
-			// 	// Handle successful payment here
-			// 	try {
-			// 		let response;
-			// 		if (registrationData.password) {
-			// 			response = await axios.post("/api/payment/confirm", {
-			// 				paymentIntentId: paymentIntent.id,
-			// 				registrationData,
-			// 				clientSecret,
-			// 			});
-			// 		} else {
-			// 			response = await axios.post("/api/payment/confirm", {
-			// 				paymentIntentId: paymentIntent.id,
-			// 				clientSecret,
-			// 			});
-			// 		}
-			// 		// use the response as needed...
-			// 	} catch (err) {
-			// 		console.error("API Error:", err);
-			// 		handleError(`Server Error - Payment Confirmation Failed: ${err}`);
-			// 	}
-			// }
 		} catch (error) {
 			console.error("Stripe confirmation error:", error);
 			handleError(`Stripe Payment Confirmation Failed: ${error}`);
 		} finally {
 			setIsLoading(false);
+			clearCart();
 			router.push("/booking/success");
 		}
 	};
