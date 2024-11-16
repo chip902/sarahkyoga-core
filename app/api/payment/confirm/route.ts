@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 
 			if (!cartItems || cartItems.length === 0) {
 				console.error("No valid cart items found for the user or guest.");
-				return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+				return NextResponse.json({ error: "Cart is empty" }, { status: 406 });
 			}
 
 			// Create an order
