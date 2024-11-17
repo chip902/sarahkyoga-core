@@ -14,15 +14,26 @@ export async function POST(req: NextRequest) {
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		const user = await prisma.user.create({
-			data: {
-				email,
-				password: hashedPassword,
-				firstName,
-				lastName,
-			},
-		});
+		// Check if a user with the provided email exists
+		let user = await prisma.user.findUnique({ where: { email } });
 
+		if (!user) {
+			// If no such user is found, create a new one
+			user = await prisma.user.create({
+				data: {
+					email,
+					password: hashedPassword,
+					firstName,
+					lastName,
+				},
+			});
+		} else {
+			// If a user with the provided email is found, update their password
+			await prisma.user.update({
+				where: { email },
+				data: { password: hashedPassword },
+			});
+		}
 		return NextResponse.json(user, { status: 201 });
 	} catch (error) {
 		console.error("Error during user creation:", error);
