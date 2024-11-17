@@ -5,7 +5,6 @@ import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { FormControl, FormLabel, Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
 import useCart from "../hooks/useCart";
 
 interface PaymentFormProps {
@@ -39,7 +38,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 				payment_method: {
 					card: cardElement!,
 					billing_details: {
-						name: billingDetails.name,
+						name: billingDetails.firstName + " " + billingDetails.lastName,
 						email: billingDetails.email,
 						address: billingDetails.address,
 					},

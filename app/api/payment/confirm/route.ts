@@ -6,10 +6,19 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import url from "url";
 import { v4 as uuidv4 } from "uuid";
+import { emailTemplates } from "@/app/templates/emailTemplates";
 
+function generateOrderNumber() {
+	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	let result = "";
+	for (let i = 0; i < 8; i++) {
+		result += characters.charAt(Math.floor(Math.random() * characters.length));
+	}
+	return result;
+}
 export async function POST(request: Request) {
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_DEV!);
-	const cookiesStore = cookies();
+	const cookiesStore = await cookies();
 
 	try {
 		const { paymentIntentId, registrationData, billingDetails } = await request.json();
@@ -27,43 +36,68 @@ export async function POST(request: Request) {
 		let existingUser;
 
 		try {
-			existingUser = await prisma.user.findUnique({ where: { email: registrationData?.email } });
+			if (registrationData && registrationData.email) {
+				existingUser = await prisma.user.findUnique({ where: { email: registrationData.email } });
+			}
 		} catch (err) {
 			console.error("An error occurred during email check", err);
+			return NextResponse.json({ error: "Error checking user existence" }, { status: 500 });
 		}
 
 		if (existingUser) {
-			//return NextResponse.json({ warning: "Email is already registered" }, { status: 401 });
-		} else if (registrationData.password) {
+			userId = existingUser.id;
+		} else if (registrationData && registrationData.password) {
 			// Hash the password
-			const hashedPassword = await bcrypt.hash(registrationData?.password, 10);
+			const hashedPassword = await bcrypt.hash(registrationData.password, 10);
 
 			// Create a new user
-			const newUser = await prisma.user.create({
-				data: {
-					email: registrationData?.email,
-					password: hashedPassword,
-					firstName: registrationData?.firstName,
-					lastName: registrationData?.lastName,
-				},
-			});
+			try {
+				const newUser = await prisma.user.create({
+					data: {
+						email: registrationData.email,
+						password: hashedPassword,
+						firstName: registrationData.firstName || null,
+						lastName: registrationData.lastName || null,
+					},
+				});
 
-			userId = newUser.id;
+				userId = newUser.id;
+			} catch (err) {
+				console.error("Failed to create new user", err);
+				return NextResponse.json({ error: "Error creating new user" }, { status: 500 });
+			}
 		} else {
 			// GUEST USER
-			const anonymousUserId = uuidv4();
-			const guestUser = await prisma.user.create({
-				data: {
-					id: anonymousUserId,
-					email: billingDetails.email,
-					role: "guest",
-				},
-			});
-			userId = guestUser.id;
+			let guestUser;
+
+			try {
+				if (billingDetails.email) {
+					existingUser = await prisma.user.findUnique({ where: { email: billingDetails.email } });
+					if (existingUser) {
+						userId = existingUser.id;
+					} else {
+						const anonymousUserId = uuidv4();
+						guestUser = await prisma.user.create({
+							data: {
+								id: anonymousUserId,
+								email: billingDetails.email,
+								role: "guest",
+							},
+						});
+						userId = guestUser.id;
+					}
+				} else {
+					console.error("No email address provided for guest user.");
+					return NextResponse.json({ error: "No email address provided" }, { status: 400 });
+				}
+			} catch (err) {
+				console.error("Failed to create or find guest user", err);
+				return NextResponse.json({ error: "Error creating or finding guest user" }, { status: 500 });
+			}
 		}
 
 		// Get the cart ID from the cookie
-		const storedCartId = (await cookiesStore).get("cartId");
+		const storedCartId = cookiesStore.get("cartId");
 		if (!storedCartId) {
 			return NextResponse.json({ error: "No cart found in session" }, { status: 400 });
 		}
@@ -72,7 +106,10 @@ export async function POST(request: Request) {
 
 		// Retrieve the existing cart items
 		try {
-			const cartItems = await prisma.cartItem.findMany({ where: { cartId: (await cookies()).get("cartId")?.value }, include: { product: true } });
+			const cartItems = await prisma.cartItem.findMany({
+				where: { cartId },
+				include: { product: true },
+			});
 
 			if (!cartItems || cartItems.length === 0) {
 				console.error("No valid cart items found for the user or guest.");
@@ -81,12 +118,35 @@ export async function POST(request: Request) {
 
 			// Create an order
 			const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			const orderNumber = generateOrderNumber();
+			let newOrder;
+			let templateName;
+			switch (cartItems[0].productId) {
+				case "0":
+					templateName = "sunday-zoom";
+					break;
+				case "1":
+					templateName = "template-product-456";
+					break;
+				default:
+					templateName = "default-template";
+			}
+
+			const template = emailTemplates[templateName];
+
+			if (!template) {
+				throw new Error("Template not found");
+			}
+			const subject = template.subject.replace("{firstName}", billingDetails.firstName);
+			const textContent = template.text.replace("{firstName}", billingDetails.firstName).replace("{orderId}", orderNumber);
+			const htmlContent = template.html.replace("{firstName}", billingDetails.firstName).replace("{orderId}", orderNumber);
 
 			try {
-				await prisma.order.create({
+				newOrder = await prisma.order.create({
 					data: {
 						userId,
 						total,
+						orderNumber,
 						items: {
 							create: cartItems.map((item) => ({
 								productId: item.productId,
@@ -103,23 +163,32 @@ export async function POST(request: Request) {
 
 			// Send confirmation email
 			try {
-				const currentUrl = new URL(request?.url || "", "https://sarahkyoga.com");
+				const currentUrl = new URL(request.url, "https://sarahkyoga.com");
 				const sendEmailEndpoint = url.resolve(currentUrl.origin, "/api/send-email");
 
-				await axios.post(sendEmailEndpoint, {
-					body: JSON.stringify({
-						to: paymentIntent.receipt_email || registrationData?.email,
-						from: "no-reply@sarahkyoga.com",
-						subject: "Booking Confirmation",
-						text: "Your payment was successful. Thank you for booking with us!",
-						html: "<p>Your payment was successful. Thank you for booking with us!</p>",
-					}),
+				const toEmail = paymentIntent.receipt_email || registrationData?.email || billingDetails.email;
+				if (!toEmail) {
+					console.error("No email address provided for sending confirmation email.");
+					return NextResponse.json({ error: "No email address provided" }, { status: 400 });
+				}
+
+				const emailBody = JSON.stringify({
+					to: toEmail,
+					bcc: "sarah@sarahkyoga.com",
+					from: "no-reply@sarahkyoga.com",
+					subject: subject,
+					text: textContent,
+					html: htmlContent,
 				});
+
+				console.log("Sending email with body:", emailBody);
+
+				await axios.post(sendEmailEndpoint, { body: emailBody });
 			} catch (emailError) {
 				console.error("Failed to send email", emailError);
 			}
 
-			return NextResponse.json({ message: "Payment confirmed and order created", cartId: cartId }, { status: 201 });
+			return NextResponse.json({ message: "Payment confirmed and order created", cartId }, { status: 201 });
 		} catch (err) {
 			console.error("Error confirming payment", err);
 			return NextResponse.json({ error: "An unexpected error occurred while confirming the payment" }, { status: 500 });

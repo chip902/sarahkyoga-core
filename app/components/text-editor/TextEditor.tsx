@@ -34,7 +34,7 @@ const DEFAULT_CONTENT = `
   }
 </style>
 <div class="container">
-  <img alt="Logo" src="http://sarahkyoga.com/sky_banner.webp" style="max-width: 100%; height: auto; display: block; margin: auto;">
+  <img alt="Logo" src="https://sarahkyoga.com/sky_banner.webp" style="max-width: 100%; height: auto; display: block; margin: auto;">
   <div><br></div>
 </div>
 `;

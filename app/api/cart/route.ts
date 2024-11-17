@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json([], { status: 200 });
 		}
 
-		// Return the entire array of cart items in the JSON response
+		//const orderNumber = cartItems[0].orderNumber;
 		return NextResponse.json(cartItems, { status: 200 });
 	} catch (error) {
 		console.error("Error fetching cart items:", error);

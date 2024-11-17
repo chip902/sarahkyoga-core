@@ -1,4 +1,3 @@
-// app/api/send-email/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
@@ -26,16 +25,22 @@ export async function POST(req: NextRequest) {
 
 	// Ensure that req.body is defined
 	const body = await req.json();
-	if (!body) {
+	if (!body || !body.body) {
 		return new NextResponse("Request body is missing", { status: 400 });
 	}
 
+	const emailData = JSON.parse(body.body);
+
 	sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
-	const { to, from, subject, text, html } = body;
+	const { to, bcc, from, subject, text, html } = emailData;
+
+	// Log the email details for debugging
+	console.log("Email Details:", { to, bcc, from, subject, text, html });
 
 	const msg = {
 		to,
+		bcc,
 		from,
 		subject,
 		text,
