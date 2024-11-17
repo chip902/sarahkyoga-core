@@ -1,4 +1,3 @@
-"use client";
 import { theme as proTheme } from "@chakra-ui/pro-theme";
 import { extendTheme } from "@chakra-ui/react";
 
@@ -218,6 +217,36 @@ const components = {
 				color: "white",
 				position: "relative",
 				textDecoration: "none",
+			},
+			cta: {
+				marginX: 5,
+				marginTop: 5,
+				paddingY: 2,
+				paddingX: [2, 2],
+				backgroundColor: "brand.900",
+				fontWeight: "bold",
+				borderRadius: "8px",
+				_hover: {
+					backgroundColor: "#bf4b36",
+					transform: "translateY(-1px)",
+					transition: "0.3s ease-out",
+					_after: {
+						width: [90, "75%", "72.5%", "80%"],
+						height: "3px",
+						left: 65,
+					},
+				},
+			},
+		},
+	},
+	Card: {
+		variants: {
+			productCard: {
+				width: "calc(100vw - 4rem)",
+				boxShadow: "dark-lg",
+				borderRadius: "8px",
+				backgroundColor: "transparent",
+				color: "gray.900",
 			},
 		},
 	},

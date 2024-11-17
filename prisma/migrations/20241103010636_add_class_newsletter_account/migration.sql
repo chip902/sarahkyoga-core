@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Product" ALTER COLUMN "duration" DROP NOT NULL,
+ALTER COLUMN "availableSlots" DROP NOT NULL,
+ALTER COLUMN "imageUrl" DROP NOT NULL;

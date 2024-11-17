@@ -17,7 +17,7 @@ const AboutPage = () => {
 
 	return (
 		<>
-			<Box position="relative" my="50vh">
+			<Box position="relative" maxW="800px" mx="auto" my={{ sm: "35vh", lg: "50vh" }} px={4}>
 				<Flex
 					position="absolute"
 					top="50%"
@@ -28,9 +28,9 @@ const AboutPage = () => {
 					borderRadius="md"
 					p={8}
 					maxW="800px"
-					w="100%">
+					w="90%">
 					<Container>
-						<Heading as="h1" fontSize="3xl" mb={4}>
+						<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
 							ABOUT SARAH
 						</Heading>
 						<Text fontSize="lg" mb={4}>
@@ -52,7 +52,7 @@ const AboutPage = () => {
 			</Box>
 			<Center>
 				<Box mt="30vh" p={4} maxW="80vw">
-					<Heading as="h1" fontSize="3xl" mb={4}>
+					<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
 						Testimonials
 					</Heading>
 					<Slider {...settings}>
@@ -70,10 +70,10 @@ const AboutPage = () => {
 			<Center>
 				<Flex bg="rgba(255, 255, 255, 0.7)" boxShadow="xl" borderRadius="md" mt="10vh" maxW="800px" w="100%">
 					<Container>
-						<Heading as="h1" fontSize="3xl" mb={4}>
+						<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
 							TEACHING STYLE
 						</Heading>
-						<Heading as="h2" fontSize="2xl">
+						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
 							KATONAH YOGA®
 						</Heading>
 						<Text fontSize="lg" mb={4}>
@@ -100,7 +100,7 @@ const AboutPage = () => {
 								www.katonahyoga.com
 							</Button>
 						</NextLink>
-						<Heading as="h2" fontSize="2xl">
+						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
 							CHAIR YOGA
 						</Heading>
 						<Text>
@@ -108,7 +108,7 @@ const AboutPage = () => {
 							be restorative and serve to give us leverage to be held. It can also be used to turn ourselves upside down and change our
 							perspective. Chair classes are inspired heavily by Katonah Yoga®
 						</Text>
-						<Heading as="h2" fontSize="2xl">
+						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
 							VINYASA
 						</Heading>
 						<Text mb="7vh">

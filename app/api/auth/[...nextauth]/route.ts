@@ -40,6 +40,11 @@ const authOptions: NextAuthOptions = {
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID!,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+			authorization: {
+				params: {
+					scope: "https://www.googleapis.com/auth/calendar.readonly",
+				},
+			},
 		}),
 		CredentialsProvider({
 			name: "Credentials",
@@ -65,7 +70,8 @@ const authOptions: NextAuthOptions = {
 					// Ensuring role is a string
 					return {
 						id: user.id,
-						name: user.name,
+						firstName: user.firstName,
+						lastName: user.lastName,
 						email: user.email,
 						role: user.role ?? "user",
 					};
@@ -78,6 +84,7 @@ const authOptions: NextAuthOptions = {
 	],
 	pages: {
 		signIn: "/auth/login",
+		signOut: "/auth/logout",
 	},
 	session: {
 		strategy: "jwt",
@@ -108,7 +115,6 @@ const authOptions: NextAuthOptions = {
 				if (!existingUser) {
 					await prisma.user.create({
 						data: {
-							name: user.name,
 							email: user.email,
 							image: user.image ?? undefined,
 							role: user.role ?? "user",
@@ -124,4 +130,5 @@ const authOptions: NextAuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST, handler as OPTIONS };
+// Next.js 14 App Router expects you to explicitly define the HTTP methods
+export { handler as GET, handler as POST };

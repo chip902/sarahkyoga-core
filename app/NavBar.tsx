@@ -14,6 +14,8 @@ import {
 	DrawerHeader,
 	DrawerOverlay,
 	Grid,
+	HStack,
+	Icon,
 	IconButton,
 	Image,
 	Menu,
@@ -25,17 +27,21 @@ import {
 	VStack,
 	useDisclosure,
 } from "@chakra-ui/react";
+import { GiEmptyHourglass } from "react-icons/gi";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import useResponsive from "./components/hooks/useResponsive";
+import ShoppingCartPopout from "./components/ShoppingCartPopout";
 
-const NavBar = () => {
+interface NavBarProps {
+	isResponsive: boolean;
+}
+
+const NavBar = ({ isResponsive }: NavBarProps) => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
 	const { status, data: session } = useSession();
-	const isResponsive = useResponsive();
 
 	const openMenu = () => {
 		if (closeTimeoutRef.current !== null) {
@@ -62,7 +68,7 @@ const NavBar = () => {
 					<Box display="flex">
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
-					<Box display="flex" justifyContent="flex-end" alignItems="center">
+					<Box display="flex" justifyContent="flex-end" alignItems="center" px={10}>
 						<NextLink href="/" passHref legacyBehavior>
 							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
@@ -99,11 +105,20 @@ const NavBar = () => {
 											Private Sessions
 										</Button>
 									</NextLink>
-									<NextLink href="/" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
-											Workshops
-										</Button>
-									</NextLink>
+									<HStack>
+										<NextLink href="/" passHref legacyBehavior>
+											<Button
+												as="a"
+												variant="linkNav"
+												onClick={onClose}
+												my={5}
+												isDisabled
+												_disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
+												Workshops
+											</Button>
+										</NextLink>
+										<Icon as={GiEmptyHourglass} color="gray.400" />
+									</HStack>
 								</VStack>
 							</MenuList>
 						</Menu>
@@ -170,6 +185,7 @@ const NavBar = () => {
 								</Button>
 							</NextLink>
 						)}
+						<ShoppingCartPopout isResponsive={isResponsive} />
 					</Box>
 				</Grid>
 			</Box>

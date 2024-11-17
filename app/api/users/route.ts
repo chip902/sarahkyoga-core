@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
 	const body = await req.json();
 
 	const schema = z.object({
-		name: z.string(),
+		firstName: z.string(),
+		lastName: z.string(),
 		email: z.string().email(),
 		password: z.string().min(8),
 	});
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest) {
 
 	const newUser = await prisma.user.create({
 		data: {
-			name: body.name,
+			firstName: body.firstName,
+			lastName: body.lastName,
 			email: body.email,
 			password: hashedPassword,
 		},

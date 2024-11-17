@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
 			from: "Sarah K. Yoga <noreply@sarahkyoga.com>",
 			subject: "Password Reset Request",
 			html: `
-                  <p>Hi ${user.name},</p>
+                  <p>Hi ${user.firstName},</p>
                   <p>You recently requested a password reset.</p>
                   <p>Please click on the following link to reset your password:</p>
-                  <a href="http://localhost:3000/api/auth/resetpassword/${resetToken}">Reset Password</a>
+                  <a href="https://sarahkyoga.com/auth/reset-password/${resetToken}">Reset Password</a>
                   <p>This link will expire in 15 minutes.</p>
                   <p>If you did not request a password reset, please ignore this email.</p>
                   <p>Thanks,</p>

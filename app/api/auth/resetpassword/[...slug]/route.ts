@@ -23,11 +23,11 @@ export async function POST(request: NextRequest) {
 		return new Response("No new password provided or invalid format", { status: 400 });
 	}
 
-	const hashedPassword = await bcrypt.hash(newPassword, 10); // Hash the new password
+	const hashedPassword = await bcrypt.hash(newPassword, 10);
 	try {
 		await prisma.user.update({
 			where: { id: user.id },
-			data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }, // Clear the token after update
+			data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null },
 		});
 
 		return new Response("Password reset successful", { status: 200 });

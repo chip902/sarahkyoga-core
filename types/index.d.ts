@@ -18,3 +18,33 @@ export interface TextHistory {
 	content: string;
 	timestamp: Date;
 }
+
+// Extend the CartItem type to include product data
+export interface CartItem {
+	id: string;
+	cartId: string;
+	productId?: string;
+	quantity: number;
+	createdAt?: Date;
+	updatedAt?: Date;
+	product: Product;
+}
+export interface Product {
+	id: string;
+	name: string;
+	description?: string | null;
+	price: number;
+	duration?: number | null;
+	availableSlots?: number | null;
+	createdAt: Date;
+	updatedAt: Date;
+	imageUrl?: string | null;
+}
+export interface ShoppingCartPopoutProps {
+	isResponsive: boolean;
+}
+export interface EmailTemplate {
+	subject: string;
+	text: string;
+	html: string;
+}

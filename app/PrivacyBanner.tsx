@@ -26,7 +26,7 @@ const PrivacyBanner = () => {
 	return (
 		<Slide direction="bottom" in={isOpen} style={{ zIndex: 10 }}>
 			<Box flexDirection="row" p="40px" color="white" mt="4" bg="brand.800" rounded="md" shadow="md">
-				<Text mb={5}>
+				<Text color="white" mb={5}>
 					This website uses cookies to improve your experience. We will assume you accept this policy as long as you are using this website.
 				</Text>
 				<Button mx={10} onClick={handleAcceptCookies}>
