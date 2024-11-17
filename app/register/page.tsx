@@ -22,7 +22,8 @@ const Register = () => {
 			const response = await axios.post("/api/auth/new-user", {
 				email,
 				password,
-				name,
+				firstName,
+				lastName,
 			});
 
 			if (response.status === 201) {
