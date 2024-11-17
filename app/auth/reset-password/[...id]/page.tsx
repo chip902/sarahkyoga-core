@@ -2,7 +2,7 @@
 "use client";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Box, Button, Input, Text, FormLabel, useToast } from "@chakra-ui/react";
+import { Box, Button, Input, Text, FormLabel, useToast, Container } from "@chakra-ui/react";
 import useResetPassword from "@/app/hooks/useResetPassword";
 
 const ResetPassword = () => {
@@ -46,7 +46,7 @@ const ResetPassword = () => {
 	};
 
 	return (
-		<Box p={8}>
+		<Container maxW="md" py={{ base: "12", md: "24" }} mt={80} bgColor="brand.600" borderRadius={20}>
 			<Text fontSize="xl" fontWeight="bold">
 				Reset Password
 			</Text>
@@ -62,7 +62,7 @@ const ResetPassword = () => {
 					Reset Password
 				</Button>
 			</form>
-		</Box>
+		</Container>
 	);
 };
 

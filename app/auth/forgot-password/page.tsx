@@ -6,15 +6,18 @@ import useForgotPassword from "../../hooks/useForgotPassword";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
-	const { message, isLoading, resetPassword } = useForgotPassword();
+	const { message, isLoading, resetPassword, handleCallback } = useForgotPassword();
 	const toast = useToast();
-
+	const onResetForm = () => {
+		setEmail("");
+	};
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		await resetPassword(email);
+		handleCallback(onResetForm);
 
 		toast({
-			title: "Password Reset",
+			title: "Password Reset Email Sent",
 			description: message,
 			status: "info",
 			duration: 5000,
@@ -34,7 +37,14 @@ const ForgotPassword = () => {
 					<Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 				</FormControl>
 
-				<Button mt={10} type="submit" isLoading={isLoading} colorScheme="brand">
+				<Button
+					mt={10}
+					type="submit"
+					isLoading={isLoading}
+					colorScheme="brand"
+					onClick={(e) => {
+						handleSubmit(e);
+					}}>
 					{isLoading ? "Sending..." : "Send Reset Link"}
 				</Button>
 			</form>

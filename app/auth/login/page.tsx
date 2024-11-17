@@ -17,20 +17,22 @@ import {
 	Stack,
 	Text,
 } from "@chakra-ui/react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { GoogleIcon } from "./ProviderIcons";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
 	// State to store email and password
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const { data: session, status } = useSession();
+	const router = useRouter();
 
 	const handleLogin = async () => {
 		// Perform the sign-in with credentials
 		const result = await signIn("credentials", {
 			email,
 			password,
-			callbackUrl: "/dashboard",
 		});
 		if (result?.error) {
 			// Handle login error
@@ -44,6 +46,11 @@ const Login = () => {
 					<AlertDescription maxWidth="sm">Your Email or Password was not found; please try again.</AlertDescription>
 				</Alert>
 			);
+		}
+		if (status === "authenticated" && session.user.role === "admin") {
+			router.push("/admin/dashboard");
+		} else {
+			router.push("/dashboard");
 		}
 	};
 

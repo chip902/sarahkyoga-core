@@ -48,3 +48,26 @@ export interface EmailTemplate {
 	text: string;
 	html: string;
 }
+
+export interface Order {
+	id: string;
+	userId: string;
+	total: number;
+	status: string;
+	orderNumber: string;
+	createdAt: Date;
+	updatedAt: Date;
+	user?: {
+		firstName: string;
+		lastName: string;
+		email: string;
+	};
+	item?: {
+		id: string;
+		name: string;
+	};
+}
+export interface SortConfig {
+	key: string | string[];
+	direction: "ascending" | "descending";
+}

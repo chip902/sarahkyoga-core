@@ -175,7 +175,7 @@ export async function POST(request: Request) {
 				const emailBody = JSON.stringify({
 					to: toEmail,
 					bcc: "sarah@sarahkyoga.com",
-					from: "no-reply@sarahkyoga.com",
+					from: "Sarah K. Yoga <noreply@sarahkyoga.com>",
 					subject: subject,
 					text: textContent,
 					html: htmlContent,

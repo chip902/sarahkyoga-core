@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Order } from "@/types/index";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
