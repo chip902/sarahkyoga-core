@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 const Register = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [name, setName] = useState("");
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 	const toast = useToast();
@@ -49,18 +50,24 @@ const Register = () => {
 				</Stack>
 			</Stack>
 			<Stack spacing="6" direction={{ base: "column", md: "row" }}>
-				<FormControl id="name">
-					<FormLabel>Name</FormLabel>
-					<Input defaultValue="Name" onChange={(e) => setName(e.target.value)} value={name} />
-				</FormControl>
+				<Flex mb={{ base: 4, md: 2 }} justifyContent="space-between">
+					<FormControl isRequired width="50%" id="firstName" mr={2}>
+						<FormLabel fontFamily="inherit">First Name</FormLabel>
+						<Input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+					</FormControl>
+					<FormControl isRequired width="50%" ml={2} id="lastName">
+						<FormLabel fontFamily="inherit">Last Name</FormLabel>
+						<Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+					</FormControl>
+				</Flex>
 				<FormControl id="email">
 					<FormLabel>Email</FormLabel>
-					<Input defaultValue="Email" onChange={(e) => setEmail(e.target.value)} value={email} />
+					<Input value={email} onChange={(e) => setEmail(e.target.value)} />
 				</FormControl>
 			</Stack>
 			<FormControl id="password">
 				<FormLabel>Password</FormLabel>
-				<Input defaultValue="Password" onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
+				<Input onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
 			</FormControl>
 
 			<Divider />
