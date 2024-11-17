@@ -17,7 +17,7 @@ function generateOrderNumber() {
 	return result;
 }
 export async function POST(request: Request) {
-	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_DEV!);
+	const stripe = process.env.NODE_ENV === "development" ? new Stripe(process.env.STRIPE_SECRET_KEY_DEV!) : new Stripe(process.env.STRIPE_SECRET_KEY_PROD!);
 	const cookiesStore = await cookies();
 
 	try {
