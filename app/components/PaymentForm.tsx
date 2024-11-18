@@ -1,11 +1,12 @@
 // components/PaymentForm.tsx
 "use client";
 
-import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";
 import { FormControl, FormLabel, Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import useCart from "../hooks/useCart";
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 
 interface PaymentFormProps {
 	isLoading: boolean;

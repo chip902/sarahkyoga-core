@@ -1,6 +1,5 @@
 "use client";
 
-import { getStripe } from "@/lib/stripe";
 import {
 	useColorModeValue,
 	Box,
@@ -19,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { CartItem, Product } from "@prisma/client";
 import { Elements } from "@stripe/react-stripe-js";
-import { StripeElementsOptions } from "@stripe/stripe-js";
+import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -78,14 +77,14 @@ const CheckoutPage = () => {
 
 	// Calculate total
 	const total = cartItems?.length ? cartItems.reduce((acc: number, item: CartItemWithProduct) => acc + item.product.price * item.quantity, 0) : 0;
-
-	// Get the stripePromise from getStripe
-	const stripePromise = getStripe();
+	// Get the stripePromise from loadStripe
+	const stripePromise = loadStripe(
+		process.env.NODE_ENV == "development" ? process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV! : process.env.STRIPE_PUBLISH_KEY_PROD!
+	);
 	// Stripe Elements options
 	const options: StripeElementsOptions = {
 		clientSecret,
 	};
-
 	// Styling variables
 	const bgColor = useColorModeValue("white", "brand.600");
 	const boxShadow = useColorModeValue("lg", "dark-lg");
@@ -243,9 +242,9 @@ const CheckoutPage = () => {
 							</FormControl>
 						</Box>
 						<Box mb={{ base: 4, md: 2 }}>
-							{/* Payment Form */}
-							{clientSecret && (
-								<Elements stripe={stripePromise} options={options}>
+							<Elements stripe={stripePromise} options={options}>
+								{/* Payment Form */}
+								{clientSecret && (
 									<PaymentForm
 										isLoading={isLoading}
 										setIsLoading={setIsLoading}
@@ -254,8 +253,8 @@ const CheckoutPage = () => {
 										clientSecret={clientSecret}
 										handleError={setApiError}
 									/>
-								</Elements>
-							)}
+								)}
+							</Elements>
 						</Box>
 					</Stack>
 				</Box>
