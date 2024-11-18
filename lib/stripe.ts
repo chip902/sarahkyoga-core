@@ -6,7 +6,7 @@ let stripePromise: Promise<Stripe | null>;
 export const getStripe = () => {
 	if (!stripePromise) {
 		const publishableKey = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV : process.env.STRIPE_PUBLISH_KEY_PROD;
-		console.log("Publishable Key:", publishableKey); // Add this line
+		console.log("Publishable Key:", publishableKey);
 		if (!publishableKey) {
 			console.error("Stripe publishable key is not set.");
 		} else {

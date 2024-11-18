@@ -237,6 +237,22 @@ const components = {
 					},
 				},
 			},
+			preview: {
+				backgroundColor: "brand.900",
+				fontWeight: "bold",
+				borderRadius: "8px",
+				_hover: {
+					backgroundColor: "#bf4b36",
+					color: "white",
+					transform: "translateY(-1px)",
+					transition: "0.3s ease-out",
+					_after: {
+						width: [90, "75%", "72.5%", "80%"],
+						height: "3px",
+						left: 65,
+					},
+				},
+			},
 		},
 	},
 	Card: {

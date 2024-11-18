@@ -36,8 +36,8 @@ export async function POST(request: Request) {
 		let existingUser;
 
 		try {
-			if (registrationData && registrationData.email) {
-				existingUser = await prisma.user.findUnique({ where: { email: registrationData.email } });
+			if (billingDetails && billingDetails.email) {
+				existingUser = await prisma.user.findUnique({ where: { email: billingDetails.email } });
 			}
 		} catch (err) {
 			console.error("An error occurred during email check", err);

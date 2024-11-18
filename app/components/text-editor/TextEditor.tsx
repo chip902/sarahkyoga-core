@@ -7,6 +7,7 @@ import TextEditorToolbar from "./TextEditorToolbar";
 import { TextStyle, TextHistory } from "./types";
 import { convert } from "html-to-text";
 import PublishConfirmDialog from "../newsletter/PublishConfirmDialoge";
+import axios from "axios";
 
 const DEFAULT_STYLE: TextStyle = {
 	fontFamily: "Quicksand",
@@ -227,7 +228,7 @@ export default function TextEditor({
 		}
 	};
 
-	const handleSave = async (isDraft: boolean) => {
+	const handleSave = async (isDraft: boolean, isTest: boolean) => {
 		if (!subject.trim()) {
 			toast({
 				title: "Subject is required",
@@ -251,9 +252,22 @@ export default function TextEditor({
 					style,
 					isDraft,
 				});
+				if (isTest == false) {
+					return;
+				}
+			}
+			if (isTest) {
+				const endpoint = "/api/newsletter/test";
+				await axios.post(endpoint, {
+					subject,
+					content,
+					style,
+					isDraft,
+				});
+				return;
 			} else {
 				const endpoint = newsletterId ? `/api/newsletter/${newsletterId}` : "/api/newsletter";
-				const method = newsletterId ? "PUT" : "POST";
+				const method = "POST";
 
 				const response = await fetch(endpoint, {
 					method,
@@ -271,7 +285,7 @@ export default function TextEditor({
 				}
 
 				toast({
-					title: `Newsletter ${isDraft ? "saved as draft" : "published"}`,
+					title: `Newsletter ${isDraft ? (isTest ? "saved as draft and sent test email." : "saved as draft") : "published"}`,
 					status: "success",
 					duration: 3000,
 					isClosable: true,
@@ -348,11 +362,14 @@ export default function TextEditor({
 			</Box>
 
 			<HStack mt={4} spacing={4}>
-				<Button colorScheme="blue" onClick={() => handleSave(true)} isLoading={isSaving}>
+				<Button colorScheme="blue" onClick={() => handleSave(true, false)} isLoading={isSaving}>
 					Save as Draft
 				</Button>
-				<Button colorScheme="green" onClick={() => handleSave(false)} isLoading={isSaving}>
+				<Button colorScheme="green" onClick={() => handleSave(false, false)} isLoading={isSaving}>
 					Publish
+				</Button>
+				<Button variant="preview" onClick={() => handleSave(true, true)} isLoading={isSaving}>
+					Test Publish
 				</Button>
 			</HStack>
 
@@ -380,7 +397,7 @@ export default function TextEditor({
 					title: subject,
 				}}
 				onConfirm={() => {
-					handleSave(false);
+					handleSave(false, false);
 					setIsSaving(false);
 				}}
 			/>
