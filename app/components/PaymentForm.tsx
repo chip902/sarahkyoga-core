@@ -92,7 +92,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 					</Box>
 				</FormControl>
 				<Button colorScheme="blue" size="lg" mt={6} w="full" type="submit" isLoading={isLoading} fontFamily="inherit">
-					Place Order
+					Reserve Now!
 				</Button>
 			</form>
 		</Box>

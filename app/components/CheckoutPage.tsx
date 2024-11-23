@@ -79,7 +79,7 @@ const CheckoutPage = () => {
 	const total = cartItems?.length ? cartItems.reduce((acc: number, item: CartItemWithProduct) => acc + item.product.price * item.quantity, 0) : 0;
 	// Get the stripePromise from loadStripe
 	const stripePromise = loadStripe(
-		process.env.NODE_ENV == "development" ? process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV! : process.env.STRIPE_PUBLISH_KEY_PROD!
+		process.env.NODE_ENV == "development" ? String(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV!) : String(process.env.STRIPE_PUBLISH_KEY_PROD!)
 	);
 	// Stripe Elements options
 	const options: StripeElementsOptions = {
