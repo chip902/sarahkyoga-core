@@ -3,8 +3,6 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { CartItem } from "@/types/index";
-import { Cart } from "@prisma/client";
-import { cookies } from "next/headers";
 
 const useCart = () => {
 	const queryClient = useQueryClient();

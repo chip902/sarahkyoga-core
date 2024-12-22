@@ -1,65 +1,33 @@
+// File at /Users/andrew/code/sarahkyoga-core/app/booking/BookNow.tsx
 "use client";
 import { useSession } from "next-auth/react";
-import axios from "axios";
-import { useState } from "react";
 import { Button, Spinner, useToast } from "@chakra-ui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAddToCart } from "@/app/hooks/useAddToCart"; // Adjust the path as necessary
 
-const addToCart = async (productId: string, toast: any) => {
-	try {
-		const response = await axios.post("/api/cart", {
-			productId,
-		});
+export const BookNowButton = ({ productId }: { productId: string }) => {
+	const { data: session } = useSession();
+	const toast = useToast();
 
-		if (response.status === 201) {
-			// Handle success
+	const { addToCart, isLoading } = useAddToCart(productId);
+
+	// Handler for the add to cart action
+	const handleAddToCart = async () => {
+		if (!session) {
 			toast({
-				title: "Added to Cart",
-				description: "Your class has been successfully added to the cart.",
-				status: "success",
+				title: "Please log in",
+				description: "You need to be logged in to book a class.",
+				status: "warning",
 				duration: 3000,
 				isClosable: true,
 			});
+			return;
 		}
-	} catch (error: any) {
-		console.error("Error adding product to cart:", error);
-		// Handle failure
-		toast({
-			title: "Failed to Add to Cart",
-			description: error.message || "An unexpected error occurred.",
-			status: "error",
-			duration: 3000,
-			isClosable: true,
-		});
-	}
-};
 
-export const BookNowButton = ({ productId }: { productId: string }) => {
-	const [isLoading, setIsLoading] = useState(false);
-	const { data: session } = useSession();
-	const queryClient = useQueryClient();
-	const toast = useToast();
-
-	const handleAddToCart = async () => {
-		setIsLoading(true);
-		try {
-			await addToCart(productId, toast);
-		} finally {
-			queryClient.invalidateQueries({ queryKey: ["cart"] });
-			setIsLoading(false);
-		}
+		addToCart();
 	};
 
 	if (isLoading) {
 		return <Spinner />;
-	}
-
-	if (productId === "0") {
-		return (
-			<Button onClick={handleAddToCart} bg="brand.600" variant="cta">
-				Book Now!
-			</Button>
-		);
 	}
 
 	if (!session) {
@@ -71,7 +39,7 @@ export const BookNowButton = ({ productId }: { productId: string }) => {
 	}
 
 	return (
-		<Button onClick={() => addToCart(productId, toast)} bg="brand.600" variant="cta">
+		<Button onClick={handleAddToCart} bg="brand.600" variant="cta">
 			Book Now
 		</Button>
 	);
