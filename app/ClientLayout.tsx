@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import PrivacyBanner from "./PrivacyBanner";
 import useResponsive from "./hooks/useResponsive";
 import ShoppingCartPopout from "./components/ShoppingCartPopout";
+
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 	const isResponsive = useResponsive();
 	return (
