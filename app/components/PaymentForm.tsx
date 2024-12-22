@@ -75,10 +75,11 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 		} catch (error) {
 			console.error("Stripe confirmation error:", error);
 			handleError(`Stripe Payment Confirmation Failed: ${error}`);
+			router.push("/booking/decline");
 		} finally {
 			setIsLoading(false);
-			clearCart();
 			router.push("/booking/success");
+			clearCart();
 		}
 	};
 
