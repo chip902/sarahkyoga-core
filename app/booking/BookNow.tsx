@@ -1,8 +1,8 @@
-// File at /Users/andrew/code/sarahkyoga-core/app/booking/BookNow.tsx
+// /app/booking/BookNow.tsx
 "use client";
 import { useSession } from "next-auth/react";
 import { Button, Spinner, useToast } from "@chakra-ui/react";
-import { useAddToCart } from "@/app/hooks/useAddToCart"; // Adjust the path as necessary
+import { useAddToCart } from "@/app/hooks/useAddToCart";
 
 export const BookNowButton = ({ productId }: { productId: string }) => {
 	const { data: session } = useSession();
@@ -12,7 +12,7 @@ export const BookNowButton = ({ productId }: { productId: string }) => {
 
 	// Handler for the add to cart action
 	const handleAddToCart = async () => {
-		if (!session) {
+		if (!session && productId !== "0") {
 			toast({
 				title: "Please log in",
 				description: "You need to be logged in to book a class.",
@@ -30,7 +30,7 @@ export const BookNowButton = ({ productId }: { productId: string }) => {
 		return <Spinner />;
 	}
 
-	if (!session) {
+	if (!session && productId !== "0") {
 		return (
 			<Button variant="cta" isDisabled>
 				Login to book
