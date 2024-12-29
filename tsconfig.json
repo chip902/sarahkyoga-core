@@ -10,8 +10,8 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "module": "esnext",
-    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
@@ -27,7 +27,11 @@
         "./*"
       ]
     },
-    "target": "ES2017"
+    "target": "ES2017",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ],
   },
   "include": [
     "next-env.d.ts",

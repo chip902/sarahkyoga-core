@@ -1,22 +1,29 @@
-// /Users/andrew/code/sarahkyoga-core/app/hooks/useFetchData.tsx
-
+// app/hooks/useFetchData.ts
 import { useState, useEffect } from "react";
-import { fetchAPI } from "../../lib/strapi";
 
-export default function useFetchData<T>(url: string) {
+function useFetchData<T>(url: string) {
 	const [data, setData] = useState<T | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await fetchAPI(url);
-				if (!response || !response.data) throw new Error("No data fetched");
-				setData(response.data as T);
-			} catch (err: any) {
-				setError(err.message);
-			} finally {
+				const response = await fetch(url, {
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
+
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				const result = await response.json();
+				setData(result);
+				setLoading(false);
+			} catch (e) {
+				setError(e instanceof Error ? e.message : "An error occurred");
 				setLoading(false);
 			}
 		};
@@ -26,3 +33,5 @@ export default function useFetchData<T>(url: string) {
 
 	return { data, loading, error };
 }
+
+export default useFetchData;

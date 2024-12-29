@@ -131,4 +131,5 @@ const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 // Next.js 14 App Router expects you to explicitly define the HTTP methods
-export { handler as GET, handler as POST };
+// Next.js 14 App Router expects you to explicitly define the HTTP methods
+export { handler as GET, handler as POST, authOptions };
