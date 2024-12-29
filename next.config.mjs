@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import { resolve } from 'path';
+
 const nextConfig = {
     env: {
         NEXT_PUBLIC_STRAPI_API_URL: process.env.NEXT_PUBLIC_STRAPI_API_URL,
@@ -16,6 +18,10 @@ const nextConfig = {
                 child_process: false,
             };
         }
+
+        // Add support for importing Payload config
+        config.resolve.alias['payload-config'] = resolve('./payload.config.ts');
+
         return config;
     },
     typescript: {
