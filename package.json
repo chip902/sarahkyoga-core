@@ -55,6 +55,7 @@
 	},
 	"devDependencies": {
 		"@next/third-parties": "^15.0.2",
+		"@payloadcms/bundler-webpack": "^1.0.7",
 		"@payloadcms/next-payload": "^0.1.11",
 		"@prisma/client": "^5.21.1",
 		"@sendgrid/mail": "^8.1.4",
