@@ -1,10 +1,10 @@
 "use client";
 import { Box, Button, Center, Container, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import { testimonials } from "./data";
 import NextLink from "next/link";
+import { MutableRefObject, ReactNode } from "react";
 
 const AboutPage = () => {
 	const settings = {
@@ -13,6 +13,20 @@ const AboutPage = () => {
 		speed: 500,
 		slidesToShow: 1,
 		slidesToScroll: 1,
+	};
+
+	interface SliderProps {
+		dots: boolean;
+		infinite: boolean;
+		speed: number;
+		slidesToShow: number;
+		slidesToScroll: number;
+		ref?: MutableRefObject<null>;
+		children: ReactNode;
+	}
+
+	const Slider = ({ dots, infinite, speed, slidesToShow, slidesToScroll, children, ...props }: SliderProps) => {
+		return <div {...props}>{children}</div>;
 	};
 
 	return (
