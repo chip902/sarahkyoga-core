@@ -1,6 +1,6 @@
 {
 	"name": "sarahkyoga-core",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"private": true,
 	"scripts": {
 		"export": "next export",
@@ -16,6 +16,7 @@
 		"@chakra-ui/next-js": "^2.2.0",
 		"@chakra-ui/pro-theme": "^0.10.0",
 		"@chakra-ui/react": "^2.8.2",
+		"@types/react-slick": "^0.23.13",
 		"@emotion/react": "^11.11.4",
 		"@emotion/styled": "^11.11.5",
 		"@fontsource-variable/quicksand": "^5.0.18",
@@ -71,7 +72,6 @@
 		"@types/react-color": "^3.0.12",
 		"@types/react-date-range": "^1.4.9",
 		"@types/react-select": "^5.0.0",
-		"@types/react-slick": "^0.23.13",
 		"@types/uuid": "^10.0.0",
 		"fs": "^0.0.1-security"
 	},
