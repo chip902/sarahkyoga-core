@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export async function POST(req: NextRequest) {
 	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";
@@ -10,8 +7,8 @@ export async function POST(req: NextRequest) {
 		process.env.NODE_ENV === "production"
 			? "https://sarahkyoga.com"
 			: frontendDomain.includes("localhost")
-			? "http://localhost:3001"
-			: `https://${frontendDomain}`;
+				? "http://localhost:3001"
+				: `https://${frontendDomain}`;
 
 	const res = NextResponse.next();
 	res.headers.set("Access-Control-Allow-Origin", origin);

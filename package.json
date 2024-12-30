@@ -49,6 +49,7 @@
 		"next-auth": "^4.24.7",
 		"next-connect": "^1.0.0",
 		"next-sitemap": "^4.2.3",
+		"@next/third-parties": "^15.0.2",
 		"payload": "^3.12.0",
 		"react": "^18.2.0",
 		"react-calendar": "^5.0.0",
@@ -67,7 +68,6 @@
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
-		"@next/third-parties": "^15.0.2",
 		"@payloadcms/bundler-webpack": "^1.0.7",
 		"@payloadcms/next-payload": "^0.1.11",
 		"@prisma/client": "^5.21.1",
@@ -85,7 +85,6 @@
 		"@types/react-slick": "^0.23.13",
 		"@types/uuid": "^10.0.0",
 		"cross-env": "^7.0.3",
-		"dotenv": "^16.4.5",
 		"eslint": "^8",
 		"eslint-config-next": "^14.2.3",
 		"fs": "^0.0.1-security",
