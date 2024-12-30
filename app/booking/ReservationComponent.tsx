@@ -24,7 +24,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import Calendar from "react-date-range";
+import { Calendar } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import Select from "react-select";
