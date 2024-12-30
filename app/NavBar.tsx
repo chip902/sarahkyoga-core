@@ -15,7 +15,6 @@ import {
 	DrawerOverlay,
 	Grid,
 	HStack,
-	Icon,
 	IconButton,
 	Image,
 	Menu,
@@ -27,7 +26,6 @@ import {
 	VStack,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { GiEmptyHourglass } from "react-icons/gi";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
@@ -106,18 +104,11 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 										</Button>
 									</NextLink>
 									<HStack>
-										<NextLink href="/" passHref legacyBehavior>
-											<Button
-												as="a"
-												variant="linkNav"
-												onClick={onClose}
-												my={5}
-												isDisabled
-												_disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
+										<NextLink href="/workshops" passHref legacyBehavior>
+											<Button as="a" variant="linkNav" onClick={onClose} my={5}>
 												Workshops
 											</Button>
 										</NextLink>
-										<Icon as={GiEmptyHourglass} color="gray.400" />
 									</HStack>
 								</VStack>
 							</MenuList>
@@ -149,6 +140,9 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 									</NextLink>
 									<NextLink href="/admin/users" passHref legacyBehavior>
 										<MenuItem>Manage Users</MenuItem>
+									</NextLink>
+									<NextLink href="/admin/dashboard/workshop" passHref legacyBehavior>
+										<MenuItem>Manage Workshops</MenuItem>
 									</NextLink>
 									<NextLink href="/admin/newsletter" passHref legacyBehavior>
 										<MenuItem>Newsletter</MenuItem>
@@ -247,7 +241,7 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 														Private Sessions
 													</Button>
 												</NextLink>
-												<NextLink href="/" passHref legacyBehavior>
+												<NextLink href="/workshops" passHref legacyBehavior>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>

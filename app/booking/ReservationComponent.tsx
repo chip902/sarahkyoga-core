@@ -1,3 +1,4 @@
+// app/booking/ReservationComponent.tsx
 "use client";
 import {
 	Button,
@@ -164,6 +165,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 					Select your preferred day
 				</Heading>
 				<Box width="100%">
+					{/*@ts-ignore*/}
 					<Calendar
 						date={selectedDate}
 						onChange={handleDateSelect}
