@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-import { resolve } from 'path';
-
 const nextConfig = {
     env: {
         STRIPE_PUBLISH_KEY_PROD: process.env.STRIPE_PUBLISH_KEY_PROD,

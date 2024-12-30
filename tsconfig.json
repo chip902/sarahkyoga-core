@@ -22,6 +22,7 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./*"
@@ -32,8 +33,7 @@
       "payload/*": [
         "./node_modules/payload/*"
       ]
-    },
-    "baseUrl": "."
+    }
   },
   "include": [
     "next-env.d.ts",
