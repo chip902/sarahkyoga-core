@@ -1,11 +1,11 @@
 {
 	"name": "sarahkyoga-core",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"private": true,
 	"scripts": {
 		"export": "next export",
 		"dev": "next dev",
-		"build": "prisma generate && next build && next-sitemap",
+		"build": "prisma generate && next build && next-sitemap --config next-sitemap.config.cjs",
 		"lint": "next lint",
 		"start": "next start",
 		"seed": "ts-node prisma/seed.ts"
