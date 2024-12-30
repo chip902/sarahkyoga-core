@@ -1,3 +1,4 @@
+// app/booking/ReservationComponent.tsx
 "use client";
 import {
 	Button,
@@ -23,7 +24,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { Calendar } from "react-date-range";
+import Calendar from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import Select from "react-select";
@@ -164,6 +165,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 					Select your preferred day
 				</Heading>
 				<Box width="100%">
+					{/*@ts-ignore*/}
 					<Calendar
 						date={selectedDate}
 						onChange={handleDateSelect}

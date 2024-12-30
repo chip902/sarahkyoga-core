@@ -28,7 +28,7 @@ import {
 	VStack,
 	useToast,
 } from "@chakra-ui/react";
-import { Workshop } from "@/payload-types";
+import { type Workshop } from "@/payload-types";
 
 // Define props type
 type WorkshopsDashboardProps = {
@@ -168,7 +168,7 @@ const WorkshopsDashboard: React.FC<WorkshopsDashboardProps> = ({ initialWorkshop
 					version: 1,
 				},
 			},
-			_status: "draft",
+			_status: "draft" as const,
 		});
 		onOpen();
 	};

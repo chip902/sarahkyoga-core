@@ -3,10 +3,10 @@ import { resolve } from 'path';
 
 const nextConfig = {
     env: {
-        NEXT_PUBLIC_STRAPI_API_URL: process.env.NEXT_PUBLIC_STRAPI_API_URL,
         STRIPE_PUBLISH_KEY_PROD: process.env.STRIPE_PUBLISH_KEY_PROD,
-        STRAPI_TOKEN: process.env.STRAPI_TOKEN,
         NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV: process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV,
+        PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
+        POSTGRES_URL: process.env.POSTGRES_URL,
     },
     webpack: (config, { isServer }) => {
         if (!isServer) {
@@ -19,13 +19,10 @@ const nextConfig = {
             };
         }
 
-        // Add support for importing Payload config
-        config.resolve.alias['payload-config'] = resolve('./payload.config.ts');
-
         return config;
     },
     typescript: {
-        ignoreBuildErrors: true,
+        ignoreBuildErrors: false,
     },
 };
 

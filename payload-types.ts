@@ -110,7 +110,7 @@ export interface Workshop {
     startTime: string;
     endTime: string;
   };
-  description: {
+  description?: {
     root: {
       type: string;
       children: {
@@ -124,7 +124,7 @@ export interface Workshop {
       version: number;
     };
     [k: string]: unknown;
-  };
+  } | null;
   location: string;
   price?: number | null;
   maxParticipants?: number | null;

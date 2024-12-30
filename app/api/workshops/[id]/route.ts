@@ -3,14 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { initPayload } from "@/lib/payload";
 
 // Update a workshop
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
 	try {
+		const body = await req.json();
 		const payload = await initPayload();
 		const workshopData = await req.json();
 
 		const updatedWorkshop = await payload.update({
 			collection: "workshops",
-			id: params.id,
+			id: body.id,
 			data: workshopData,
 		});
 
@@ -27,13 +28,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Delete a workshop
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest) {
 	try {
+		const body = await _req.json();
 		const payload = await initPayload();
 
 		await payload.delete({
 			collection: "workshops",
-			id: params.id,
+			id: body.id,
 		});
 
 		return NextResponse.json({ message: "Workshop deleted successfully" });

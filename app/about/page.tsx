@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Box, Button, Center, Container, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";

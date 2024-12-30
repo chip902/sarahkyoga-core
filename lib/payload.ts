@@ -1,42 +1,31 @@
-// lib/payload.ts
+import payloadConfig from "@/payload.config";
 import payload from "payload";
-import { PayloadClientConfig } from "@payloadcms/next-payload";
-import configModule from "../payload.config";
 
-let isInitialized = false;
+let cached = (global as any).payloadClient || null;
 
-export async function initPayload() {
-	if (!isInitialized) {
-		try {
-			// Ensure secret is set
-			if (!process.env.PAYLOAD_SECRET) {
-				throw new Error("PAYLOAD_SECRET is not set");
-			}
-
-			await payload.init({
-				config: configModule,
-				secret: process.env.PAYLOAD_SECRET!,
-			} as any);
-
-			isInitialized = true;
-		} catch (error) {
-			console.error("Failed to initialize Payload:", error);
-			throw error;
-		}
+export const getPayloadClient = async () => {
+	if (!process.env.PAYLOAD_SECRET) {
+		throw new Error("PAYLOAD_SECRET environment variable is required");
 	}
-	return payload;
-}
 
-// Optional: if you need to access the config directly
-export function getPayloadConfig(): PayloadClientConfig {
-	return {
-		buildConfig: configModule,
-		auth: {
-			verify: async (req) => {
-				// Implement authentication verification logic if needed
-				// This is a placeholder implementation
-				return false;
+	if (cached) {
+		return cached;
+	}
+
+	try {
+		cached = await payload.init({
+			onInit: async (cms) => {
+				cms.logger.info(`Admin URL: ${cms.getAdminURL()}`);
 			},
-		},
-	};
-}
+			config: payloadConfig,
+		});
+		(global as any).payloadClient = cached;
+		return cached;
+	} catch (error: unknown) {
+		console.error("Error initializing Payload:", error);
+		throw error;
+	}
+};
+
+// For the route.ts file
+export { getPayloadClient as initPayload };

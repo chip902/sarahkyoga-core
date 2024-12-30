@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -10,11 +11,10 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
     "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -25,21 +25,26 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "payload": [
+        "./node_modules/payload"
+      ],
+      "payload/*": [
+        "./node_modules/payload/*"
       ]
     },
-    "target": "ES2017",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/fonts.tsx.off",
-    "app/api/users/route.ts",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "payload.config.ts"
   ],
   "exclude": [
     "node_modules"

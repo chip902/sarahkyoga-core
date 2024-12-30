@@ -1,60 +1,32 @@
-// app/api/payload/[...payload]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import payload from "payload";
-import { initPayload } from "@/lib/payload";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getPayloadClient } from "@/lib/payload";
+import { headers } from "next/headers";
 
-export async function handlePayloadRoute(req: NextRequest) {
-	const session = await getServerSession(authOptions);
+// This handler will process all GET and POST requests to /api/payload/[...payload]
+async function handler(req: NextRequest) {
+	const payload = await getPayloadClient();
 
-	if (!session?.user) {
-		return new Response("Unauthorized", { status: 401 });
-	}
+	// Get incoming headers
+	const headersList = await headers();
+	const referer = headersList.get("referer");
 
-	// Initialize Payload if not already initialized
-	await initPayload();
+	// Pass the request through Payload
+	const res = await payload.handle({
+		req,
+		headers: {
+			...Object.fromEntries(headersList.entries()),
+			host: process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
+			referer: referer || undefined,
+		},
+	});
 
-	// Get the path and method from the request
-	const pathname = req.nextUrl.pathname;
-	const method = req.method;
+	// Convert the Payload response to a NextResponse
+	const response = new NextResponse(res.body, {
+		status: res.status,
+		headers: res.headers as HeadersInit,
+	});
 
-	try {
-		// Use Payload's find method to handle the route
-		// You might need to adjust this based on your exact requirements
-		const result = await payload.find({
-			collection: "workshops", // Replace with appropriate collection
-			limit: 50,
-		});
-
-		return NextResponse.json(result);
-	} catch (error) {
-		console.error("Payload route error:", error);
-		return NextResponse.json(
-			{
-				error: "Failed to process request",
-			},
-			{ status: 500 }
-		);
-	}
+	return response;
 }
 
-export async function GET(req: NextRequest) {
-	return handlePayloadRoute(req);
-}
-
-export async function POST(req: NextRequest) {
-	return handlePayloadRoute(req);
-}
-
-export async function PUT(req: NextRequest) {
-	return handlePayloadRoute(req);
-}
-
-export async function PATCH(req: NextRequest) {
-	return handlePayloadRoute(req);
-}
-
-export async function DELETE(req: NextRequest) {
-	return handlePayloadRoute(req);
-}
+export { handler as GET, handler as POST, handler as PATCH, handler as PUT, handler as DELETE };

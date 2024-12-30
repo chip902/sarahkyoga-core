@@ -1,42 +1,42 @@
-// storage-adapter-import-placeholder
-import { vercelPostgresAdapter } from "@payloadcms/db-vercel-postgres";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import path from "path";
 import { buildConfig } from "payload";
+import type { Config } from "payload";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelPostgresAdapter } from "@payloadcms/db-vercel-postgres";
+import path from "path";
 import { fileURLToPath } from "url";
-import sharp from "sharp";
 
-import { Users } from "./collections/Users";
-import { Media } from "./collections/Media";
-import { Workshops } from "./collections/Workshops";
+import { Users } from "./src/collections/Users";
+import { Media } from "./src/collections/Media";
+import { Workshops } from "./src/collections/Workshops";
 
-const filename = fileURLToPath(import.meta.url);
-const dirname = path.dirname(filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-export default buildConfig({
+const config: Config = {
+	serverURL: process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
+	secret: process.env.PAYLOAD_SECRET || "YOUR-SECRET-KEY",
 	admin: {
-		user: Users.slug,
-		importMap: {
-			baseDir: path.resolve(dirname),
-		},
+		user: "users",
 	},
 	collections: [Users, Media, Workshops],
 	cors: ["https://sarahkyoga.com", "https://www.sarahkyoga.com", "http://localhost:3000", "http://localhost:3001"],
+	csrf: ["https://sarahkyoga.com", "https://www.sarahkyoga.com", "http://localhost:3000", "http://localhost:3001"],
 	editor: lexicalEditor({}),
-	secret: process.env.PAYLOAD_SECRET || "",
-	typescript: {
-		outputFile: path.resolve(dirname, "payload-types.ts"),
-	},
 	db: vercelPostgresAdapter({
 		pool: {
-			connectionString: process.env.POSTGRES_URL,
+			connectionString: process.env.POSTGRES_URL || "",
 			ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 			max: 10,
 		},
 		schemaName: "payload",
 	}),
-	sharp,
-	plugins: [
-		// storage-adapter-placeholder
-	],
-});
+	typescript: {
+		outputFile: path.resolve(__dirname, "payload-types.ts"),
+	},
+	graphQL: {
+		schemaOutputFile: path.resolve(__dirname, "generated-schema.graphql"),
+	},
+	debug: process.env.NODE_ENV === "development",
+};
+
+export default buildConfig(config);
