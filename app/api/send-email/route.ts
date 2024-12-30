@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import sgMail from "@sendgrid/mail";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 export async function POST(req: NextRequest) {
 	const frontendDomain = process.env.VERCEL_URL ? process.env.VERCEL_URL : "sarahkyoga.com";

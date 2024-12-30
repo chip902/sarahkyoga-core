@@ -21,6 +21,11 @@
 		"@fontsource-variable/quicksand": "^5.0.18",
 		"@fontsource/quicksand": "^5.0.18",
 		"@next-auth/prisma-adapter": "^1.0.7",
+		"@next/third-parties": "^15.0.2",
+		"@prisma/client": "^5.21.1",
+		"@sendgrid/mail": "^8.1.4",
+		"@stripe/react-stripe-js": "^2.8.1",
+		"@stripe/stripe-js": "^4.9.0",
 		"@tanstack/react-query": "^5.59.20",
 		"@vercel/postgres": "^0.9.0",
 		"axios": "^1.7.7",
@@ -32,9 +37,11 @@
 		"html-to-text": "^9.0.5",
 		"lucide-react": "^0.445.0",
 		"multer": "^1.4.5-lts.1",
+		"next": "^15.1.3",
 		"next-auth": "^4.24.7",
 		"next-connect": "^1.0.0",
 		"next-sitemap": "^4.2.3",
+		"prisma": "^5.21.1",
 		"react": "^18",
 		"react-calendar": "^5.0.0",
 		"react-color": "^2.19.3",
@@ -43,18 +50,12 @@
 		"react-dom": "^18",
 		"react-icons": "^5.2.1",
 		"react-select": "^5.8.0",
+		"react-slick": "^0.30.3",
 		"slick-carousel": "^1.8.1",
 		"stripe": "^17.3.1",
-		"prisma": "^5.21.1",
 		"typescript": "^5.4.5",
 		"uuid": "^11.0.2",
-		"zod": "^3.23.8",
-		"next": "^15.1.3",
-		"@next/third-parties": "^15.0.2",
-		"@prisma/client": "^5.21.1",
-		"@sendgrid/mail": "^8.1.4",
-		"@stripe/react-stripe-js": "^2.8.1",
-		"@stripe/stripe-js": "^4.9.0"
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@types/bcryptjs": "*",
@@ -70,11 +71,9 @@
 		"@types/react-select": "^5.0.0",
 		"@types/react-slick": "^0.23.13",
 		"@types/uuid": "^10.0.0",
-		"dotenv": "^16.4.5",
 		"eslint": "^8",
 		"eslint-config-next": "^14.2.3",
-		"fs": "^0.0.1-security",
-		"react-slick": "^0.30.2"
+		"fs": "^0.0.1-security"
 	},
 	"prisma": {
 		"seed": "ts-node prisma/seed.ts"
