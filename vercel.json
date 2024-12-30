@@ -1,0 +1,5 @@
+{
+	"buildCommand": "prisma generate && next lint && next build",
+	"installCommand": "pnpm install",
+	"framework": "nextjs"
+}
