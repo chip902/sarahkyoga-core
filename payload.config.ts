@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 const config: Config = {
 	serverURL: process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
-	secret: process.env.PAYLOAD_SECRET || "YOUR-SECRET-KEY",
+	secret: process.env.PAYLOAD_SECRET || "ABCD1234efgh",
 	admin: {
 		user: "users",
 	},

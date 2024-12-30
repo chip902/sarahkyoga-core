@@ -21,21 +21,6 @@ export const Workshops: CollectionConfig = {
 	},
 	fields: [
 		{
-			name: "_status",
-			type: "select",
-			defaultValue: "draft",
-			options: [
-				{
-					label: "Draft",
-					value: "draft",
-				},
-				{
-					label: "Published",
-					value: "published",
-				},
-			],
-		},
-		{
 			name: "title",
 			type: "text",
 			required: true,
@@ -91,6 +76,7 @@ export const Workshops: CollectionConfig = {
 		},
 		{
 			name: "description",
+			required: true,
 			type: "richText",
 		},
 		{
