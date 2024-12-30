@@ -1,4 +1,5 @@
-import { initPayload } from "@/lib/payload"; // Adjust path as needed
+// app/admin/dashboard/workshop/page.tsx
+import { initPayload } from "@/lib/payload";
 import WorkshopsDashboard from "./WorkshopsDashboard";
 
 export default async function WorkshopsPage() {

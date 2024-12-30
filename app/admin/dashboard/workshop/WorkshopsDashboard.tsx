@@ -35,7 +35,7 @@ type WorkshopsDashboardProps = {
 	initialWorkshops: Workshop[];
 };
 
-const WorkshopsDashboard: React.FC<WorkshopsDashboardProps> = ({ initialWorkshops }) => {
+const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 	const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops);
 	const [selectedWorkshop, setSelectedWorkshop] = useState<Partial<Workshop> | null>(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();

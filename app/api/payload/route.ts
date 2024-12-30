@@ -1,7 +1,6 @@
 // app/api/payload/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { initPayload } from "@/lib/payload"; // Adjust path as needed
-import { Workshop } from "@/payload-types";
+import { initPayload } from "@/lib/payload";
 
 export async function GET() {
 	try {
