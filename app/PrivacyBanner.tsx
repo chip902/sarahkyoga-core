@@ -1,10 +1,12 @@
 "use client";
+import { Box, Container, HStack, Icon, Stack, Text, useDisclosure } from "@chakra-ui/react";
+import { LuCookie } from "react-icons/lu";
+import { Button } from "@/src/components/ui/button";
 import { useEffect, useState } from "react";
-import { Box, Button, Slide, Text, useDisclosure } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 const PrivacyBanner = () => {
-	const { isOpen, onToggle } = useDisclosure();
+	const { open, onToggle } = useDisclosure();
 	const [isCookieChecked, setIsCookieChecked] = useState(false);
 
 	useEffect(() => {
@@ -24,19 +26,32 @@ const PrivacyBanner = () => {
 	};
 
 	return (
-		<Slide direction="bottom" in={isOpen} style={{ zIndex: 10 }}>
-			<Box flexDirection="row" p="40px" color="white" mt="4" bg="brand.800" rounded="md" shadow="md">
-				<Text color="white" mb={5}>
-					This website uses cookies to improve your experience. We will assume you accept this policy as long as you are using this website.
-				</Text>
-				<Button mx={10} onClick={handleAcceptCookies}>
-					Accept Cookies
-				</Button>
-				<Button as={NextLink} href="/privacy-policy">
-					Privacy Policy
-				</Button>
-			</Box>
-		</Slide>
+		<Box borderBottomWidth="1px" bg="bg.panel">
+			<Container py={{ base: "4", md: "3.5" }}>
+				<Stack gap="4" justifyContent={{ base: "start", md: "space-between" }} flexDirection={{ base: "column", md: "row" }}>
+					<Stack direction={{ base: "column", md: "row" }} alignItems={{ base: "start", md: "center" }} gap={{ base: "1", md: "2" }}>
+						<HStack gap="2">
+							<Icon size="md">
+								<LuCookie />
+							</Icon>
+							<Text fontWeight="medium" display={{ md: "none" }}>
+								Cookie Consent
+							</Text>
+						</HStack>
+						<Text color="fg.muted">
+							We use third-party cookies in order to personalise your experience. Read our{" "}
+							<NextLink href="/privacy-policy">Cookie Policy</NextLink>.
+						</Text>
+					</Stack>
+					<HStack gap="3">
+						<Button variant="outline" colorPalette="gray">
+							Reject
+						</Button>
+						<Button>Allow</Button>
+					</HStack>
+				</Stack>
+			</Container>
+		</Box>
 	);
 };
 

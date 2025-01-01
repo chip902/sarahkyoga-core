@@ -1,26 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-	Box,
-	Flex,
-	Heading,
-	Table,
-	Thead,
-	Tbody,
-	Tr,
-	Th,
-	Td,
-	Spinner,
-	Alert,
-	AlertIcon,
-	AlertTitle,
-	AlertDescription,
-	Container,
-	Skeleton,
-} from "@chakra-ui/react";
+import { Box, Flex, Heading, Table, Container, Skeleton, AlertTitle } from "@chakra-ui/react";
 import { useOrders } from "@/app/hooks/useOrders";
 import { SortConfig, Order } from "@/types";
+import { Alert } from "@/src/components/ui/alert";
 
 const AdminDashboard = () => {
 	const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "ascending" });
@@ -72,66 +56,63 @@ const AdminDashboard = () => {
 
 				{isLoading && (
 					<Flex mt={4} justifyContent="center">
-						<Spinner size="xl" color="blue.500" />
+						<Skeleton boxSize="50px" color="brand.500" />
 					</Flex>
 				)}
 
 				{error && (
-					<Alert status="error" my={4}>
-						<AlertIcon />
-						<AlertTitle>Error:</AlertTitle>
-						<AlertDescription>{error.message}</AlertDescription>
+					<Alert>
+						<AlertTitle>{`Error: ${error.message}`}</AlertTitle>
 					</Alert>
 				)}
 
 				{!isLoading && !error && orders?.length === 0 && (
 					<Alert status="info" my={4}>
-						<AlertIcon />
 						No open orders found.
 					</Alert>
 				)}
 
 				{!isLoading && !error && orders && orders?.length > 0 && (
-					<Table mt={4} variant="striped" colorScheme="gray">
-						<Thead>
-							<Tr>
-								<Th onClick={() => requestSort("orderNumber")}>
+					<Table.Root mt={4} colorScheme="gray">
+						<Table.Header>
+							<Table.Row>
+								<Table.ColumnHeader onClick={() => requestSort("orderNumber")}>
 									<Box _hover={{ cursor: "pointer" }}>Order ID</Box>
-								</Th>
-								<Th onClick={() => requestSort("firstName")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("firstName")}>
 									<Box _hover={{ cursor: "pointer" }}>Name</Box>
-								</Th>
-								<Th onClick={() => requestSort("user.email")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("user.email")}>
 									<Box _hover={{ cursor: "pointer" }}>Email</Box>
-								</Th>
-								<Th onClick={() => requestSort("item.id")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("item.id")}>
 									<Box _hover={{ cursor: "pointer" }}>Product ID</Box>
-								</Th>
-								<Th onClick={() => requestSort("total")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("total")}>
 									<Box _hover={{ cursor: "pointer" }}>Amount ($)</Box>
-								</Th>
-								<Th onClick={() => requestSort("status")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("status")}>
 									<Box _hover={{ cursor: "pointer" }}>Status</Box>
-								</Th>
-								<Th onClick={() => requestSort("createdAt")}>
+								</Table.ColumnHeader>
+								<Table.ColumnHeader onClick={() => requestSort("createdAt")}>
 									<Box _hover={{ cursor: "pointer" }}>Date Created</Box>
-								</Th>
-							</Tr>
-						</Thead>
-						<Tbody>
+								</Table.ColumnHeader>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
 							{sortedOrders?.map((order: Order) => (
-								<Tr key={order.id}>
-									<Td>{order.orderNumber}</Td>
-									<Td>{`${order.user?.firstName} ${order.user?.lastName}`}</Td>
-									<Td>{order.user?.email}</Td>
-									<Td>{order.item?.id}</Td>
-									<Td>{order.total.toFixed(2)}</Td>
-									<Td>{order.status}</Td>
-									<Td>{new Date(order.createdAt).toLocaleDateString()}</Td>
-								</Tr>
+								<Table.Row key={order.id}>
+									<Table.Cell>{order.orderNumber}</Table.Cell>
+									<Table.Cell>{`${order.user?.firstName} ${order.user?.lastName}`}</Table.Cell>
+									<Table.Cell>{order.user?.email}</Table.Cell>
+									<Table.Cell>{order.item?.id}</Table.Cell>
+									<Table.Cell>{order.total.toFixed(2)}</Table.Cell>
+									<Table.Cell>{order.status}</Table.Cell>
+									<Table.Cell>{new Date(order.createdAt).toLocaleDateString()}</Table.Cell>
+								</Table.Row>
 							))}
-						</Tbody>
-					</Table>
+						</Table.Body>
+					</Table.Root>
 				)}
 			</Box>
 		</Container>

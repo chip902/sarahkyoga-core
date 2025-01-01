@@ -1,13 +1,14 @@
 // app/pages/auth/forgot-password.tsx
 "use client";
 import { useState } from "react";
-import { Button, Container, FormControl, FormLabel, Input, Text, useToast } from "@chakra-ui/react";
+import { Button, Container, Text, Input } from "@chakra-ui/react";
 import useForgotPassword from "../../hooks/useForgotPassword";
+import { toaster } from "@/src/components/ui/toaster";
+import { Field } from "@/src/components/ui/field";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
 	const { message, isLoading, resetPassword, handleCallback } = useForgotPassword();
-	const toast = useToast();
 	const onResetForm = () => {
 		setEmail("");
 	};
@@ -16,12 +17,11 @@ const ForgotPassword = () => {
 		await resetPassword(email);
 		handleCallback(onResetForm);
 
-		toast({
+		toaster.create({
 			title: "Password Reset Email Sent",
 			description: message,
-			status: "info",
+			type: "info",
 			duration: 5000,
-			isClosable: true,
 		});
 	};
 
@@ -32,15 +32,13 @@ const ForgotPassword = () => {
 			</Text>
 
 			<form onSubmit={handleSubmit}>
-				<FormControl>
-					<FormLabel htmlFor="email">Email Address</FormLabel>
-					<Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-				</FormControl>
+				<Field>Email Address</Field>
+				<Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
 				<Button
 					mt={10}
 					type="submit"
-					isLoading={isLoading}
+					disabled={isLoading}
 					colorScheme="brand"
 					onClick={(e) => {
 						handleSubmit(e);

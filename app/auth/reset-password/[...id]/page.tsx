@@ -2,12 +2,13 @@
 "use client";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Box, Button, Input, Text, FormLabel, useToast, Container } from "@chakra-ui/react";
+import { Button, Input, Text, Container } from "@chakra-ui/react";
 import useResetPassword from "@/app/hooks/useResetPassword";
+import { toaster } from "@/src/components/ui/toaster";
+import { Field } from "@/src/components/ui/field";
 
 const ResetPassword = () => {
 	const router = useRouter();
-	const toast = useToast();
 	const pathname = useParams()?.token;
 	let parts: string | string[] = [];
 
@@ -28,12 +29,11 @@ const ResetPassword = () => {
 		event.preventDefault();
 
 		if (newPassword !== confirmPassword) {
-			toast({
+			toaster.create({
 				title: "Validation Error",
 				description: "The passwords do not match.",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 			return;
 		}
@@ -52,13 +52,11 @@ const ResetPassword = () => {
 			</Text>
 			{error && <Text color="red.500">{error}</Text>}
 			<form onSubmit={handleSubmit}>
-				<FormLabel htmlFor="newPassword">New Password:</FormLabel>
+				<Field>New Password:</Field>
 				<Input type="password" id="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-				<FormLabel htmlFor="confirmPassword" mt={4}>
-					Confirm Password:
-				</FormLabel>
+				<Field mt={4}>Confirm Password:</Field>
 				<Input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-				<Button type="submit" colorScheme="teal" mt={6} isLoading={isLoading}>
+				<Button type="submit" colorScheme="teal" mt={6} disabled={isLoading}>
 					Reset Password
 				</Button>
 			</form>

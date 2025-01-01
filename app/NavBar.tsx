@@ -1,42 +1,21 @@
 "use client";
-import { ChevronDownIcon, HamburgerIcon } from "@chakra-ui/icons";
-import {
-	Accordion,
-	AccordionButton,
-	AccordionIcon,
-	AccordionItem,
-	AccordionPanel,
-	Box,
-	Button,
-	Drawer,
-	DrawerBody,
-	DrawerContent,
-	DrawerHeader,
-	DrawerOverlay,
-	Grid,
-	HStack,
-	IconButton,
-	Image,
-	Menu,
-	MenuButton,
-	MenuItem,
-	MenuList,
-	Spinner,
-	Stack,
-	VStack,
-	useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Button, Grid, HStack, IconButton, Image, Spinner, Stack, VStack, useDisclosure } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import ShoppingCartPopout from "./components/ShoppingCartPopout";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { ChevronDownIcon } from "lucide-react";
+import { MenuRoot, MenuTrigger, MenuItem, MenuItemGroup } from "@/src/components/ui/menu";
+import { DrawerRoot, DrawerTrigger, DrawerContent, DrawerHeader, DrawerBody } from "@/src/components/ui/drawer";
+import { AccordionItem, AccordionRoot, AccordionItemTrigger } from "@/src/components/ui/accordion";
 
 interface NavBarProps {
 	isResponsive: boolean;
 }
 
 const NavBar = ({ isResponsive }: NavBarProps) => {
-	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { open, onOpen, onClose } = useDisclosure();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const closeTimeoutRef = useRef<number | null>(null);
 	const { status, data: session } = useSession();
@@ -68,117 +47,98 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 					</Box>
 					<Box display="flex" justifyContent="flex-end" alignItems="center" px={10}>
 						<NextLink href="/" passHref legacyBehavior>
-							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} mx={5}>
 								Home
 							</Button>
 						</NextLink>
 						<NextLink href="/about" passHref legacyBehavior>
-							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} mx={5}>
 								About
 							</Button>
 						</NextLink>
-						<Menu isOpen={menuOpen} onClose={closeMenu}>
-							<MenuButton
-								variant="linkNav"
-								fontSize="lg"
-								as={Button}
-								height="normal"
-								lineHeight="1.2"
-								backgroundColor="transparent"
-								rightIcon={<ChevronDownIcon height="100%" lineHeight="normal" boxSize="20px" />}
-								onMouseEnter={openMenu}
-								onMouseLeave={closeMenu}
-								_focus={{ outline: "none", boxShadow: "none" }}>
-								Schedule
-							</MenuButton>
-							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
-								<VStack py="10px">
-									<NextLink href="/classes" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
-											All Classes
-										</Button>
-									</NextLink>
-									<NextLink href="/booking" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
-											Private Sessions
-										</Button>
-									</NextLink>
-									<HStack>
-										<NextLink href="/workshops" passHref legacyBehavior>
-											<Button as="a" variant="linkNav" onClick={onClose} my={5}>
-												Workshops
+						<MenuRoot open={menuOpen} onExitComplete={closeMenu}>
+							<MenuItemGroup>
+								<MenuItem
+									value="schedule"
+									fontSize="lg"
+									as={Button}
+									height="normal"
+									lineHeight="1.2"
+									backgroundColor="transparent"
+									onMouseEnter={openMenu}
+									onMouseLeave={closeMenu}
+									_focus={{ outline: "none", boxShadow: "none" }}>
+									<ChevronDownIcon />
+									Schedule
+								</MenuItem>
+								<MenuItem value="menu-toggle" onMouseEnter={openMenu} onMouseLeave={closeMenu}>
+									<VStack py="10px">
+										<NextLink href="/classes" passHref legacyBehavior>
+											<Button as="a" onClick={onClose} my={5}>
+												All Classes
 											</Button>
 										</NextLink>
-									</HStack>
-								</VStack>
-							</MenuList>
-						</Menu>
+										<NextLink href="/booking" passHref legacyBehavior>
+											<Button as="a" onClick={onClose} my={5}>
+												Private Sessions
+											</Button>
+										</NextLink>
+										<HStack>
+											<NextLink href="/workshops" passHref legacyBehavior>
+												<Button as="a" onClick={onClose} my={5}>
+													Workshops
+												</Button>
+											</NextLink>
+										</HStack>
+									</VStack>
+								</MenuItem>
+							</MenuItemGroup>
+						</MenuRoot>
 						<NextLink href="/contact" passHref legacyBehavior>
-							<Button
-								as="a"
-								height="100%"
-								lineHeight="1.2"
-								p={0}
-								backgroundColor="transparent"
-								flex={1}
-								variant="linkNav"
-								mx={5}
-								marginRight={35}>
+							<Button as="a" height="100%" lineHeight="1.2" p={0} backgroundColor="transparent" flex={1} mx={5} marginRight={35}>
 								Contact
 							</Button>
 						</NextLink>
 						{status === "loading" ? (
 							<Spinner size="lg" marginRight={70} />
 						) : status === "authenticated" && session?.user.role === "admin" ? (
-							<Menu>
-								<MenuButton variant="linkNav" as={Button} rightIcon={<ChevronDownIcon />} marginRight={70}>
-									Admin
-								</MenuButton>
-								<MenuList>
+							<MenuRoot>
+								<MenuTrigger>
+									<Button as={Button} marginRight={70}>
+										<ChevronDownIcon />
+										Admin
+									</Button>
+								</MenuTrigger>
+								<MenuItemGroup>
 									<NextLink href="/admin/dashboard" passHref legacyBehavior>
-										<MenuItem>Dashboard</MenuItem>
+										<MenuItem value="dashboard">Dashboard</MenuItem>
 									</NextLink>
 									<NextLink href="/admin/users" passHref legacyBehavior>
-										<MenuItem>Manage Users</MenuItem>
+										<MenuItem value="manage-users">Manage Users</MenuItem>
 									</NextLink>
 									<NextLink href="/admin/dashboard/workshop" passHref legacyBehavior>
-										<MenuItem>Manage Workshops</MenuItem>
+										<MenuItem value="manage-workshops">Manage Workshops</MenuItem>
 									</NextLink>
 									<NextLink href="/admin/newsletter" passHref legacyBehavior>
-										<MenuItem>Newsletter</MenuItem>
+										<MenuItem value="newsletter">Newsletter</MenuItem>
 									</NextLink>
-									<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
-								</MenuList>
-							</Menu>
+									<MenuItem value="sign-out" onClick={handleSignOut}>
+										Sign Out
+									</MenuItem>
+								</MenuItemGroup>
+							</MenuRoot>
 						) : status === "authenticated" ? (
-							<Button
-								height="100%"
-								lineHeight="1.2"
-								p={0}
-								backgroundColor="transparent"
-								flex={1}
-								variant="linkNav"
-								mx={5}
-								marginRight={70}
-								onClick={handleSignOut}>
+							<Button height="100%" lineHeight="1.2" p={0} backgroundColor="transparent" flex={1} mx={5} marginRight={70} onClick={handleSignOut}>
 								Sign Out
 							</Button>
 						) : (
 							<NextLink href="/auth/login" passHref legacyBehavior>
-								<Button
-									as="a"
-									height="100%"
-									lineHeight="1.2"
-									p={0}
-									backgroundColor="transparent"
-									flex={1}
-									variant="linkNav"
-									mx={5}
-									marginRight={70}>
+								<Button as="a" height="100%" lineHeight="1.2" p={0} backgroundColor="transparent" flex={1} mx={5} marginRight={70}>
 									Sign In
 								</Button>
 							</NextLink>
 						)}
+
 						<ShoppingCartPopout isResponsive={isResponsive} />
 					</Box>
 				</Grid>
@@ -193,84 +153,64 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
 					<Box>
-						<Menu>
-							<MenuButton
-								alignItems="center"
-								as={IconButton}
-								aria-label="Open menu"
-								icon={<HamburgerIcon />}
-								variant="outline"
-								onClick={onOpen}
-							/>
-						</Menu>
+						<MenuRoot>
+							<MenuItem value="menu-toggle">
+								<Button alignItems="center" as={IconButton} aria-label="Open menu" variant="outline" onClick={onOpen} value="toggle menu" />
+								<GiHamburgerMenu />
+							</MenuItem>
+						</MenuRoot>
 					</Box>
-					<Drawer isOpen={isOpen} placement="start" onClose={onClose}>
-						<DrawerOverlay />
+					<DrawerRoot open={open} placement="start" closeOnInteractOutside>
+						<DrawerTrigger />
 						<DrawerContent flexDirection="column">
 							<DrawerHeader textAlign="center" as="h2" borderBottomWidth="1px">
 								Sarah K Yoga
 							</DrawerHeader>
 							<DrawerBody textAlign="left" flexDirection="column">
-								<Stack direction="column" spacing={4}>
+								<Stack direction="column" gap={4}>
 									<NextLink href="/" passHref legacyBehavior>
-										<Button variant="mobileMenu" onClick={onClose}>
-											Home
-										</Button>
+										<Button onClick={onClose}>Home</Button>
 									</NextLink>
 									<NextLink href="/about" passHref legacyBehavior>
-										<Button variant="mobileMenu" onClick={onClose}>
-											About Me
-										</Button>
+										<Button onClick={onClose}>About Me</Button>
 									</NextLink>
-									<Accordion allowToggle>
-										<AccordionItem border="none">
-											<AccordionButton>
+									<AccordionRoot collapsible>
+										<AccordionItem value="schedule" border="none">
+											<AccordionItemTrigger>
 												<Box as="span" flex="1" textAlign="left" fontWeight="semibold">
 													Schedule
 												</Box>
-												<AccordionIcon />
-											</AccordionButton>
-											<AccordionPanel pb={4}>
+												<GiHamburgerMenu />
+											</AccordionItemTrigger>
+											<AccordionItemTrigger pb={4}>
 												<NextLink href="/classes" passHref legacyBehavior>
-													<Button variant="mobileMenu" onClick={onClose}>
-														All Classes
-													</Button>
+													<Button onClick={onClose}>All Classes</Button>
 												</NextLink>
 												<NextLink href="/booking" passHref legacyBehavior>
-													<Button variant="mobileMenu" onClick={onClose}>
-														Private Sessions
-													</Button>
+													<Button onClick={onClose}>Private Sessions</Button>
 												</NextLink>
 												<NextLink href="/workshops" passHref legacyBehavior>
-													<Button variant="mobileMenu" onClick={onClose}>
-														Workshops
-													</Button>
+													<Button onClick={onClose}>Workshops</Button>
 												</NextLink>
-											</AccordionPanel>
+											</AccordionItemTrigger>
 										</AccordionItem>
-									</Accordion>
+									</AccordionRoot>
 									<NextLink href="/contact" passHref legacyBehavior>
-										<Button variant="mobileMenu" onClick={onClose}>
-											Contact
-										</Button>
+										<Button onClick={onClose}>Contact</Button>
 									</NextLink>
 									{status === "loading" ? (
 										<Spinner size="lg" marginRight={70} />
 									) : status === "authenticated" ? (
-										<Button variant="mobileMenu" onClick={handleSignOut}>
-											Sign Out
-										</Button>
+										<Button onClick={handleSignOut}>Sign Out</Button>
 									) : (
 										<NextLink href="/auth/login" passHref legacyBehavior>
-											<Button variant="mobileMenu" onClick={onClose}>
-												Sign In
-											</Button>
+											<Button onClick={onClose}>Sign In</Button>
 										</NextLink>
 									)}
 								</Stack>
 							</DrawerBody>
 						</DrawerContent>
-					</Drawer>
+					</DrawerRoot>
 				</Grid>
 			</nav>
 		);

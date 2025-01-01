@@ -1,6 +1,6 @@
 // app/admin/users/page.tsx
 "use client";
-import { Table, Tbody, Td, Th, Thead, Tr, Button, Container } from "@chakra-ui/react";
+import { Button, Container, TableRoot, TableHeader, TableRow, TableColumnHeader, TableBody, TableCell } from "@chakra-ui/react";
 import { User } from "@prisma/client";
 import axios from "axios";
 
@@ -34,31 +34,31 @@ const Users = () => {
 
 	return (
 		<Container mt={80}>
-			<Table variant="simple">
-				<Thead>
-					<Tr>
-						<Th>Name</Th>
-						<Th>Email</Th>
-						<Th>Actions</Th>
-					</Tr>
-				</Thead>
-				<Tbody>
+			<TableRoot>
+				<TableHeader>
+					<TableRow>
+						<TableColumnHeader>Name</TableColumnHeader>
+						<TableColumnHeader>Email</TableColumnHeader>
+						<TableColumnHeader>Actions</TableColumnHeader>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
 					{users.map((user) => (
-						<Tr key={user.id}>
-							<Td>{user.name}</Td>
-							<Td>{user.email}</Td>
-							<Td>
+						<TableRow key={user.id}>
+							<TableCell>{user.name}</TableCell>
+							<TableCell>{user.email}</TableCell>
+							<TableCell>
 								<Button colorScheme="blue" mr={2}>
 									Edit
 								</Button>
 								<Button colorScheme="red" onClick={() => handleDelete(user.id)}>
 									Delete
 								</Button>
-							</Td>
-						</Tr>
+							</TableCell>
+						</TableRow>
 					))}
-				</Tbody>
-			</Table>
+				</TableBody>
+			</TableRoot>
 		</Container>
 	);
 };

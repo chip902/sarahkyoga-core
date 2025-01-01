@@ -6,7 +6,7 @@ import ReservationComponent from "./ReservationComponent";
 const BookingPage = () => {
 	return (
 		<Container maxW="xl" py={12} mt={8}>
-			<VStack spacing={8}>
+			<VStack gap={8}>
 				<ReservationComponent
 					onNext={(availableOptions, dateTime) => {
 						console.log("Available options:", availableOptions);

@@ -7,8 +7,6 @@ import {
 	VStack,
 	Box,
 	Spinner,
-	Alert,
-	AlertIcon,
 	useDisclosure,
 	HStack,
 	Card,
@@ -19,9 +17,8 @@ import {
 	SimpleGrid,
 	Stack,
 	Flex,
-	Collapse,
+	Collapsible,
 	IconButton,
-	useToast,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Calendar } from "react-date-range";
@@ -31,6 +28,8 @@ import Select from "react-select";
 import useCheckAvailability from "../hooks/useCheckAvailability";
 import { BookNowButton } from "./BookNow";
 import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
+import { toaster } from "@/src/components/ui/toaster";
+import { Alert } from "@/src/components/ui/alert";
 
 interface IReservationComponentProps {
 	onNext: (availableOptions: string[], dateTime: Date) => void;
@@ -42,11 +41,10 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	const [selectedTime, setSelectedTime] = useState<string | null>(null);
 	const [zoomAvailable, setZoomAvailable] = useState<string | null>();
 	const [inPersonAvailable, setInPersonAvailable] = useState<string | null>();
-	const { isOpen, onOpen } = useDisclosure();
+	const { open, onOpen } = useDisclosure();
 	const [showZoomClassInfo, setShowZoomClassInfo] = useState(false);
 	const { checkAvailability, loading, error } = useCheckAvailability();
 	const [dateError, setDateError] = useState<string | null>(null);
-	const toast = useToast();
 
 	// Define the time slots array
 	const timeSlots = Array.from({ length: 10 }, (_, index) => {
@@ -107,12 +105,11 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 				// Call the onNext prop with available options and the selected date/time
 				onNext([zoomAvailability === "Available" ? "Zoom" : "", inPersonAvailability === "Available" ? "In-Person" : ""].filter(Boolean), finalDate);
 			} else {
-				toast({
+				toaster.create({
 					title: "Availabilty Issue",
 					description: "There are no slots available for the selected date and time. Try another selection.",
-					status: "error",
+					type: "error",
 					duration: 5000,
-					isClosable: true,
 				});
 			}
 		}
@@ -132,30 +129,34 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			alignItems="center"
 			textAlign="center"
 			transition="max-width 0.5s ease-in-out">
-			<VStack spacing={4} alignItems="center" width="100%">
+			<VStack gap={4} alignItems="center" width="100%">
 				<Box as="section" pt={{ base: "4", md: "8" }} pb={{ base: "12", md: "24" }}>
 					<Container>
 						<Box px="4" py="5" bg="brand.700" opacity="0.8" borderRadius="lg">
 							<Flex justifyContent="space-between" alignItems="center">
-								<Stack spacing="1">
-									<Text textStyle="lg" fontWeight="medium" color="brand.200">
-										Looking for my Sunday Zoom Class?
-									</Text>
-									<Collapse in={showZoomClassInfo}>
-										<Text textStyle="sm" color="brand.400">
-											Click below to get on my next Sunday Zoom Class!
-										</Text>
-										<BookNowButton productId="0" />
-									</Collapse>
+								<Stack gap="1">
+									<Collapsible.Root>
+										<Collapsible.Trigger>
+											<Text textStyle="lg" fontWeight="medium" color="brand.200">
+												Looking for my Sunday Zoom Class?
+											</Text>
+										</Collapsible.Trigger>
+										<Collapsible.Content>
+											<Text textStyle="sm" color="brand.400">
+												Click below to get on my next Sunday Zoom Class!
+											</Text>
+											<BookNowButton productId="0" />
+										</Collapsible.Content>
+									</Collapsible.Root>
 								</Stack>
 								<Flex padding={5}>
 									<IconButton
 										size="sm"
 										bg="brand.600"
 										onClick={() => setShowZoomClassInfo(!showZoomClassInfo)}
-										icon={showZoomClassInfo ? <ChevronUpIcon /> : <ChevronDownIcon />}
-										aria-label="Toggle update info"
-									/>
+										aria-label="Toggle update info">
+										{showZoomClassInfo ? <ChevronUpIcon /> : <ChevronDownIcon />}
+									</IconButton>
 								</Flex>
 							</Flex>
 						</Box>
@@ -172,16 +173,11 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 						minDate={new Date()} // Disable past dates
 					/>
 				</Box>
-				{dateError && (
-					<Alert status="error" width="100%">
-						<AlertIcon />
-						{dateError}
-					</Alert>
-				)}
+				{dateError && <Alert status="error" width="100%" title={dateError} />}
 			</VStack>
 
-			{isOpen && !dateError && (
-				<VStack spacing={4} alignItems="center" mt={4} width="100%">
+			{open && !dateError && (
+				<VStack gap={4} alignItems="center" mt={4} width="100%">
 					<Text fontSize={{ base: "md", lg: "lg" }} mt={4}>
 						Select Desired Time
 					</Text>
@@ -206,24 +202,22 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 					{loading && <Spinner size="lg" color="teal.500" />}
 					{error && (
 						<Alert status="error" width="100%">
-							<AlertIcon />
 							{error}
 						</Alert>
 					)}
 					{availability && (
 						<VStack>
 							<Alert status={availability === "Available" ? "success" : "warning"} width="100%">
-								<AlertIcon />
 								{availability === "Available" ? "The selected time is available!" : "The selected time is busy!"}
 							</Alert>
 
 							{/* Conditionally Render SimpleGrid Based on Availability */}
 							{availability === "Available" && (
 								<VStack>
-									<SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
+									<SimpleGrid gap={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
 										{/* Conditionally Render the Cards Based on Availability */}
 										{zoomAvailable && (
-											<Card variant="productCard">
+											<Card.Root variant="elevated">
 												<CardHeader>
 													<Heading fontFamily="inherit" size="md">
 														60-Min Zoom Session
@@ -237,12 +231,12 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 												<CardFooter>
 													<BookNowButton productId="1" />
 												</CardFooter>
-											</Card>
+											</Card.Root>
 										)}
 
 										{inPersonAvailable && (
 											<>
-												<Card variant="productCard">
+												<Card.Root variant="elevated">
 													<CardHeader>
 														<Heading fontFamily="inherit" size="md">
 															75-Min In-Person (1-2 People)
@@ -256,8 +250,8 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 													<CardFooter>
 														<BookNowButton productId="2" />
 													</CardFooter>
-												</Card>
-												<Card variant="productCard">
+												</Card.Root>
+												<Card.Root variant="elevated">
 													<CardHeader>
 														<Heading fontFamily="inherit" size="md">
 															75-Min In-Person (3+ People)
@@ -271,7 +265,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 													<CardFooter>
 														<BookNowButton productId="3" />
 													</CardFooter>
-												</Card>
+												</Card.Root>
 											</>
 										)}
 									</SimpleGrid>
@@ -280,9 +274,9 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 						</VStack>
 					)}
 
-					<HStack spacing={4} mt={4} alignItems="center">
+					<HStack gap={4} mt={4} alignItems="center">
 						{!availability && (
-							<Button colorScheme="teal" isDisabled={!selectedDate || !selectedTime || loading || !!dateError} onClick={handleNextClick}>
+							<Button colorScheme="teal" disabled={!selectedDate || !selectedTime || loading || !!dateError} onClick={handleNextClick}>
 								Check Time
 							</Button>
 						)}

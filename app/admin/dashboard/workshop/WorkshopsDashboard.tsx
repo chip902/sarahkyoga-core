@@ -1,34 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import {
-	Box,
-	Flex,
-	Heading,
-	Table,
-	Thead,
-	Tbody,
-	Tr,
-	Th,
-	Td,
-	Button,
-	Container,
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalFooter,
-	ModalBody,
-	ModalCloseButton,
-	useDisclosure,
-	FormControl,
-	FormLabel,
-	Input,
-	Select,
-	VStack,
-	useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, Heading, Table, Button, Container, useDisclosure, Input, VStack, createListCollection } from "@chakra-ui/react";
+import { toaster } from "@/src/components/ui/toaster";
+import { SelectContent, SelectItem, SelectRoot } from "@/src/components/ui/select";
+
 import { type Workshop } from "@/payload-types";
+import { DialogBody, DialogFooter, DialogHeader, DialogRoot } from "@/src/components/ui/dialog";
+import { Field } from "@/src/components/ui/field";
 
 // Define props type
 type WorkshopsDashboardProps = {
@@ -36,10 +15,17 @@ type WorkshopsDashboardProps = {
 };
 
 const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
+	const [value, setValue] = useState<string[]>([]);
 	const [workshops, setWorkshops] = useState<Workshop[]>(initialWorkshops);
 	const [selectedWorkshop, setSelectedWorkshop] = useState<Partial<Workshop> | null>(null);
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const toast = useToast();
+	const { open, onOpen, onClose } = useDisclosure();
+	const frequencyCollection = createListCollection({
+		items: [
+			{ label: "Single Day", value: "single" },
+			{ label: "Weekly", value: "weekly" },
+			{ label: "Custom Range", value: "range" },
+		],
+	});
 
 	// Create a new workshop
 	const handleCreateWorkshop = async () => {
@@ -59,22 +45,20 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 			const newWorkshop = await response.json();
 			setWorkshops([...workshops, newWorkshop]);
 
-			toast({
+			toaster.create({
 				title: "Workshop Created",
-				status: "success",
+				type: "success",
 				duration: 3000,
-				isClosable: true,
 			});
 
 			onClose();
 			setSelectedWorkshop(null);
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error",
 				description: error instanceof Error ? error.message : "An error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
 	};
@@ -99,22 +83,20 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 			const updatedWorkshop = await response.json();
 			setWorkshops(workshops.map((w) => (w.id === updatedWorkshop.id ? updatedWorkshop : w)));
 
-			toast({
+			toaster.create({
 				title: "Workshop Updated",
-				status: "success",
+				type: "success",
 				duration: 3000,
-				isClosable: true,
 			});
 
 			onClose();
 			setSelectedWorkshop(null);
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error",
 				description: error instanceof Error ? error.message : "An error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
 	};
@@ -132,19 +114,17 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 
 			setWorkshops(workshops.filter((w) => w.id !== id));
 
-			toast({
+			toaster.create({
 				title: "Workshop Deleted",
-				status: "success",
+				type: "success",
 				duration: 3000,
-				isClosable: true,
 			});
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error",
 				description: error instanceof Error ? error.message : "An error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
 	};
@@ -192,48 +172,45 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 						</Button>
 					</Flex>
 
-					<Table variant="simple">
-						<Thead>
-							<Tr>
-								<Th>Title</Th>
-								<Th>Recurrence</Th>
-								<Th>Start Date</Th>
-								<Th>Status</Th>
-								<Th>Actions</Th>
-							</Tr>
-						</Thead>
-						<Tbody>
+					<Table.Root>
+						<Table.Header>
+							<Table.Header>
+								<Table.ColumnHeader>Title</Table.ColumnHeader>
+								<Table.ColumnHeader>Recurrence</Table.ColumnHeader>
+								<Table.ColumnHeader>Start Date</Table.ColumnHeader>
+								<Table.ColumnHeader>Status</Table.ColumnHeader>
+								<Table.ColumnHeader>Actions</Table.ColumnHeader>
+							</Table.Header>
+						</Table.Header>
+						<Table.Body>
 							{workshops.map((workshop) => (
-								<Tr key={workshop.id}>
-									<Td>{workshop.title}</Td>
-									<Td>{workshop.recurrence}</Td>
-									<Td>{workshop.startDate}</Td>
-									<Td>{workshop._status || "draft"}</Td>
-									<Td>
+								<Table.Row key={workshop.id}>
+									<Table.Cell>{workshop.title}</Table.Cell>
+									<Table.Cell>{workshop.recurrence}</Table.Cell>
+									<Table.Cell>{workshop._status || "draft"}</Table.Cell>
+									<Table.Cell>
 										<Button size="sm" mr={2} onClick={() => openEditModal(workshop)}>
 											Edit
 										</Button>
 										<Button size="sm" colorScheme="red" onClick={() => handleDeleteWorkshop(workshop.id)}>
 											Delete
 										</Button>
-									</Td>
-								</Tr>
+									</Table.Cell>
+								</Table.Row>
 							))}
-						</Tbody>
-					</Table>
+						</Table.Body>
+					</Table.Root>
 				</Box>
 			</Container>
 
 			{/* Workshop Modal */}
-			<Modal isOpen={isOpen} onClose={onClose} size="xl">
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>{selectedWorkshop?.id ? "Edit Workshop" : "Create New Workshop"}</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody>
-						<VStack spacing={4}>
-							<FormControl>
-								<FormLabel>Title</FormLabel>
+			<DialogRoot open={open} closeOnInteractOutside size="xl">
+				<DialogBody>
+					<DialogHeader>{selectedWorkshop?.id ? "Edit Workshop" : "Create New Workshop"}</DialogHeader>
+					<DialogBody>
+						<VStack gap={4}>
+							<form>
+								<Field>Title</Field>
 								<Input
 									value={selectedWorkshop?.title || ""}
 									onChange={(e) =>
@@ -244,27 +221,20 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 									}
 									placeholder="Enter workshop title"
 								/>
-							</FormControl>
 
-							<FormControl>
-								<FormLabel>Recurrence</FormLabel>
-								<Select
-									value={selectedWorkshop?.recurrence || "single"}
-									onChange={(e) =>
-										setSelectedWorkshop((prev) => ({
-											...(prev || {}),
-											recurrence: e.target.value as Workshop["recurrence"],
-										}))
-									}>
-									<option value="single">Single Day</option>
-									<option value="weekly">Weekly</option>
-									<option value="range">Custom Range</option>
-								</Select>
-							</FormControl>
+								<Field>Recurrence</Field>
+								<SelectRoot value={value} onValueChange={(e) => setValue(e.value)} collection={frequencyCollection}>
+									<SelectContent>
+										{frequencyCollection.items.map((movie) => (
+											<SelectItem item={movie} key={movie.value}>
+												{movie.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</SelectRoot>
 
-							<Flex width="full" gap={4}>
-								<FormControl>
-									<FormLabel>Start Date</FormLabel>
+								<Flex width="full" gap={4}>
+									<Field>Start Date</Field>
 									<Input
 										type="date"
 										value={selectedWorkshop?.startDate || ""}
@@ -275,9 +245,8 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 											}))
 										}
 									/>
-								</FormControl>
-								<FormControl>
-									<FormLabel>End Date</FormLabel>
+
+									<Field>End Date</Field>
 									<Input
 										type="date"
 										value={selectedWorkshop?.endDate || ""}
@@ -288,12 +257,10 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 											}))
 										}
 									/>
-								</FormControl>
-							</Flex>
+								</Flex>
 
-							<Flex width="full" gap={4}>
-								<FormControl>
-									<FormLabel>Start Time</FormLabel>
+								<Flex width="full" gap={4}>
+									<Field>Start Time</Field>
 									<Input
 										type="time"
 										value={selectedWorkshop?.timeRange?.startTime || ""}
@@ -307,9 +274,8 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 											}))
 										}
 									/>
-								</FormControl>
-								<FormControl>
-									<FormLabel>End Time</FormLabel>
+
+									<Field>End Time</Field>
 									<Input
 										type="time"
 										value={selectedWorkshop?.timeRange?.endTime || ""}
@@ -323,11 +289,9 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 											}))
 										}
 									/>
-								</FormControl>
-							</Flex>
+								</Flex>
 
-							<FormControl>
-								<FormLabel>Location</FormLabel>
+								<Field>Location</Field>
 								<Input
 									value={selectedWorkshop?.location || ""}
 									onChange={(e) =>
@@ -338,19 +302,19 @@ const WorkshopsDashboard = ({ initialWorkshops }: WorkshopsDashboardProps) => {
 									}
 									placeholder="Enter workshop location"
 								/>
-							</FormControl>
+							</form>
 						</VStack>
-					</ModalBody>
-					<ModalFooter>
+					</DialogBody>
+					<DialogFooter>
 						<Button colorScheme="blue" mr={3} onClick={selectedWorkshop?.id ? handleUpdateWorkshop : handleCreateWorkshop}>
 							{selectedWorkshop?.id ? "Update" : "Create"}
 						</Button>
 						<Button variant="ghost" onClick={onClose}>
 							Cancel
 						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+					</DialogFooter>
+				</DialogBody>
+			</DialogRoot>
 		</>
 	);
 };

@@ -1,11 +1,11 @@
 "use client";
-import React from "react";
-import { Box, Button, Center, Container, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
+import { Box, Center, Container, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
 import { testimonials } from "./data";
 import NextLink from "next/link";
 import { MutableRefObject, ReactNode } from "react";
+import { Button } from "@/src/components/ui/button";
 
 const AboutPage = () => {
 	const settings = {
@@ -110,8 +110,8 @@ const AboutPage = () => {
 							<br />
 							Bedford Hills, NY 10517
 						</Text>
-						<NextLink href="https://katonahyoga.com/" passHref legacyBehavior>
-							<Button as="a" flex={1} variant="inline" target="_blank">
+						<NextLink href="https://katonahyoga.com/" passHref legacyBehavior target="blank">
+							<Button as="a" flex={1}>
 								www.katonahyoga.com
 							</Button>
 						</NextLink>
