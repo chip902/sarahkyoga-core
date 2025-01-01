@@ -2,12 +2,13 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import ContentEditable from "react-contenteditable";
-import { Box, Button, Input, HStack, useToast } from "@chakra-ui/react";
+import { Box, Button, Input, HStack } from "@chakra-ui/react";
 import TextEditorToolbar from "./TextEditorToolbar";
 import { TextStyle, TextHistory } from "./types";
 import { convert } from "html-to-text";
 import PublishConfirmDialog from "../newsletter/PublishConfirmDialoge";
 import axios from "axios";
+import { toaster } from "@/src/components/ui/toaster";
 
 const DEFAULT_STYLE: TextStyle = {
 	fontFamily: "Quicksand",
@@ -65,7 +66,6 @@ export default function TextEditor({
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
-	const toast = useToast();
 
 	useEffect(() => {
 		setContent(initialContent);
@@ -210,11 +210,10 @@ export default function TextEditor({
 	const handleCopy = () => {
 		const text = convert(content, { wordwrap: 130 });
 		navigator.clipboard.writeText(text).then(() => {
-			toast({
+			toaster.create({
 				title: "Copied to clipboard",
-				status: "success",
+				type: "success",
 				duration: 2000,
-				isClosable: true,
 			});
 		});
 	};
@@ -230,11 +229,10 @@ export default function TextEditor({
 
 	const handleSave = async (isDraft: boolean, isTest: boolean) => {
 		if (!subject.trim()) {
-			toast({
+			toaster.create({
 				title: "Subject is required",
-				status: "error",
+				type: "error",
 				duration: 3000,
-				isClosable: true,
 			});
 			return;
 		}
@@ -284,20 +282,18 @@ export default function TextEditor({
 					throw new Error("Failed to save newsletter");
 				}
 
-				toast({
+				toaster.create({
 					title: `Newsletter ${isDraft ? (isTest ? "saved as draft and sent test email." : "saved as draft") : "published"}`,
-					status: "success",
+					type: "success",
 					duration: 3000,
-					isClosable: true,
 				});
 			}
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error saving newsletter",
 				description: error instanceof Error ? error.message : "Unknown error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		} finally {
 			setIsSaving(false);
@@ -333,8 +329,8 @@ export default function TextEditor({
 			<Box
 				mt={4}
 				className="editor-container"
-				sx={{
-					".newsletter-content": {
+				css={{
+					"& .newsletter-content": {
 						minHeight: "500px",
 						border: "1px solid",
 						borderColor: "gray.200",
@@ -344,7 +340,6 @@ export default function TextEditor({
 					},
 				}}>
 				<ContentEditable
-					innerRef={textEditorRef}
 					html={content}
 					onChange={handleChange}
 					className="text-editor-content"
@@ -361,14 +356,14 @@ export default function TextEditor({
 				/>
 			</Box>
 
-			<HStack mt={4} spacing={4}>
-				<Button colorScheme="blue" onClick={() => handleSave(true, false)} isLoading={isSaving}>
+			<HStack mt={4} gap={4}>
+				<Button colorScheme="blue" onClick={() => handleSave(true, false)} disabled={isSaving}>
 					Save as Draft
 				</Button>
-				<Button colorScheme="green" onClick={() => handleSave(false, false)} isLoading={isSaving}>
+				<Button colorScheme="green" onClick={() => handleSave(false, false)} disabled={isSaving}>
 					Publish
 				</Button>
-				<Button variant="preview" onClick={() => handleSave(true, true)} isLoading={isSaving}>
+				<Button variant="plain" onClick={() => handleSave(true, true)} disabled={isSaving}>
 					Test Publish
 				</Button>
 			</HStack>

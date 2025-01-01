@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, VStack, useToast } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import TextEditor from "../text-editor/TextEditor";
 import { TextStyle } from "../text-editor/types";
+import { toaster } from "@/src/components/ui/toaster";
 
 interface NewsletterEditorProps {
 	onSave: (title: string, content: string, style: TextStyle, isDraft: boolean) => void;
@@ -22,15 +23,13 @@ const DEFAULT_STYLE: TextStyle = {
 
 const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ onSave }) => {
 	const [style, setStyle] = useState<TextStyle>(DEFAULT_STYLE);
-	const toast = useToast();
 
 	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
 		if (!data.subject.trim()) {
-			toast({
+			toaster.create({
 				title: "Subject is required",
-				status: "error",
+				type: "error",
 				duration: 3000,
-				isClosable: true,
 			});
 			return;
 		}
@@ -38,7 +37,7 @@ const NewsletterEditor: React.FC<NewsletterEditorProps> = ({ onSave }) => {
 	};
 
 	return (
-		<VStack spacing={4} align="stretch">
+		<VStack gap={4} align="stretch">
 			<Box borderWidth={1} borderRadius="md">
 				<TextEditor initialStyle={style} onSave={handleSave} />
 			</Box>

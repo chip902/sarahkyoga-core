@@ -2,11 +2,13 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { HStack, Select, IconButton, Tooltip, Popover, PopoverTrigger, PopoverContent, Box } from "@chakra-ui/react";
+import { HStack, IconButton, Popover, PopoverTrigger, PopoverContent, Box } from "@chakra-ui/react";
 import type { ColorResult } from "react-color";
 import { AlignLeft, AlignCenter, AlignRight, Type, Bold, Italic, Underline, Palette, RotateCcw, RotateCw, Copy, Trash2 } from "lucide-react";
 import { TextStyle } from "./types";
+import { Tooltip } from "@/src/components/ui/tooltip";
 import { ImageUploadButton } from "./ImageUpload";
+import { SelectContent } from "@/src/components/ui/select";
 
 const ColorPicker = dynamic(() => import("./ColorPicker"), {
 	ssr: false,
@@ -41,12 +43,10 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 
 	return (
 		<Box bg="white" p={2} borderRadius="md" borderWidth="1px" borderColor="gray.200" shadow="sm">
-			<HStack spacing={2} flexWrap="wrap">
-				<Select
-					value={style.fontFamily}
-					onChange={(e) => onStyleChange({ fontFamily: e.target.value })}
+			<HStack gap={2} flexWrap="wrap">
+				<SelectContent
+					onChange={(e) => onStyleChange({ fontFamily: e.value })}
 					width="150px"
-					size="sm"
 					bg="white"
 					color="gray.800"
 					borderColor="gray.200"
@@ -59,13 +59,11 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 							{font}
 						</option>
 					))}
-				</Select>
+				</SelectContent>
 
-				<Select
-					value={style.fontSize}
+				<SelectContent
 					onChange={(e) => onStyleChange({ fontSize: Number(e.target.value) })}
 					width="80px"
-					size="sm"
 					bg="white"
 					color="gray.800"
 					borderColor="gray.200"
@@ -78,14 +76,13 @@ export default function TextEditorToolbar({ style, onStyleChange, onUndo, onRedo
 							{size}
 						</option>
 					))}
-				</Select>
+				</SelectContent>
 
 				<Tooltip label="Bold">
 					<IconButton
 						aria-label="Bold"
 						icon={<Bold size={16} />}
 						onClick={() => onStyleChange({ isBold: !style.isBold })}
-						size="sm"
 						{...getButtonStyles(style.isBold)}
 					/>
 				</Tooltip>

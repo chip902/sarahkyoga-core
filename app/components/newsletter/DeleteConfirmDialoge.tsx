@@ -1,7 +1,9 @@
 "use client";
 
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Text, VStack, useToast } from "@chakra-ui/react";
+import { toaster } from "@/src/components/ui/toaster";
+import { DialogRoot, DialogBody, DialogHeader, DialogTitle, DialogFooter, DialogContent } from "@/src/components/ui/dialog";
 import { useState } from "react";
+import { VStack, Text, Button, DialogCloseTrigger } from "@chakra-ui/react";
 
 interface DeleteConfirmDialogProps {
 	isOpen: boolean;
@@ -15,7 +17,6 @@ interface DeleteConfirmDialogProps {
 
 export function DeleteConfirmDialog({ isOpen, onClose, newsletter, onConfirm }: DeleteConfirmDialogProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
-	const toast = useToast();
 
 	const handleDelete = async () => {
 		setIsDeleting(true);
@@ -29,22 +30,20 @@ export function DeleteConfirmDialog({ isOpen, onClose, newsletter, onConfirm }: 
 				throw new Error(error.error || "Failed to delete newsletter");
 			}
 
-			toast({
+			toaster.create({
 				title: "Newsletter deleted",
 				description: "The newsletter has been permanently removed",
-				status: "success",
+				type: "success",
 				duration: 3000,
-				isClosable: true,
 			});
 
 			onConfirm();
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error deleting newsletter",
 				description: error instanceof Error ? error.message : "Unknown error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		} finally {
 			setIsDeleting(false);
@@ -53,29 +52,30 @@ export function DeleteConfirmDialog({ isOpen, onClose, newsletter, onConfirm }: 
 	};
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} isCentered>
-			<ModalOverlay />
-			<ModalContent>
-				<ModalHeader>Confirm Deletion</ModalHeader>
-				<ModalCloseButton />
-				<ModalBody>
-					<VStack spacing={4} align="stretch">
+		<DialogRoot open={isOpen} closeOnEscape>
+			<DialogContent>
+				<DialogTitle>Delete</DialogTitle>
+				<DialogHeader>Confirm Deletion</DialogHeader>
+				<DialogBody>
+					<VStack gap={4} align="stretch">
 						<Text>Are you sure you want to delete the newsletter &quot;{newsletter.title}&quot;?</Text>
 						<Text fontSize="sm" color="gray.500">
 							This action cannot be undone.
 						</Text>
 					</VStack>
-				</ModalBody>
+				</DialogBody>
 
-				<ModalFooter>
-					<Button variant="ghost" mr={3} onClick={onClose} isDisabled={isDeleting}>
-						Cancel
-					</Button>
-					<Button colorScheme="red" onClick={handleDelete} isLoading={isDeleting} loadingText="Deleting...">
+				<DialogFooter>
+					<DialogCloseTrigger>
+						<Button variant="ghost" mr={3} onClick={onClose} disabled={isDeleting}>
+							Cancel
+						</Button>
+					</DialogCloseTrigger>
+					<Button colorScheme="red" onClick={handleDelete} disabled={isDeleting}>
 						Delete
 					</Button>
-				</ModalFooter>
-			</ModalContent>
-		</Modal>
+				</DialogFooter>
+			</DialogContent>
+		</DialogRoot>
 	);
 }

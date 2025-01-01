@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Heading, Tabs, TabList, TabPanels, Tab, TabPanel, useToast } from "@chakra-ui/react";
+import { Box, Heading, Tabs } from "@chakra-ui/react";
 import TextEditor from "../text-editor/TextEditor";
 import NewsletterList from "./NewsletterList";
 import { TextStyle } from "../text-editor/types";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialoge";
+import { toaster } from "@/src/components/ui/toaster";
 
 const DEFAULT_STYLE: TextStyle = {
 	fontFamily: "Quicksand",
@@ -33,7 +34,6 @@ const NewsletterDashboard: React.FC = () => {
 	const [activeTab, setActiveTab] = useState(0);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	const [newsletterToDelete, setNewsletterToDelete] = useState<Newsletter | null>(null);
-	const toast = useToast();
 
 	const fetchNewsletters = useCallback(async () => {
 		try {
@@ -48,15 +48,14 @@ const NewsletterDashboard: React.FC = () => {
 				}))
 			);
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error fetching newsletters",
 				description: error instanceof Error ? error.message : "Unknown error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
-	}, [toast]);
+	}, []);
 
 	useEffect(() => {
 		fetchNewsletters();
@@ -93,19 +92,17 @@ const NewsletterDashboard: React.FC = () => {
 			setEditingNewsletter(null);
 			setActiveTab(data.isDraft ? 2 : 1);
 
-			toast({
+			toaster.create({
 				title: `Newsletter ${data.isDraft ? "saved as draft" : "published"}`,
-				status: "success",
+				type: "success",
 				duration: 3000,
-				isClosable: true,
 			});
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error saving newsletter",
 				description: error instanceof Error ? error.message : "Unknown error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
 	};
@@ -127,19 +124,17 @@ const NewsletterDashboard: React.FC = () => {
 
 			setActiveTab(0);
 
-			toast({
+			toaster.create({
 				title: "Newsletter loaded for editing",
-				status: "success",
+				type: "success",
 				duration: 2000,
-				isClosable: true,
 			});
 		} catch (error) {
-			toast({
+			toaster.create({
 				title: "Error loading newsletter",
 				description: error instanceof Error ? error.message : "Unknown error occurred",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 		}
 	};
@@ -153,11 +148,11 @@ const NewsletterDashboard: React.FC = () => {
 		fetchNewsletters();
 	};
 
-	const handleTabChange = (index: number) => {
-		if (index === 0) {
+	const handleTabChange = (index: string) => {
+		if (parseInt(index) === 0) {
 			setEditingNewsletter(null);
 		}
-		setActiveTab(index);
+		setActiveTab(parseInt(index));
 	};
 
 	return (
@@ -165,31 +160,30 @@ const NewsletterDashboard: React.FC = () => {
 			<Heading mb={6} color="brand.100" fontFamily={"inherit"}>
 				Newsletter Dashboard
 			</Heading>
-			<Tabs index={activeTab} onChange={handleTabChange} variant="enclosed" colorScheme="brand">
-				<TabList mb={4}>
-					<Tab>{editingNewsletter ? "Edit Newsletter" : "Create Newsletter"}</Tab>
-					<Tab>Published</Tab>
-					<Tab>Drafts</Tab>
-				</TabList>
-				<TabPanels>
-					<TabPanel>
-						<TextEditor
-							key={editingNewsletter?.id || "new"}
-							onSave={handleSave}
-							initialContent={editingNewsletter?.content || ""}
-							initialStyle={editingNewsletter?.style || DEFAULT_STYLE}
-							initialSubject={editingNewsletter?.title || ""}
-							newsletterId={editingNewsletter?.id}
-						/>
-					</TabPanel>
-					<TabPanel>
-						<NewsletterList newsletters={newsletters.filter((n) => !n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
-					</TabPanel>
-					<TabPanel>
-						<NewsletterList newsletters={newsletters.filter((n) => n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
-					</TabPanel>
-				</TabPanels>
-			</Tabs>
+			<Tabs.Root defaultValue={String(activeTab)} onValueChange={(e) => handleTabChange(e.value)} variant="enclosed" colorScheme="brand">
+				<Tabs.List mb={4}>
+					<Tabs.Trigger value="newsletter">{editingNewsletter ? "Edit Newsletter" : "Create Newsletter"}</Tabs.Trigger>
+					<Tabs.Trigger value="newsletter-published">Published</Tabs.Trigger>
+					<Tabs.Trigger value="newsletter-drafts">Drafts</Tabs.Trigger>
+				</Tabs.List>
+
+				<Tabs.Content value="newsletter-edit">
+					<TextEditor
+						key={editingNewsletter?.id || "new"}
+						onSave={handleSave}
+						initialContent={editingNewsletter?.content || ""}
+						initialStyle={editingNewsletter?.style || DEFAULT_STYLE}
+						initialSubject={editingNewsletter?.title || ""}
+						newsletterId={editingNewsletter?.id}
+					/>
+				</Tabs.Content>
+				<Tabs.Content value="newsletter-delete">
+					<NewsletterList newsletters={newsletters.filter((n) => !n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
+				</Tabs.Content>
+				<Tabs.Content value="newsletter-save">
+					<NewsletterList newsletters={newsletters.filter((n) => n.isDraft)} onEdit={handleEdit} onDelete={handleDelete} />
+				</Tabs.Content>
+			</Tabs.Root>
 
 			{newsletterToDelete && (
 				<DeleteConfirmDialog

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CartItem, ShoppingCartPopoutProps } from "@/types";
 import { QueryClient } from "@tanstack/react-query";
 import NextLink from "next/link";
+import { PopoverRoot } from "@/src/components/ui/popover";
 
 type LoadingState = {
 	[key: string]: boolean;
@@ -15,7 +16,7 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 	const { cartItems, addItemToCart, decreaseQuantity, isLoading } = useCart();
 	const [cartItemsCount, setCartItemsCount] = useState(0);
 	const [loadingStates, setLoadingStates] = useState<LoadingState>({});
-	const { onOpen, onClose, isOpen } = useDisclosure();
+	const { onOpen, onClose, open } = useDisclosure();
 	const queryClient = new QueryClient();
 	useEffect(() => {
 		if (cartItems) {
@@ -25,13 +26,15 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 			setCartItemsCount(totalQuantity);
 		}
 		queryClient.invalidateQueries({ queryKey: ["cart"] });
-	}, [cartItems]);
+	}, [cartItems, queryClient]);
 
 	return (
 		<Box position="relative">
-			<Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement={isResponsive ? "bottom-end" : "right-start"}>
+			<PopoverRoot open={open} onOpenChange={onOpen}>
 				<PopoverTrigger>
-					<IconButton aria-label="Shopping cart" icon={<MdShoppingCart />}></IconButton>
+					<IconButton aria-label="Shopping cart">
+						<MdShoppingCart />
+					</IconButton>
 				</PopoverTrigger>
 				{cartItemsCount > 0 && (
 					<Badge colorScheme="red" borderRadius="2rem" position="absolute" zIndex={10} top="-5px" right="-15px">
@@ -39,11 +42,11 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 					</Badge>
 				)}
 				<PopoverContent>
-					<Stack spacing={4}>
+					<Stack gap={4}>
 						{cartItems && cartItemsCount > 0 ? (
 							cartItems.map((item: CartItem) => (
 								<Box key={item.id} display="flex" alignItems="center" padding={5}>
-									<Stack spacing={1}>
+									<Stack gap={1}>
 										<Text fontWeight="bold">{item.product.name}</Text>
 										<Text>{`$${item.product.price} x ${item.quantity}`}</Text>
 										<Box display="flex" alignItems="center">
@@ -51,13 +54,13 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 												<Spinner />
 											) : (
 												<>
-													<Button isLoading={isLoading} size="sm" onClick={() => decreaseQuantity(item)} mr={2}>
+													<Button disabled={isLoading} size="sm" onClick={() => decreaseQuantity(item)} mr={2}>
 														-
 													</Button>
 													<Text>{`Quantity: ${item.quantity}`}</Text>
 												</>
 											)}
-											<Button isLoading={isLoading} size="sm" onClick={() => addItemToCart(item)} ml={2}>
+											<Button disabled={isLoading} size="sm" onClick={() => addItemToCart(item)} ml={2}>
 												+
 											</Button>
 										</Box>
@@ -71,14 +74,14 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 						)}
 						<Center display="flex" padding={5}>
 							<NextLink href="/booking/checkout" passHref legacyBehavior>
-								<Button onClick={onClose} isLoading={isLoading} variant="primary">
+								<Button onClick={onClose} disabled={isLoading} variant="plain">
 									Checkout
 								</Button>
 							</NextLink>
 						</Center>
 					</Stack>
 				</PopoverContent>
-			</Popover>
+			</PopoverRoot>
 		</Box>
 	);
 };

@@ -20,7 +20,7 @@ interface NewsletterListProps {
 
 const NewsletterList: React.FC<NewsletterListProps> = ({ newsletters, onEdit, onDelete }) => {
 	return (
-		<VStack spacing={4} align="stretch">
+		<VStack gap={4} align="stretch">
 			{newsletters.map((newsletter) => (
 				<Box key={newsletter.id} borderWidth={1} borderRadius="md" p={4} bg="white" shadow="sm" _hover={{ shadow: "md" }} transition="box-shadow 0.2s">
 					<Flex justify="space-between" align="center">

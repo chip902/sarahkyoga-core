@@ -1,21 +1,7 @@
 "use client";
 
-import {
-	useColorModeValue,
-	Box,
-	Heading,
-	Flex,
-	Text,
-	Stack,
-	Divider,
-	FormControl,
-	FormLabel,
-	Input,
-	Checkbox,
-	Skeleton,
-	Container,
-	useToast,
-} from "@chakra-ui/react";
+import { Box, Heading, Flex, Text, Stack, Separator, Input, Skeleton, Container } from "@chakra-ui/react";
+import { Checkbox } from "@/src/components/ui/checkbox";
 import { CartItem, Product } from "@prisma/client";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
@@ -24,14 +10,14 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import PaymentForm from "./PaymentForm";
 import useCart from "../hooks/useCart";
+import { toaster } from "@/src/components/ui/toaster";
+import { Field } from "@/src/components/ui/field";
 
 interface CartItemWithProduct extends CartItem {
 	product: Product;
 }
 
 const CheckoutPage = () => {
-	const { data: session } = useSession();
-	const toast = useToast();
 	const [regState, setRegState] = useState(false);
 	const { cartItems } = useCart();
 
@@ -58,7 +44,7 @@ const CheckoutPage = () => {
 	});
 	useEffect(() => {
 		if (apiError) {
-			toast({ title: "An error occurred.", description: apiError, status: "error", duration: 5000, isClosable: true });
+			toaster.create({ title: "An error occurred.", description: apiError, type: "error", duration: 5000 });
 		}
 	}, [apiError]);
 	// Fetch cart items and create Payment Intent
@@ -85,9 +71,6 @@ const CheckoutPage = () => {
 	const options: StripeElementsOptions = {
 		clientSecret,
 	};
-	// Styling variables
-	const bgColor = useColorModeValue("white", "brand.600");
-	const boxShadow = useColorModeValue("lg", "dark-lg");
 
 	if (!clientSecret) {
 		return (
@@ -99,14 +82,14 @@ const CheckoutPage = () => {
 
 	return (
 		<Box maxW="800px" mx="auto" my={{ sm: 100, md: 400 }} px={4}>
-			<Flex direction={{ sm: "column" }} bg={bgColor} boxShadow={boxShadow} borderRadius="md" p={8}>
+			<Flex direction={{ sm: "column" }} bg="brand.500" boxShadow="xl" borderRadius="md" p={8}>
 				{/* Order Summary */}
 				<Box flex={{ sm: "0", md: 1 }} mb={{ md: 8, lg: 0 }}>
 					<Heading fontFamily="inherit" size="lg" mb={6}>
 						Order Summary
 					</Heading>
 					{cartItems.length > 0 ? (
-						<Stack spacing={4}>
+						<Stack gap={4}>
 							{cartItems.map((item: CartItemWithProduct) => (
 								<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
 									<Text fontWeight="bold" fontSize="lg">
@@ -116,7 +99,7 @@ const CheckoutPage = () => {
 									<Text>Price: ${item.product.price.toFixed(2)} each</Text>
 								</Box>
 							))}
-							<Divider />
+							<Separator />
 							<Text fontWeight="bold" fontSize="xl">
 								Total: ${total.toFixed(2)}
 							</Text>
@@ -127,47 +110,46 @@ const CheckoutPage = () => {
 				</Box>
 
 				{/* Payment and Billing Details */}
-				<Box flex={{ sm: "0 0 100%", md: 1 }} mb={4}>
-					<Heading fontFamily="inherit" size="md" mb={6}>
-						Billing Details
-					</Heading>
-					<Stack spacing={4}>
-						{/* Billing Address Form */}
-						<Flex mb={{ base: 4, md: 2 }} justifyContent="space-between">
-							<FormControl isRequired width="50%" mr={2}>
-								<FormLabel fontFamily="inherit">First Name</FormLabel>
+				<form>
+					<Box flex={{ sm: "0 0 100%", md: 1 }} mb={4}>
+						<Heading fontFamily="inherit" size="md" mb={6}>
+							Billing Details
+						</Heading>
+						<Stack gap={4}>
+							{/* Billing Address Form */}
+							<Flex mb={{ base: 4, md: 2 }} justifyContent="space-between">
+								<Field required fontFamily="inherit">
+									First Name
+								</Field>
 								<Input
 									type="text"
 									value={billingDetails.firstName}
 									onChange={(e) => setBillingDetails({ ...billingDetails, firstName: e.target.value })}
 								/>
-							</FormControl>
-							<FormControl isRequired width="50%" ml={2}>
-								<FormLabel fontFamily="inherit">Last Name</FormLabel>
+
+								<Field fontFamily="inherit">Last Name</Field>
 								<Input
 									type="text"
 									value={billingDetails.lastName}
 									onChange={(e) => setBillingDetails({ ...billingDetails, lastName: e.target.value })}
 								/>
-							</FormControl>
-						</Flex>
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl isRequired>
-								<FormLabel fontFamily="inherit">Email</FormLabel>
+							</Flex>
+							<Box mb={{ base: 4, md: 2 }}>
+								<Field required fontFamily="inherit">
+									Email
+								</Field>
 								<Input
 									type="email"
 									value={billingDetails.email}
 									onChange={(e) => setBillingDetails({ ...billingDetails, email: e.target.value })}
 								/>
-							</FormControl>
-						</Box>
-						<Checkbox isChecked={regState} onChange={() => setRegState(!regState)}>
-							Would you like to make an account?
-						</Checkbox>
-						{regState && (
-							<Box mb={{ base: 4, md: 2 }}>
-								<FormControl isRequired>
-									<FormLabel>Password</FormLabel>
+							</Box>
+							<Checkbox checked={regState} onChange={() => setRegState(!regState)}>
+								Would you like to make an account?
+							</Checkbox>
+							{regState && (
+								<Box mb={{ base: 4, md: 2 }}>
+									<Field required>Password</Field>
 									<Input
 										type="password"
 										value={registrationData.password}
@@ -178,12 +160,12 @@ const CheckoutPage = () => {
 											})
 										}
 									/>
-								</FormControl>
-							</Box>
-						)}
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl isRequired>
-								<FormLabel fontFamily="inherit">Address Line 1</FormLabel>
+								</Box>
+							)}
+							<Box mb={{ base: 4, md: 2 }}>
+								<Field required fontFamily="inherit">
+									Address Line 1
+								</Field>
 								<Input
 									type="text"
 									value={billingDetails.address.line1}
@@ -194,11 +176,11 @@ const CheckoutPage = () => {
 										})
 									}
 								/>
-							</FormControl>
-						</Box>
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl>
-								<FormLabel fontFamily="inherit">City</FormLabel>
+							</Box>
+							<Box mb={{ base: 4, md: 2 }}>
+								<Field required fontFamily="inherit">
+									City
+								</Field>
 								<Input
 									type="text"
 									value={billingDetails.address.city}
@@ -209,11 +191,11 @@ const CheckoutPage = () => {
 										})
 									}
 								/>
-							</FormControl>
-						</Box>
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl>
-								<FormLabel fontFamily="inherit">State</FormLabel>
+							</Box>
+							<Box mb={{ base: 4, md: 2 }}>
+								<Field required fontFamily="inherit">
+									State
+								</Field>
 								<Input
 									type="text"
 									value={billingDetails.address.state}
@@ -224,11 +206,11 @@ const CheckoutPage = () => {
 										})
 									}
 								/>
-							</FormControl>
-						</Box>
-						<Box mb={{ base: 4, md: 2 }}>
-							<FormControl isRequired>
-								<FormLabel fontFamily="inherit">Postal Code</FormLabel>
+							</Box>
+							<Box mb={{ base: 4, md: 2 }}>
+								<Field required fontFamily="inherit">
+									Postal Code
+								</Field>
 								<Input
 									type="text"
 									value={billingDetails.address.postal_code}
@@ -239,25 +221,26 @@ const CheckoutPage = () => {
 										})
 									}
 								/>
-							</FormControl>
-						</Box>
-						<Box mb={{ base: 4, md: 2 }}>
-							<Elements stripe={stripePromise} options={options}>
-								{/* Payment Form */}
-								{clientSecret && (
-									<PaymentForm
-										isLoading={isLoading}
-										setIsLoading={setIsLoading}
-										billingDetails={billingDetails}
-										registrationData={registrationData.password ? registrationData : null}
-										clientSecret={clientSecret}
-										handleError={setApiError}
-									/>
-								)}
-							</Elements>
-						</Box>
-					</Stack>
-				</Box>
+							</Box>
+
+							<Box mb={{ base: 4, md: 2 }}>
+								<Elements stripe={stripePromise} options={options}>
+									{/* Payment Form */}
+									{clientSecret && (
+										<PaymentForm
+											isLoading={isLoading}
+											setIsLoading={setIsLoading}
+											billingDetails={billingDetails}
+											registrationData={registrationData.password ? registrationData : null}
+											clientSecret={clientSecret}
+											handleError={setApiError}
+										/>
+									)}
+								</Elements>
+							</Box>
+						</Stack>
+					</Box>
+				</form>
 			</Flex>
 		</Box>
 	);

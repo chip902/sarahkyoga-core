@@ -41,7 +41,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	const [selectedTime, setSelectedTime] = useState<string | null>(null);
 	const [zoomAvailable, setZoomAvailable] = useState<string | null>();
 	const [inPersonAvailable, setInPersonAvailable] = useState<string | null>();
-	const { open, onOpen } = useDisclosure();
+	const { open, onOpen, onToggle } = useDisclosure();
 	const [showZoomClassInfo, setShowZoomClassInfo] = useState(false);
 	const { checkAvailability, loading, error } = useCheckAvailability();
 	const [dateError, setDateError] = useState<string | null>(null);
@@ -63,9 +63,9 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			} else {
 				setDateError(null);
 			}
-			onOpen(); // Trigger the expansion to show time slot picker
+			onToggle(); //or onOpen
 		}
-	}, [selectedDate]);
+	}, [selectedDate, onToggle]);
 
 	const handleDateSelect = (date: Date) => {
 		setShowZoomClassInfo(false);

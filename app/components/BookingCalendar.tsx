@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
-import { Box, Input, Button, VStack, FormControl, FormLabel, Text } from "@chakra-ui/react";
+import { Box, Input, Button, VStack, Text } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
+import { Field } from "@/src/components/ui/field";
 
 interface BookingCalendarProps {}
 
@@ -60,16 +61,16 @@ const BookingCalendar: React.FC<BookingCalendarProps> = () => {
 	return (
 		<Box>
 			<Calendar onChange={() => handleDateChange} value={date} />
-			<VStack spacing={4} mt={4}>
-				<FormControl id="name">
-					<FormLabel>Name</FormLabel>
+			<VStack gap={4} mt={4}>
+				<form>
+					<Field id="name">Name</Field>
 					<Input value={name} onChange={(e) => setName(e.target.value)} />
-				</FormControl>
-				<FormControl id="email">
-					<FormLabel>Email</FormLabel>
+
+					<Field id="email">Email</Field>
 					<Input value={email} onChange={(e) => setEmail(e.target.value)} />
-				</FormControl>
-				<Button onClick={handleSubmit}>Book</Button>
+
+					<Button onClick={handleSubmit}>Book</Button>
+				</form>
 			</VStack>
 			<Box mt={4}>
 				<Text>Availability:</Text>

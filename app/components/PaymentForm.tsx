@@ -2,11 +2,12 @@
 "use client";
 
 import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";
-import { FormControl, FormLabel, Button, Box } from "@chakra-ui/react";
+import { Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import useCart from "../hooks/useCart";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
+import { Field } from "@/src/components/ui/field";
 
 interface PaymentFormProps {
 	isLoading: boolean;
@@ -86,13 +87,12 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 	return (
 		<Box mt={8}>
 			<form onSubmit={handleSubmit}>
-				<FormControl>
-					<FormLabel fontFamily="inherit">Card Details</FormLabel>
-					<Box border="1px solid" borderColor="gray.300" borderRadius="md" p={2}>
-						<CardElement options={{ hidePostalCode: true }} />
-					</Box>
-				</FormControl>
-				<Button colorScheme="blue" size="lg" mt={6} w="full" type="submit" isLoading={isLoading} fontFamily="inherit">
+				<Field fontFamily="inherit">Card Details</Field>
+				<Box border="1px solid" borderColor="gray.300" borderRadius="md" p={2}>
+					<CardElement options={{ hidePostalCode: true }} />
+				</Box>
+
+				<Button colorScheme="blue" size="lg" mt={6} w="full" type="submit" disabled={isLoading} fontFamily="inherit">
 					Reserve Now!
 				</Button>
 			</form>

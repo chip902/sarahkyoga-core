@@ -2,27 +2,12 @@
 
 import { useState, useRef } from "react";
 import { ImageIcon } from "lucide-react";
-import {
-	Popover,
-	PopoverTrigger,
-	PopoverContent,
-	PopoverBody,
-	Button,
-	VStack,
-	Input,
-	FormLabel,
-	Box,
-	Image,
-	Slider,
-	SliderTrack,
-	SliderFilledTrack,
-	SliderThumb,
-	Select,
-	Text,
-	IconButton,
-	useToast,
-} from "@chakra-ui/react";
-
+import { Button, VStack, Input, Box, Image, Text, IconButton, SliderTrack, SliderThumb, createListCollection } from "@chakra-ui/react";
+import { PopoverBody, PopoverContent, PopoverRoot, PopoverTitle, PopoverTrigger } from "@/src/components/ui/popover";
+import { toaster } from "@/src/components/ui/toaster";
+import { Field } from "@/src/components/ui/field";
+import { Slider } from "@/src/components/ui/slider";
+import { SelectContent, SelectItem, SelectRoot, SelectTrigger } from "@/src/components/ui/select";
 interface ImageUploadButtonProps {
 	onImageInsert?: (imageHtml: string) => void;
 }
@@ -31,9 +16,15 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedImage, setSelectedImage] = useState<string | null>(null);
 	const [imageWidth, setImageWidth] = useState(300);
-	const [alignment, setAlignment] = useState("none");
+	const [alignment, setAlignment] = useState<string[]>([]);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const toast = useToast();
+	const alignmentCollection = createListCollection({
+		items: [
+			{ label: "None", value: "none" },
+			{ label: "Left", value: "left" },
+			{ label: "Right", value: "right" },
+		],
+	});
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
@@ -48,18 +39,17 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 
 	const handleInsertImage = () => {
 		if (!onImageInsert) {
-			toast({
+			toaster.create({
 				title: "Implementation Error",
 				description: "Please provide an onImageInsert handler to handle inserted images",
-				status: "error",
+				type: "error",
 				duration: 5000,
-				isClosable: true,
 			});
 			return;
 		}
 
 		if (selectedImage) {
-			const alignClass = alignment !== "none" ? `float-${alignment}` : "";
+			const alignClass = selectedImage !== "none" ? `float-${alignment}` : "";
 			const imageHtml = `<div class="image-container" style="text-align: center; margin: 1em 0;" contenteditable="true">
 			<img 
 			  src="${selectedImage}" 
@@ -79,44 +69,52 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 	};
 
 	return (
-		<Popover isOpen={isOpen} onClose={() => setIsOpen(false)} onOpen={() => setIsOpen(true)}>
+		<PopoverRoot open={isOpen} onOpenChange={() => setIsOpen(!isOpen)}>
 			<PopoverTrigger>
-				<IconButton aria-label="Insert image" icon={<ImageIcon />} variant="ghost" size="sm" />
+				<IconButton aria-label="Insert image" variant="ghost" size="sm">
+					<ImageIcon />
+				</IconButton>
 			</PopoverTrigger>
 			<PopoverContent width="320px">
 				<PopoverBody>
-					<VStack spacing={4} align="stretch">
+					<VStack gap={4} align="stretch">
 						<Box>
-							<FormLabel>Upload Image</FormLabel>
+							<Field>Upload Image</Field>
 							<Input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} size="sm" />
 						</Box>
 
 						{selectedImage && (
 							<>
 								<Box>
-									<FormLabel>Preview</FormLabel>
+									<Field>Preview</Field>
 									<Box borderWidth={1} borderRadius="md" p={2}>
 										<Image src={selectedImage} alt="Preview" width={`${imageWidth}px`} maxWidth="100%" />
 									</Box>
 								</Box>
 
 								<Box>
-									<FormLabel>Width (px): {imageWidth}</FormLabel>
-									<Slider value={imageWidth} onChange={(value) => setImageWidth(value)} min={50} max={800} step={10}>
+									<Field>Width (px): {imageWidth}</Field>
+									<Slider defaultValue={[imageWidth]} onValueChange={(value) => setImageWidth(Number(value))} min={50} max={800} step={10}>
 										<SliderTrack>
-											<SliderFilledTrack />
+											<Slider />
 										</SliderTrack>
-										<SliderThumb />
+										<SliderThumb index={imageWidth} />
 									</Slider>
 								</Box>
 
 								<Box>
-									<FormLabel>Alignment</FormLabel>
-									<Select value={alignment} onChange={(e) => setAlignment(e.target.value)} size="sm">
-										<option value="none">None</option>
-										<option value="left">Left</option>
-										<option value="right">Right</option>
-									</Select>
+									<Field>Alignment</Field>
+									<SelectRoot value={alignment} onValueChange={(e) => setAlignment(e.value)} collection={alignmentCollection}>
+										<SelectContent>
+											{alignmentCollection.items.map((position) => (
+												<SelectTrigger key={position.value}>
+													<SelectItem item={position} key={position.value}>
+														{position.label}
+													</SelectItem>
+												</SelectTrigger>
+											))}
+										</SelectContent>
+									</SelectRoot>
 								</Box>
 
 								<Button onClick={handleInsertImage} colorScheme="blue" width="100%">
@@ -133,6 +131,6 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 					</VStack>
 				</PopoverBody>
 			</PopoverContent>
-		</Popover>
+		</PopoverRoot>
 	);
 }

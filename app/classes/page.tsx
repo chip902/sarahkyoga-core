@@ -1,4 +1,4 @@
-import { Box, Heading, Text, Divider, Stack, Flex, Button } from "@chakra-ui/react";
+import { Box, Heading, Text, Stack, Flex, Separator } from "@chakra-ui/react";
 import NextLink from "next/link";
 
 export default function YogaClasses() {
@@ -18,14 +18,14 @@ export default function YogaClasses() {
 			mx="auto" // This forces horizontal centering
 		>
 			<Box w="100%" padding={["4", "6", "8"]}>
-				<Stack spacing={10}>
+				<Stack gap={10}>
 					{/* Sunday Class */}
 					<Box>
 						<Heading size="md" color="brand.600">
 							Sunday
 						</Heading>
 						<NextLink href="/booking" passHref legacyBehavior>
-							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1}>
 								ZOOM Home Studio
 							</Text>
 						</NextLink>
@@ -37,15 +37,15 @@ export default function YogaClasses() {
 						</Text>
 					</Box>
 
-					<Divider />
+					<Separator />
 
 					{/* Tuesday Class https://prasadayogacenter.com/ */}
 					<Box>
 						<Heading size="md" color="brand.600">
 							Tuesday
 						</Heading>
-						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior target="_blank">
+							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1}>
 								Prasada Yoga Center
 							</Text>
 						</NextLink>
@@ -57,15 +57,15 @@ export default function YogaClasses() {
 						</Text>
 					</Box>
 
-					<Divider />
+					<Separator />
 
 					{/* Wednesday Classes https://www.yogaonyork.com/*/}
 					<Box>
 						<Heading size="md" color="brand.600">
 							Wednesday
 						</Heading>
-						<NextLink href="https://yogaonyork.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+						<NextLink href="https://yogaonyork.com/" passHref legacyBehavior target="_blank">
+							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1}>
 								Yoga on York
 							</Text>
 						</NextLink>
@@ -83,15 +83,15 @@ export default function YogaClasses() {
 						</Text>
 					</Box>
 
-					<Divider />
+					<Separator />
 
 					{/* Friday Class */}
 					<Box>
 						<Heading size="md" color="brand.600">
 							Friday
 						</Heading>
-						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior target="_blank">
+							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1}>
 								Prasada Yoga Center
 							</Text>
 						</NextLink>
