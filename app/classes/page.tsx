@@ -94,7 +94,7 @@ export default function YogaClasses() {
 					<Divider />
 					<Center flexDirection="column">
 						<Text fontWeight="bold">Looking for my private classes? Book a session with me!</Text>
-						<Button mt={4} onClick={handleClick}>
+						<Button mt={4} onClick={handleClick} variant="cta">
 							Book Now!
 						</Button>
 					</Center>

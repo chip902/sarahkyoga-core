@@ -1,5 +1,4 @@
 import { extendTheme } from "@chakra-ui/react";
-import { theme as proTheme } from "@chakra-ui/pro-theme";
 
 const fontConfig = {
 	fonts: {
@@ -223,7 +222,8 @@ const components = {
 				marginTop: 5,
 				paddingY: 2,
 				paddingX: [2, 2],
-				backgroundColor: "brand.900",
+				backgroundColor: "brand.200",
+				color: "white",
 				fontWeight: "bold",
 				borderRadius: "8px",
 				_hover: {
@@ -423,4 +423,4 @@ const extendedConfig = extendTheme({
 	},
 });
 
-export const skyTheme = extendTheme(proTheme, extendedConfig);
+export const skyTheme = extendTheme(extendedConfig);
