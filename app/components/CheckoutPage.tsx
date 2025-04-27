@@ -16,21 +16,20 @@ import {
 	Container,
 	useToast,
 } from "@chakra-ui/react";
-import { CartItem, Product } from "@prisma/client";
+import { CartItem, Product } from "@/app/generated/prisma/client";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import PaymentForm from "./PaymentForm";
 import useCart from "../hooks/useCart";
 
 interface CartItemWithProduct extends CartItem {
+	quantity: any;
 	product: Product;
 }
 
 const CheckoutPage = () => {
-	const { data: session } = useSession();
 	const toast = useToast();
 	const [regState, setRegState] = useState(false);
 	const { cartItems } = useCart();
