@@ -69,7 +69,7 @@ const extension = {
 			body: {
 				backgroundImage: "url('/background.jpg')",
 				backgroundSize: "cover",
-				backgroundPosition: "center",
+				backgroundPosition: "50% 20%",
 				backgroundRepeat: "no-repeat",
 				fontFamily: "var(--font-quicksand)",
 				color: "grey.800",
