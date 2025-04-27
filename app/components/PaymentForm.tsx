@@ -66,7 +66,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 							billingDetails,
 						});
 					}
-					// use the response as needed...
+					console.log("API Response: ", response);
 				} catch (err) {
 					console.error("API Error:", err);
 					handleError(`Server Error - Payment Confirmation Failed: ${err}`);
@@ -77,7 +77,6 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 			handleError(`Stripe Payment Confirmation Failed: ${error}`);
 		} finally {
 			setIsLoading(false);
-			clearCart();
 			router.push("/booking/success");
 		}
 	};

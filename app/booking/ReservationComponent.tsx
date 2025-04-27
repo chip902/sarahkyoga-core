@@ -144,7 +144,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 										<Text textStyle="sm" color="brand.400">
 											Click below to get on my next Sunday Zoom Class!
 										</Text>
-										<BookNowButton productId="0" />
+										<BookNowButton productId="1" />
 									</Collapse>
 								</Stack>
 								<Flex padding={5}>

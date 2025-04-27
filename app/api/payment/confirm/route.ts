@@ -191,6 +191,33 @@ export async function POST(request: Request) {
 				console.error("Failed to send email", emailError);
 			}
 
+			// Clean up the cart
+			try {
+				// First delete all cart items
+				await prisma.cartItem.deleteMany({
+					where: { cartId },
+				});
+
+				// Then delete the cart itself
+				if (existingUser) {
+					// For registered users
+					await prisma.cart.deleteMany({
+						where: { userId },
+					});
+				} else {
+					// For guest users
+					await prisma.cart.delete({
+						where: { id: cartId },
+					});
+				}
+
+				// Clear the cart cookie
+				cookiesStore.delete("cartId");
+			} catch (cleanupError) {
+				console.error("Failed to clean up cart after order creation", cleanupError);
+				// Still continue with the response - this is not critical enough to fail the entire transaction
+			}
+
 			return NextResponse.json({ message: "Payment confirmed and order created", cartId }, { status: 201 });
 		} catch (err) {
 			console.error("Error confirming payment", err);
