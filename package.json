@@ -5,7 +5,7 @@
 	"scripts": {
 		"export": "next export",
 		"dev": "next dev",
-		"build": "prisma generate && next build && next-sitemap",
+		"build": "prisma generate && next build && next-sitemap --config next-sitemap.config.cjs",
 		"lint": "next lint",
 		"start": "next start",
 		"seed": "ts-node prisma/seed.mjs"

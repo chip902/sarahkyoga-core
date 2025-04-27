@@ -380,6 +380,7 @@ const components = {
 				fontWeight: "bold",
 				position: "relative",
 				textDecoration: "none",
+				display: "inline-block",
 				_hover: {
 					textDecoration: "none",
 					_after: {

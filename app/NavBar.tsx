@@ -69,13 +69,13 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 						<Image src="/sky_banner.webp" h="20vh" alt="Logo" />
 					</Box>
 					<Box display="flex" justifyContent="flex-end" alignItems="center" px={10}>
-						<NextLink href="/" passHref legacyBehavior>
-							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+						<NextLink href="/" passHref>
+							<Button height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								Home
 							</Button>
 						</NextLink>
-						<NextLink href="/about" passHref legacyBehavior>
-							<Button as="a" height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
+						<NextLink href="/about" passHref>
+							<Button height="100%" lineHeight="1.2" p={1} backgroundColor="transparent" flex={1} variant="linkNav" mx={5}>
 								About
 							</Button>
 						</NextLink>
@@ -95,25 +95,19 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 							</MenuButton>
 							<MenuList onMouseEnter={openMenu} onMouseLeave={closeMenu}>
 								<VStack py="10px">
-									<NextLink href="/classes" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
+									<NextLink href="/classes" passHref>
+										<Button variant="linkNav" onClick={onClose} my={5}>
 											All Classes
 										</Button>
 									</NextLink>
-									<NextLink href="/booking" passHref legacyBehavior>
-										<Button as="a" variant="linkNav" onClick={onClose} my={5}>
+									<NextLink href="/booking" passHref>
+										<Button variant="linkNav" onClick={onClose} my={5}>
 											Private Sessions
 										</Button>
 									</NextLink>
 									<HStack>
-										<NextLink href="/" passHref legacyBehavior>
-											<Button
-												as="a"
-												variant="linkNav"
-												onClick={onClose}
-												my={5}
-												isDisabled
-												_disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
+										<NextLink href="/" passHref>
+											<Button variant="linkNav" onClick={onClose} my={5} isDisabled _disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
 												Workshops
 											</Button>
 										</NextLink>
@@ -122,17 +116,8 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 								</VStack>
 							</MenuList>
 						</Menu>
-						<NextLink href="/contact" passHref legacyBehavior>
-							<Button
-								as="a"
-								height="100%"
-								lineHeight="1.2"
-								p={0}
-								backgroundColor="transparent"
-								flex={1}
-								variant="linkNav"
-								mx={5}
-								marginRight={35}>
+						<NextLink href="/contact" passHref>
+							<Button height="100%" lineHeight="1.2" p={0} backgroundColor="transparent" flex={1} variant="linkNav" mx={5} marginRight={35}>
 								Contact
 							</Button>
 						</NextLink>
@@ -170,17 +155,8 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 								Sign Out
 							</Button>
 						) : (
-							<NextLink href="/auth/login" passHref legacyBehavior>
-								<Button
-									as="a"
-									height="100%"
-									lineHeight="1.2"
-									p={0}
-									backgroundColor="transparent"
-									flex={1}
-									variant="linkNav"
-									mx={5}
-									marginRight={70}>
+							<NextLink href="/auth/login" passHref>
+								<Button height="100%" lineHeight="1.2" p={0} backgroundColor="transparent" flex={1} variant="linkNav" mx={5} marginRight={70}>
 									Sign In
 								</Button>
 							</NextLink>
@@ -218,12 +194,12 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 							</DrawerHeader>
 							<DrawerBody textAlign="left" flexDirection="column">
 								<Stack direction="column" spacing={4}>
-									<NextLink href="/" passHref legacyBehavior>
+									<NextLink href="/" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Home
 										</Button>
 									</NextLink>
-									<NextLink href="/about" passHref legacyBehavior>
+									<NextLink href="/about" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											About Me
 										</Button>
@@ -237,17 +213,17 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 												<AccordionIcon />
 											</AccordionButton>
 											<AccordionPanel pb={4}>
-												<NextLink href="/classes" passHref legacyBehavior>
+												<NextLink href="/classes" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														All Classes
 													</Button>
 												</NextLink>
-												<NextLink href="/booking" passHref legacyBehavior>
+												<NextLink href="/booking" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Private Sessions
 													</Button>
 												</NextLink>
-												<NextLink href="/" passHref legacyBehavior>
+												<NextLink href="/" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>
@@ -255,7 +231,7 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 											</AccordionPanel>
 										</AccordionItem>
 									</Accordion>
-									<NextLink href="/contact" passHref legacyBehavior>
+									<NextLink href="/contact" passHref>
 										<Button variant="mobileMenu" onClick={onClose}>
 											Contact
 										</Button>
@@ -267,7 +243,7 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 											Sign Out
 										</Button>
 									) : (
-										<NextLink href="/auth/login" passHref legacyBehavior>
+										<NextLink href="/auth/login" passHref>
 											<Button variant="mobileMenu" onClick={onClose}>
 												Sign In
 											</Button>

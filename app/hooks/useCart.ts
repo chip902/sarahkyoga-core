@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 // Create a function to check and clear cart ID based on response headers
 const handleCartClearResponse = (response: any) => {
 	if (response?.headers?.["x-clear-cart"] === "true" || response?.data?.shouldClearLocalStorage === true) {
-		localStorage.removeItem("cartId");
+		window.localStorage.removeItem("cartId");
 		return true;
 	}
 	return false;
@@ -19,9 +19,14 @@ const useCart = () => {
 	const [cartItemsCount, setCartItemsCount] = useState(0);
 	const { status } = useSession();
 	const isLoggedIn = status === "authenticated";
+	const [isClient, setIsClient] = useState(false);
 
 	// Add a ref to track if we've just cleared the cart
 	const [cartCleared, setCartCleared] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
 	// Configure axios with headers for guest users
 	const getAxiosConfig = () => {
@@ -29,7 +34,7 @@ const useCart = () => {
 
 		// Only add cart ID header for guest users
 		if (!isLoggedIn) {
-			const cartId = localStorage.getItem("cartId");
+			const cartId = window.localStorage.getItem("cartId");
 			if (cartId) {
 				config.headers = {
 					"x-cart-id": cartId,
@@ -38,6 +43,11 @@ const useCart = () => {
 		}
 
 		return config;
+	};
+
+	const getCartId = () => {
+		if (!isClient) return null;
+		return window.localStorage.getItem("cartId");
 	};
 
 	// Fetch cart items
@@ -62,7 +72,7 @@ const useCart = () => {
 
 				// For guest users, check if we got a cart ID in headers
 				if (!isLoggedIn && response.headers["x-cart-id"]) {
-					localStorage.setItem("cartId", response.headers["x-cart-id"]);
+					window.localStorage.setItem("cartId", response.headers["x-cart-id"]);
 				}
 
 				// If we get a clear cart header, handle it
@@ -85,7 +95,7 @@ const useCart = () => {
 			}
 		},
 		// Disable the query when there's no cart ID for guest users
-		enabled: isLoggedIn || !!localStorage.getItem("cartId"),
+		enabled: isLoggedIn || !!getCartId(),
 	});
 
 	// Add item to cart mutation
@@ -94,7 +104,7 @@ const useCart = () => {
 		onSuccess: (response) => {
 			// For guest users, store cart ID from response headers
 			if (!isLoggedIn && response.headers["x-cart-id"]) {
-				localStorage.setItem("cartId", response.headers["x-cart-id"]);
+				window.localStorage.setItem("cartId", response.headers["x-cart-id"]);
 			}
 
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -107,7 +117,7 @@ const useCart = () => {
 		onSuccess: (response) => {
 			// For guest users, check if we need to update cart ID
 			if (!isLoggedIn && response.headers["x-cart-id"]) {
-				localStorage.setItem("cartId", response.headers["x-cart-id"]);
+				window.localStorage.setItem("cartId", response.headers["x-cart-id"]);
 			}
 
 			queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -149,7 +159,7 @@ const useCart = () => {
 
 			// If guest user, add cartId parameter
 			if (!isLoggedIn) {
-				const cartId = localStorage.getItem("cartId");
+				const cartId = window.localStorage.getItem("cartId");
 				if (cartId) {
 					url += `${url.includes("?") ? "&" : "?"}cartId=${cartId}`;
 				}
@@ -195,14 +205,14 @@ const useCart = () => {
 
 	// Check if we need to update on mount (in case another component cleared the cart)
 	useEffect(() => {
-		if (!isLoggedIn && !localStorage.getItem("cartId") && cartItemsCount > 0) {
+		if (!isLoggedIn && !window.localStorage.getItem("cartId") && cartItemsCount > 0) {
 			setCartItemsCount(0);
 		}
 	}, [isLoggedIn, cartItemsCount]);
 
 	// Method to manually clear cart from localStorage (for use in checkout components)
 	const clearCartStorage = () => {
-		localStorage.removeItem("cartId");
+		window.localStorage.removeItem("cartId");
 		setCartItemsCount(0);
 		setCartCleared(true);
 		queryClient.invalidateQueries({ queryKey: ["cart"] });

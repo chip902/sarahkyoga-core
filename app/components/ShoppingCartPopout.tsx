@@ -12,20 +12,21 @@ type LoadingState = {
 };
 
 const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
-	const { cartItems, addItemToCart, decreaseQuantity, isLoading } = useCart();
-	const [cartItemsCount, setCartItemsCount] = useState(0);
+	const { cartItems, addItemToCart, decreaseQuantity, isLoading, cartItemsCount: hookCartItemsCount } = useCart();
+	const [localCartItemsCount, setLocalCartItemsCount] = useState(0);
 	const [loadingStates, setLoadingStates] = useState<LoadingState>({});
 	const { onOpen, onClose, isOpen } = useDisclosure();
-	const queryClient = new QueryClient();
+
 	useEffect(() => {
 		if (cartItems) {
 			const initialState = cartItems.reduce((acc: any, item: { id: any }) => ({ ...acc, [item.id]: false }), {});
 			setLoadingStates(initialState);
 			const totalQuantity = cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0);
-			setCartItemsCount(totalQuantity);
+			setLocalCartItemsCount(totalQuantity);
 		}
-		queryClient.invalidateQueries({ queryKey: ["cart"] });
 	}, [cartItems]);
+
+	const cartItemsCount = hookCartItemsCount || localCartItemsCount;
 
 	return (
 		<Box position="relative">
@@ -57,7 +58,7 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 													<Text>{`Quantity: ${item.quantity}`}</Text>
 												</>
 											)}
-											<Button isLoading={isLoading} size="sm" onClick={() => addItemToCart(item)} ml={2}>
+											<Button isLoading={isLoading} size="sm" onClick={() => addItemToCart(item.id)} ml={2}>
 												+
 											</Button>
 										</Box>
@@ -70,7 +71,7 @@ const ShoppingCartPopout = ({ isResponsive }: ShoppingCartPopoutProps) => {
 							</Box>
 						)}
 						<Center display="flex" padding={5}>
-							<NextLink href="/booking/checkout" passHref legacyBehavior>
+							<NextLink href="/booking/checkout" passHref>
 								<Button onClick={onClose} isLoading={isLoading} variant="primary">
 									Checkout
 								</Button>

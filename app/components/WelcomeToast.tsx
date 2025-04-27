@@ -9,10 +9,17 @@ export default function WelcomeToast() {
 	const toast = useToast();
 	const { status } = useSession();
 	const [hasShownToast, setHasShownToast] = useState(false);
+	const [isBrowser, setIsBrowser] = useState(false);
+
+	// Set isBrowser to true when component mounts in the browser
+	useEffect(() => {
+		setIsBrowser(true);
+	}, []);
 
 	useEffect(() => {
-		// Show toast only once per session
-		const hasToastBeenShown = localStorage.getItem("welcomeToastShown");
+		if (!isBrowser) return;
+		// Show toast only once per user
+		const hasToastBeenShown = window.localStorage.getItem("welcomeToastShown");
 
 		if (!hasToastBeenShown && !hasShownToast) {
 			// Delay the toast slightly for better UX
@@ -31,8 +38,8 @@ export default function WelcomeToast() {
 											Welcome to Sarah K. Yoga!
 										</Text>
 										<Text fontSize="sm">
-											We've recently refreshed our member system. Even if you've signed up before, please register again to enjoy all
-											member benefits and special offers!
+											We&apos;ve recently refreshed our member system. Even if you&apos;ve signed up before, please register again to
+											enjoy all member benefits and special offers!
 										</Text>
 										<HStack pt={1}>
 											<Button
@@ -61,7 +68,7 @@ export default function WelcomeToast() {
 
 				// Mark as shown in current component state and localStorage
 				setHasShownToast(true);
-				localStorage.setItem("welcomeToastShown", "true");
+				window.localStorage.setItem("welcomeToastShown", "true");
 
 				return () => {
 					clearTimeout(timer);

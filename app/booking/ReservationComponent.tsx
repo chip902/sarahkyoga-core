@@ -10,10 +10,6 @@ import {
 	AlertIcon,
 	useDisclosure,
 	HStack,
-	Card,
-	CardBody,
-	CardFooter,
-	CardHeader,
 	Heading,
 	SimpleGrid,
 	Stack,
@@ -30,6 +26,8 @@ import Select from "react-select";
 import useCheckAvailability from "../hooks/useCheckAvailability";
 import { BookNowButton } from "./BookNow";
 import { ChevronUpIcon, ChevronDownIcon } from "lucide-react";
+import { useProducts } from "../hooks/useProducts";
+import ProductItem from "./ProductItem";
 
 interface IReservationComponentProps {
 	onNext: (availableOptions: string[], dateTime: Date) => void;
@@ -45,6 +43,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 	const [showZoomClassInfo, setShowZoomClassInfo] = useState(false);
 	const { checkAvailability, loading, error } = useCheckAvailability();
 	const [dateError, setDateError] = useState<string | null>(null);
+	const { data: products, isLoading } = useProducts();
 	const toast = useToast();
 
 	// Define the time slots array
@@ -119,7 +118,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 
 	return (
 		<Container
-			maxW={["90%", "90%", "90%"]}
+			maxW={["95%", "95%", "95%"]}
 			py={{ base: "8", md: "12", lg: "24" }}
 			mt={{ base: 20, md: 80 }}
 			bgColor="brand.600"
@@ -219,57 +218,21 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 							{availability === "Available" && (
 								<VStack>
 									<SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr))">
-										{/* Conditionally Render the Cards Based on Availability */}
-										{zoomAvailable && (
-											<Card variant="productCard">
-												<CardHeader>
-													<Heading fontFamily="inherit" size="md">
-														60-Min Zoom Session
-													</Heading>
-												</CardHeader>
-												<CardBody>
-													<Text color="inherit" fontFamily="inherit">
-														Get a personalized 60-minute Zoom session for $80.
-													</Text>
-												</CardBody>
-												<CardFooter>
-													<BookNowButton productId="1" />
-												</CardFooter>
-											</Card>
-										)}
-
-										{inPersonAvailable && (
+										{isLoading ? (
+											<Spinner />
+										) : (
 											<>
-												<Card variant="productCard">
-													<CardHeader>
-														<Heading fontFamily="inherit" size="md">
-															75-Min In-Person (1-2 People)
-														</Heading>
-													</CardHeader>
-													<CardBody>
-														<Text color="inherit" fontFamily="inherit">
-															Enjoy a private 75-minute in-person session for $125.
-														</Text>
-													</CardBody>
-													<CardFooter>
-														<BookNowButton productId="2" />
-													</CardFooter>
-												</Card>
-												<Card variant="productCard">
-													<CardHeader>
-														<Heading fontFamily="inherit" size="md">
-															75-Min In-Person (3+ People)
-														</Heading>
-													</CardHeader>
-													<CardBody>
-														<Text color="inherit" fontFamily="inherit">
-															Invite more people for a 75-minute in-person session for $175.
-														</Text>
-													</CardBody>
-													<CardFooter>
-														<BookNowButton productId="3" />
-													</CardFooter>
-												</Card>
+												{/* Filter zoom products when zoom is available */}
+												{zoomAvailable &&
+													products
+														?.filter((product) => product.name.toLowerCase().includes("60 min zoom"))
+														.map((product) => <ProductItem key={product.id} product={product} quantity={1} />)}
+
+												{/* Filter in-person products when in-person is available */}
+												{inPersonAvailable &&
+													products
+														?.filter((product) => product.name.toLowerCase().includes("in person"))
+														.map((product) => <ProductItem key={product.id} product={product} quantity={1} />)}
 											</>
 										)}
 									</SimpleGrid>

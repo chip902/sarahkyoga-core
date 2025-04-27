@@ -1,7 +1,13 @@
-import { Box, Heading, Text, Divider, Stack, Flex, Button } from "@chakra-ui/react";
+"use client";
+import { Box, Heading, Text, Divider, Stack, Flex, Button, Center } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function YogaClasses() {
+	const router = useRouter();
+	const handleClick = () => {
+		router.push("/booking");
+	};
 	return (
 		<Flex
 			justify="center"
@@ -20,12 +26,12 @@ export default function YogaClasses() {
 			<Box w="100%" padding={["4", "6", "8"]}>
 				<Stack spacing={10}>
 					{/* Sunday Class */}
-					<Box>
+					<Box maxWidth="80ch" width="90%" mx="auto">
 						<Heading size="md" color="brand.600">
 							Sunday
 						</Heading>
-						<NextLink href="/booking" passHref legacyBehavior>
-							<Text as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+						<NextLink href="/booking" passHref>
+							<Text height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
 								ZOOM Home Studio
 							</Text>
 						</NextLink>
@@ -39,33 +45,13 @@ export default function YogaClasses() {
 
 					<Divider />
 
-					{/* Tuesday Class https://prasadayogacenter.com/ */}
-					<Box>
-						<Heading size="md" color="brand.600">
-							Tuesday
-						</Heading>
-						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
-								Prasada Yoga Center
-							</Text>
-						</NextLink>
-						<Text fontWeight="bold">Restorative + Sound 11a-12p</Text>
-						<Text mt={2}>
-							A passive props-based practice to help students relax in poses like forward folds, gentle twists, and supported back-bends. Poses
-							are usually held for time to help students unwind and relax. Sarah will play the harmonium to enhance relaxation throughout the
-							body, release stress, and restore your energy.
-						</Text>
-					</Box>
-
-					<Divider />
-
 					{/* Wednesday Classes https://www.yogaonyork.com/*/}
-					<Box>
+					<Box maxWidth="80ch" width="90%" mx="auto">
 						<Heading size="md" color="brand.600">
 							Wednesday
 						</Heading>
-						<NextLink href="https://yogaonyork.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+						<NextLink target="_blank" href="https://yogaonyork.com/" passHref>
+							<Text height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
 								Yoga on York
 							</Text>
 						</NextLink>
@@ -86,15 +72,17 @@ export default function YogaClasses() {
 					<Divider />
 
 					{/* Friday Class */}
-					<Box>
+					<Box maxWidth="80ch" width="90%" mx="auto">
 						<Heading size="md" color="brand.600">
 							Friday
 						</Heading>
-						<NextLink href="https://prasadayogacenter.com/" passHref legacyBehavior>
-							<Text target="_blank" as="a" height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+
+						<NextLink target="_blank" href="https://prasadayogacenter.com/" passHref>
+							<Text height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
 								Prasada Yoga Center
 							</Text>
 						</NextLink>
+
 						<Text fontWeight="bold">Katonah Yoga®️ 5:30p-6:45p</Text>
 						<Text mt={2}>
 							Katonah Yoga®️ is a syncretic Hatha yoga practice developed by Nevine Michaan of Katonah Yoga Center over 40 years. Katonah Yoga is
@@ -103,6 +91,13 @@ export default function YogaClasses() {
 							through revolutions.
 						</Text>
 					</Box>
+					<Divider />
+					<Center flexDirection="column">
+						<Text fontWeight="bold">Looking for my private classes? Book a session with me!</Text>
+						<Button mt={4} onClick={handleClick}>
+							Book Now!
+						</Button>
+					</Center>
 				</Stack>
 			</Box>
 		</Flex>
