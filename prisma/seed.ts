@@ -1,5 +1,5 @@
 // seed.js
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "../app/generated/prisma";
 
 async function main() {
 	const prisma = new PrismaClient();

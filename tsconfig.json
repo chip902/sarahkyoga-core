@@ -27,14 +27,13 @@
         "./*"
       ]
     },
-    "target": "ES2017"
+    "target": "ESNext"
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/fonts.tsx.off",
     "app/api/users/route.ts",
   ],
   "exclude": [

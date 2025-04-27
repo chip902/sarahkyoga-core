@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
 		const cookiesStore = await cookies();
-		let cartItems = []; // Change variable name to 'cartItems' to reflect that it holds an array of items
+		let cartItems = [];
 
 		if (session && session.user) {
 			const userId = session.user.id;
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
 			});
 
 			// Flatten the carts array into a single array of cart items
-			cartItems = carts.flatMap((cart) => cart.items);
+			cartItems = carts.flatMap((cart: { items: any }) => cart.items);
 		} else {
 			// For guest users
 			const cartId = cookiesStore.get("cartId")?.value;
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
 			});
 
 			// Flatten the carts array into a single array of cart items
-			cartItems = carts.flatMap((cart) => cart.items);
+			cartItems = carts.flatMap((cart: { items: any }) => cart.items);
 		}
 
 		if (!cartItems || cartItems.length === 0) {
