@@ -2,7 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-import { Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { Box, Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
@@ -44,40 +44,60 @@ const Register = () => {
 	};
 
 	return (
-		<Container as="form" maxW="md" py={{ base: "12", md: "24" }} mt={80} bgColor="brand.600" borderRadius={20} onSubmit={handleRegister}>
-			<Stack spacing="6">
-				<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
-					<Heading size={{ base: "xs", md: "sm" }}>Sign Up!</Heading>
-				</Stack>
-			</Stack>
-			<Stack spacing="6" direction={{ base: "column", md: "row" }}>
-				<Flex mb={{ base: 4, md: 2 }} justifyContent="space-between">
-					<FormControl isRequired width="50%" id="firstName" mr={2}>
-						<FormLabel fontFamily="inherit">First Name</FormLabel>
-						<Input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-					</FormControl>
-					<FormControl isRequired width="50%" ml={2} id="lastName">
-						<FormLabel fontFamily="inherit">Last Name</FormLabel>
-						<Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-					</FormControl>
-				</Flex>
-				<FormControl id="email">
-					<FormLabel>Email</FormLabel>
-					<Input value={email} onChange={(e) => setEmail(e.target.value)} />
-				</FormControl>
-			</Stack>
-			<FormControl id="password">
-				<FormLabel>Password</FormLabel>
-				<Input onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
-			</FormControl>
+		<Box w="100%" pt={{ base: "200", md: "28" }} display="flex" justifyContent="center" alignItems="flex-start">
+			<Container
+				maxW="md"
+				py={{ base: "8", md: "12" }}
+				px={{ base: "8", md: "10" }}
+				mt={{ base: "20", md: "32" }}
+				mb={{ base: "6", md: "24" }}
+				bgColor="brand.600"
+				borderRadius={20}
+				position="relative"
+				zIndex="1"
+				mx="auto"
+				display="block"
+				onSubmit={handleRegister}>
+				<Stack spacing={{ base: "4", md: "6" }}>
+					<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
+						<Heading size={{ base: "md", md: "sm" }}>Sign Up!</Heading>
+					</Stack>
 
-			<Divider />
-			<Flex direction="row-reverse" py="4" px={{ base: "4", md: "6" }}>
-				<Button type="submit" disabled={isLoading}>
-					Submit{isLoading && <Spinner />}
-				</Button>
-			</Flex>
-		</Container>
+					<Stack spacing={{ base: "4", md: "6" }}>
+						<Stack spacing={{ base: "3", md: "4" }}>
+							<Flex direction={{ base: "column", md: "row" }} mb={{ base: 2, md: 2 }} gap={{ base: "3", md: "4" }}>
+								<FormControl isRequired id="firstName">
+									<FormLabel fontFamily="inherit">First Name</FormLabel>
+									<Input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+								</FormControl>
+								<FormControl isRequired id="lastName">
+									<FormLabel fontFamily="inherit">Last Name</FormLabel>
+									<Input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+								</FormControl>
+							</Flex>
+
+							<FormControl isRequired id="email">
+								<FormLabel>Email</FormLabel>
+								<Input value={email} onChange={(e) => setEmail(e.target.value)} />
+							</FormControl>
+
+							<FormControl isRequired id="password">
+								<FormLabel>Password</FormLabel>
+								<Input onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
+							</FormControl>
+						</Stack>
+
+						<Divider />
+
+						<Flex justify="flex-end" py={{ base: "8", md: "4" }}>
+							<Button type="submit" disabled={isLoading}>
+								Submit {isLoading && <Spinner ml="2" size="sm" />}
+							</Button>
+						</Flex>
+					</Stack>
+				</Stack>
+			</Container>
+		</Box>
 	);
 };
 export default Register;

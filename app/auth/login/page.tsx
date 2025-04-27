@@ -5,6 +5,7 @@ import {
 	AlertDescription,
 	AlertIcon,
 	AlertTitle,
+	Box,
 	Button,
 	Checkbox,
 	Container,
@@ -55,58 +56,63 @@ const Login = () => {
 	};
 
 	return (
-		<Container maxW="md" py={{ base: "12", md: "24" }} mt={80} bgColor="brand.600" borderRadius={20}>
-			<Stack spacing="8">
-				<Stack spacing="6">
-					<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
-						<Heading variant="login" size={{ base: "xs", md: "sm" }}>
-							Log in to your account
-						</Heading>
+		<Box w="100%" pt={{ base: "200", md: "28" }} display="flex" justifyContent="center" alignItems="flex-start">
+			<Container
+				maxW="md"
+				py={{ base: "8", md: "12" }}
+				px={{ base: "8", md: "10" }}
+				mt={{ base: "20", md: "32" }}
+				mb={{ base: "6", md: "24" }}
+				bgColor="brand.600"
+				borderRadius={20}
+				position="relative"
+				zIndex="1"
+				mx="auto"
+				display="block">
+				<Stack spacing={{ base: "6", md: "8" }}>
+					<Stack spacing={{ base: "4", md: "6" }}>
+						<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
+							<Heading variant="login" size={{ base: "lg", md: "sm" }}>
+								Log in to your account
+							</Heading>
+						</Stack>
 					</Stack>
-				</Stack>
-				<Stack spacing="6">
-					<Stack spacing="5">
-						<FormControl>
-							<FormLabel htmlFor="email">Email</FormLabel>
-							<Input
-								id="email"
-								placeholder="Enter your email"
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)} // Capture email input
-							/>
-						</FormControl>
-						<FormControl>
-							<FormLabel htmlFor="password">Password</FormLabel>
-							<Input
-								id="password"
-								placeholder="********"
-								type="password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)} // Capture password input
-							/>
-						</FormControl>
+
+					<Stack spacing={{ base: 4, md: 6 }}>
+						<Stack spacing={{ base: 4, md: 5 }}>
+							<FormControl>
+								<FormLabel htmlFor="email">Email</FormLabel>
+								<Input id="email" placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+							</FormControl>
+							<FormControl>
+								<FormLabel htmlFor="password">Password</FormLabel>
+								<Input id="password" placeholder="********" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+							</FormControl>
+						</Stack>
+
+						<HStack justify="space-between">
+							<Checkbox defaultChecked>Remember me</Checkbox>
+							<Link color="black" href="/auth/forgot-password" fontSize={{ base: "sm", md: "md" }}>
+								Forgot Password?
+							</Link>
+						</HStack>
+
+						<Stack spacing={{ base: "3", md: "4" }}>
+							<Button onClick={handleLogin}>Sign in</Button>
+							<Button variant="secondary" leftIcon={<GoogleIcon />} onClick={() => signIn("google")}>
+								Sign in with Google
+							</Button>
+						</Stack>
 					</Stack>
-					<HStack justify="space-between">
-						<Checkbox defaultChecked>Remember me</Checkbox>
-						<Link color="black" href="/auth/forgot-password">
-							Forgot Password?
+
+					<Text textAlign="center" fontSize={{ base: "sm", md: "md" }}>
+						<Link color="black" href="/register">
+							Don&apos;t have an account? Sign up
 						</Link>
-					</HStack>
-					<Stack spacing="4">
-						<Button onClick={handleLogin}>Sign in</Button>
-						<Button variant="secondary" leftIcon={<GoogleIcon />} onClick={() => signIn("google")}>
-							Sign in with Google
-						</Button>
-					</Stack>
+					</Text>
 				</Stack>
-				<Text textStyle="sm" color="fg.muted">
-					<Link color="black" href="/register">
-						Don&apos;t have an account? Sign up
-					</Link>
-				</Text>
-			</Stack>
-		</Container>
+			</Container>
+		</Box>
 	);
 };
 

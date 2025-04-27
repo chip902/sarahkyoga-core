@@ -16,111 +16,150 @@ const AboutPage = () => {
 	};
 
 	return (
-		<>
-			<Box position="relative" maxW="800px" mx="auto" my={{ sm: "35vh", lg: "50vh" }} px={4}>
-				<Flex
-					position="absolute"
-					top="50%"
-					left="50%"
-					transform="translate(-50%, -50%)"
+		<Box px={{ base: "10vw", md: "16vw" }}>
+			<Box maxW="800px" mx="auto" mt={{ base: "25vh", md: "16vh" }} mb={{ base: "6vh", md: "10vh" }}>
+				<Box
 					bg="rgba(255, 255, 255, 0.7)"
 					boxShadow="xl"
 					borderRadius="md"
-					p={8}
-					maxW="800px"
-					w="90%">
-					<Container>
-						<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
+					p={{ base: 8, md: 10 }} // Increased padding
+					w="100%">
+					<Container maxW="100%" px={{ base: 3, md: 5 }}>
+						<Heading
+							fontFamily="inherit"
+							as="h1"
+							fontSize={{ base: "2xl", md: "3xl" }}
+							mb={6} // More space below heading
+						>
 							ABOUT SARAH
 						</Heading>
-						<Text fontSize="lg" mb={4}>
+						<Text
+							fontSize={{ base: "md", md: "lg" }}
+							mb={5} // More space between paragraphs
+							lineHeight="taller" // Increased line height
+						>
 							Sarah found yoga while training for her first marathon. She looked to yoga as just another part of her training regimen and after
 							her first class, she realized that it would become much more. Yoga changed the way Sarah breathed, looked at herself as well as the
 							world. After diving into the practice, she discovered she wanted to share this gift with others.
 						</Text>
-						<Text fontSize="lg" mb={4}>
-							A native New Yorker, Sarah received her RYT 200 certification from Laughing Lotus Yoga Center under the tutelage of Mary Dana Abbot.
-							In 2021, Sarah completed her Katonah Yoga® certification. Sarah weaves both Katonah Yoga® material along with Vinyasa into her
-							classes.
-						</Text>
-						<Text fontSize="lg" mb={4}>
-							When Sarah is not on the mat, you can find her jogging around the New Hampshire/Maine Seacoast, baking pies or on the beach with her
-							husband Steve, son Axel and daughter Lucy.
-						</Text>
 					</Container>
-				</Flex>
+				</Box>
 			</Box>
-			<Center>
-				<Box mt="30vh" p={4} maxW="80vw">
-					<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
+
+			{/* Testimonials Section */}
+			<Box maxW="800px" mx="auto" my={{ base: "12vh", md: "16vh" }}>
+				<Box
+					bg="rgba(255, 255, 255, 0.7)"
+					boxShadow="md"
+					borderRadius="md"
+					p={{ base: 8, md: 10 }} // Significantly increased padding around content
+					mb={{ base: 10, md: 12 }}>
+					<Heading
+						fontFamily="inherit"
+						as="h1"
+						fontSize={{ base: "2xl", md: "3xl" }}
+						mb={8} // More space below heading
+						px={{ base: 2, md: 4 }} // Additional padding for the heading
+					>
 						Testimonials
 					</Heading>
-					<Slider {...settings}>
-						{testimonials.map((testimonial) => (
-							<Box key={testimonial.id} p={4} bg="rgba(255, 255, 255, 0.7)" boxShadow="md" borderRadius="md">
-								<Text>{testimonial.description}</Text>
-								<Text fontWeight="bold" mt={2}>
-									- {testimonial.name}
-								</Text>
-							</Box>
-						))}
-					</Slider>
+
+					<Box
+						className="testimonial-slider-container"
+						pb={{ base: 14, md: 16 }} // Substantially more padding at bottom for slider controls
+					>
+						<Slider {...settings}>
+							{testimonials.map((testimonial) => (
+								<Box
+									key={testimonial.id}
+									p={{ base: 6, md: 8 }} // Much more padding inside testimonial boxes
+									bg="rgba(255, 255, 255, 0.9)"
+									boxShadow="md"
+									borderRadius="md"
+									mx={2} // More horizontal margin between slides
+								>
+									<Text
+										fontSize={{ base: "md", md: "lg" }}
+										lineHeight="taller" // Increased line height for better readability
+										px={{ base: 3, md: 5 }} // Additional padding on text sides
+									>
+										{testimonial.description}
+									</Text>
+									<Text
+										fontWeight="bold"
+										mt={4}
+										px={{ base: 3, md: 5 }} // Match the text padding
+									>
+										- {testimonial.name}
+									</Text>
+								</Box>
+							))}
+						</Slider>
+					</Box>
 				</Box>
-			</Center>
-			<Center>
-				<Flex bg="rgba(255, 255, 255, 0.7)" boxShadow="xl" borderRadius="md" mt="10vh" maxW="800px" w="100%">
-					<Container>
-						<Heading fontFamily="inherit" as="h1" fontSize="3xl" mb={4}>
+			</Box>
+
+			{/* Teaching Style Section */}
+			<Box mx="auto" my={{ base: "12vh", md: "20vh" }} py="14px">
+				<Box
+					bg="rgba(255, 255, 255, 0.7)"
+					boxShadow="xl"
+					borderRadius="md"
+					p={{ base: 8, md: 10 }} // Increased padding
+					w="100%">
+					<Container maxW="100%" px={{ base: "3", md: "5" }} py={{ base: "3", md: "5" }}>
+						<Heading fontFamily="inherit" as="h1" fontSize={{ base: "2xl", md: "3xl" }} mb={10}>
 							TEACHING STYLE
 						</Heading>
-						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
+						<Heading fontFamily="inherit" as="h2" fontSize={{ base: "xl", md: "2xl" }} my={10}>
 							KATONAH YOGA®
 						</Heading>
-						<Text fontSize="lg" mb={4}>
+						<Text fontSize={{ base: "md", md: "lg" }} mb={5} lineHeight="taller">
 							Katonah Yoga® is a syncretic Hatha yoga practice developed by Nevine Michaan over 40 years. She and her teachers incoporate
 							classical Hatha yoga with Taoist theory, geometry, magic, mythology, metaphor, and imagination — in a practical framework designed
 							to potentiate personal and communal well-being. Framing the practice, maps of time and personal space are defined and refined.
 							Themes using asana as origami, manipulating form for function, and developing a sense of personal measure are incorporated in
 							Katonah Yoga® practices.
 						</Text>
-						<Text fontSize="lg" mb={4}>
+						<Text fontSize={{ base: "md", md: "lg" }} mb={4}>
 							Katonah Yoga® is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has
 							pattern, pattern belies intelligence; by virtue of repetition there is potential for insight. Disciplined techniques are organized
 							for revelation through revolutions.
 						</Text>
-						<Text fontWeight="semibold">
+						<Text fontWeight="semibold" mb={3}>
 							Katonah Yoga Center
 							<br />
 							39 Main Street
 							<br />
 							Bedford Hills, NY 10517
 						</Text>
-						<NextLink href="https://katonahyoga.com/" passHref legacyBehavior>
-							<Button as="a" flex={1} variant="inline" target="_blank">
-								www.katonahyoga.com
-							</Button>
-						</NextLink>
-						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
+						<Box mb={6}>
+							<NextLink href="https://katonahyoga.com/" target="_blank" passHref>
+								<Button variant="inline">www.katonahyoga.com</Button>
+							</NextLink>
+						</Box>
+						<Heading fontFamily="inherit" as="h2" fontSize={{ base: "xl", md: "2xl" }} my={4}>
 							CHAIR YOGA
 						</Heading>
-						<Text>
+						<Text fontSize={{ base: "md", md: "lg" }} mb={5}>
 							Chair yoga is for everyone. It can be used as a physically demanding practice to access a deeper understanding of the pose. It can
 							be restorative and serve to give us leverage to be held. It can also be used to turn ourselves upside down and change our
 							perspective. Chair classes are inspired heavily by Katonah Yoga®
 						</Text>
-						<Heading fontFamily="inherit" as="h2" fontSize="2xl">
+						<Heading fontFamily="inherit" as="h2" fontSize={{ base: "xl", md: "2xl" }} my={4}>
 							VINYASA
 						</Heading>
-						<Text mb="7vh">
+						<Text fontSize={{ base: "md", md: "lg" }} mb={4}>
 							Vinyasa yoga, also known as Flow or Vinyasa Flow, is focuses on a linking one breath per movement so that there is a tempo as we
 							travel through class. Classes incorporate sun salutations, inversions, twists, folds and more.. In my Vinyasa/Flow classes, Katonah
 							Yoga ® elements will be introduced and explored.
 						</Text>
 					</Container>
-				</Flex>
-			</Center>
-			<Spacer my="20vh" />
-		</>
+				</Box>
+			</Box>
+
+			<Spacer my={{ base: "8vh", md: "10vh" }} />
+		</Box>
 	);
 };
 
