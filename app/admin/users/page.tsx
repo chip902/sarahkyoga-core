@@ -1,7 +1,7 @@
 // app/admin/users/page.tsx
 "use client";
 import { Table, Tbody, Td, Th, Thead, Tr, Button, Container } from "@chakra-ui/react";
-import { User } from "@prisma/client";
+import User from "@/prisma/client";
 import axios from "axios";
 
 const Users = () => {
@@ -21,7 +21,7 @@ const Users = () => {
 		}
 	};
 
-	const handleUpdate = async (id: number, updatedData: User) => {
+	const handleUpdate = async (id: number, updatedData: typeof User) => {
 		try {
 			await axios.put(`/api/users/${id}`, updatedData);
 			// assuming after updating, you want to refresh the list of users

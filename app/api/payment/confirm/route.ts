@@ -7,6 +7,8 @@ import { cookies } from "next/headers";
 import url from "url";
 import { v4 as uuidv4 } from "uuid";
 import { emailTemplates } from "@/app/templates/emailTemplates";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 function generateOrderNumber() {
 	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -21,10 +23,10 @@ export async function POST(request: Request) {
 		process.env.NODE_ENV === "development"
 			? new Stripe(String(process.env.STRIPE_SECRET_KEY_DEV!))
 			: new Stripe(String(process.env.STRIPE_SECRET_KEY_PROD!));
-	const cookiesStore = await cookies();
 
 	try {
 		const { paymentIntentId, registrationData, billingDetails } = await request.json();
+		const session = await getServerSession(authOptions);
 
 		// Retrieve the Payment Intent to confirm status
 		const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -99,13 +101,49 @@ export async function POST(request: Request) {
 			}
 		}
 
-		// Get the cart ID from the cookie
-		const storedCartId = cookiesStore.get("cartId");
-		if (!storedCartId) {
-			return NextResponse.json({ error: "No cart found in session" }, { status: 400 });
-		}
+		if (session && session.user) {
+			// For authenticated users, find cart by userId
+			const sessionUserId = session.user.id;
+			let cart = await prisma.cart.findFirst({
+				where: { userId: sessionUserId },
+			});
 
-		cartId = storedCartId.value;
+			// If not found, try the userId we determined earlier (might be different)
+			if (!cart && userId !== sessionUserId) {
+				cart = await prisma.cart.findFirst({
+					where: { userId: userId },
+				});
+			}
+
+			if (!cart) {
+				// Try getting cartId from header
+				const headerCartId = request.headers.get("x-cart-id");
+				if (headerCartId) {
+					cart = await prisma.cart.findFirst({
+						where: { id: headerCartId },
+					});
+				}
+			}
+
+			if (!cart) {
+				console.error("No cart found for authenticated user:", {
+					sessionUserId,
+					determinedUserId: userId,
+					billingEmail: billingDetails?.email,
+				});
+				return NextResponse.json({ error: "No cart found for user" }, { status: 400 });
+			}
+
+			cartId = cart.id;
+		} else {
+			// For guest users, get cartId from request header
+			cartId = request.headers.get("x-cart-id");
+
+			if (!cartId) {
+				console.error("No cart found for guest user");
+				return NextResponse.json({ error: "No cart found in session" }, { status: 400 });
+			}
+		}
 
 		// Retrieve the existing cart items
 		try {
@@ -125,10 +163,10 @@ export async function POST(request: Request) {
 			let newOrder;
 			let templateName;
 			switch (cartItems[0].productId) {
-				case "0":
+				case "1":
 					templateName = "sunday-zoom";
 					break;
-				case "1":
+				case "2":
 					templateName = "template-product-456";
 					break;
 				default:
@@ -191,7 +229,45 @@ export async function POST(request: Request) {
 				console.error("Failed to send email", emailError);
 			}
 
-			return NextResponse.json({ message: "Payment confirmed and order created", cartId }, { status: 201 });
+			// Clean up the cart
+			try {
+				const currentUrl = new URL(request.url);
+				const baseUrl = `${currentUrl.protocol}//${currentUrl.host}`;
+
+				// Create the delete URL with proper parameters
+				const deleteUrl = `${baseUrl}/api/cart?cartId=${cartId}&deleteCart=true`;
+
+				// Prepare headers object
+				const headers: Record<string, string> = {
+					"Content-Type": "application/json",
+				};
+
+				// For guest users, add the x-cart-id header
+				if (!session || !session.user) {
+					headers["x-cart-id"] = cartId;
+				}
+
+				// Call the cart deletion API
+				await axios.delete(deleteUrl, { headers });
+				console.log("Cart cleanup completed successfully");
+			} catch (cleanupError) {
+				console.error("Failed to clean up cart after order creation", cleanupError);
+				// Still continue with the response - this is not critical enough to fail the entire transaction
+			}
+
+			const response = NextResponse.json(
+				{
+					message: "Payment confirmed and order created",
+					success: true,
+					shouldClearLocalStorage: true,
+				},
+				{ status: 201 }
+			);
+
+			// Set headers to tell client to clear cartId (for hybrid approach)
+			response.headers.set("x-clear-cart", "true");
+
+			return response;
 		} catch (err) {
 			console.error("Error confirming payment", err);
 			return NextResponse.json({ error: "An unexpected error occurred while confirming the payment" }, { status: 500 });

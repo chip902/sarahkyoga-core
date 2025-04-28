@@ -12,7 +12,7 @@ export const BookNowButton = ({ productId }: { productId: string }) => {
 
 	// Handler for the add to cart action
 	const handleAddToCart = async () => {
-		if (!session && productId !== "0") {
+		if (!session && productId !== "1") {
 			toast({
 				title: "Please log in",
 				description: "You need to be logged in to book a class.",

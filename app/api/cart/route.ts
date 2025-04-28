@@ -31,26 +31,29 @@ export async function POST(request: NextRequest) {
 			}
 		} else {
 			// For guest users
-			let cartId = (await cookiesStore).get("cartId")?.value;
+			const clientCartId = request.headers.get("x-cart-id");
+			let cartId = clientCartId;
 
 			if (!cartId) {
-				// Generate a new cartId and set it in the cookie
+				// Generate a new cartId
 				cartId = uuidv4();
-				(await cookiesStore).set("cartId", cartId, { httpOnly: true, path: "/" });
 			}
 
-			// Get or create the cart for the guest user using cartId
+			// Get or create cart (still in database)
 			cart = await prisma.cart.findFirst({
 				where: { id: cartId },
 			});
 
 			if (!cart) {
 				cart = await prisma.cart.create({
-					data: {
-						id: cartId,
-					},
+					data: { id: cartId },
 				});
 			}
+
+			// Return the cartId in the response for the client to store in localStorage
+			const response = NextResponse.json(cart);
+			response.headers.set("x-cart-id", cart.id);
+			return response;
 		}
 
 		// Now, add the item to the cart
@@ -94,11 +97,12 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
-		const cookiesStore = await cookies();
-		let cartItems = []; // Change variable name to 'cartItems' to reflect that it holds an array of items
+		let cartItems = [];
 
 		if (session && session.user) {
+			// For authenticated users - continue using user ID
 			const userId = session.user.id;
+
 			// Retrieve all carts for the authenticated user
 			const carts = await prisma.cart.findMany({
 				where: { userId },
@@ -112,10 +116,11 @@ export async function GET(request: NextRequest) {
 			});
 
 			// Flatten the carts array into a single array of cart items
-			cartItems = carts.flatMap((cart) => cart.items);
+			cartItems = carts.flatMap((cart: { items: any }) => cart.items);
 		} else {
-			// For guest users
-			const cartId = cookiesStore.get("cartId")?.value;
+			// For guest users - get cartId from header instead of cookie
+			const cartId = request.headers.get("x-cart-id");
+
 			if (!cartId) {
 				return NextResponse.json([], { status: 200 });
 			}
@@ -133,14 +138,13 @@ export async function GET(request: NextRequest) {
 			});
 
 			// Flatten the carts array into a single array of cart items
-			cartItems = carts.flatMap((cart) => cart.items);
+			cartItems = carts.flatMap((cart: { items: any }) => cart.items);
 		}
 
 		if (!cartItems || cartItems.length === 0) {
 			return NextResponse.json([], { status: 200 });
 		}
 
-		//const orderNumber = cartItems[0].orderNumber;
 		return NextResponse.json(cartItems, { status: 200 });
 	} catch (error) {
 		console.error("Error fetching cart items:", error);
@@ -151,51 +155,87 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
-		const cookiesStore = await cookies();
-		let cart;
-		if (session && session.user) {
-			const userId = session.user.id;
-
-			// Get or create the cart for the authenticated user
-			cart = await prisma.cart.findFirst({
-				where: { userId },
-			});
-
-			await prisma.cart.deleteMany({
-				where: {
-					userId,
-				},
-			});
-		} else {
-			// For guest users
-			let cartId = (await cookiesStore).get("cartId")?.value;
-
-			await prisma.cart.delete({
-				where: {
-					id: cartId,
-				},
-			});
-		}
-
 		const url = new URL(request.url);
+
+		// First, determine what we're deleting based on URL params
 		if (url.searchParams.has("cartItemId")) {
 			// Delete a single CartItem from the cart based on cartItemId
 			const cartItemId = url.searchParams.get("cartItemId") || undefined;
 			const deletionResult = await prisma.cartItem.delete({
 				where: { id: cartItemId },
 			});
-			return new Response(JSON.stringify({ message: "Cart item removed", deletedItemsCount: deletionResult ? 1 : 0 }), { status: 201 });
+			return new Response(
+				JSON.stringify({
+					message: "Cart item removed",
+					deletedItemsCount: deletionResult ? 1 : 0,
+				}),
+				{ status: 201 }
+			);
 		} else {
-			// Correctly fetch cartId value from URL search params
-			const cartId = url.searchParams.get("cartId") || undefined;
-			// Delete all CartItems associated with a specific cartId
+			// Handle full cart deletion scenarios
+			let cartId;
+
+			if (session && session.user) {
+				// For authenticated users
+				const userId = session.user.id;
+
+				// Get cart for the authenticated user
+				const cart = await prisma.cart.findFirst({
+					where: { userId },
+				});
+				cartId = cart?.id;
+
+				// Delete the cart if specified
+				if (url.searchParams.has("deleteCart")) {
+					await prisma.cart.deleteMany({
+						where: { userId },
+					});
+				}
+			} else {
+				// For guest users - get cartId from header instead of cookie
+				cartId = request.headers.get("x-cart-id");
+
+				// Delete the cart if specified
+				if (url.searchParams.has("deleteCart") && cartId) {
+					await prisma.cart.delete({
+						where: { id: cartId },
+					});
+
+					// We don't need to clear cookies, client will handle localStorage
+				}
+			}
+
+			// Use cartId from URL params if provided, otherwise use the one we determined
+			const urlCartId = url.searchParams.get("cartId");
+			cartId = urlCartId || cartId;
+
 			if (!cartId) {
 				return new Response(JSON.stringify({ error: "Missing cartId" }), { status: 400 });
 			}
-			const deletionResult = await prisma.cartItem.deleteMany({ where: { cartId } });
-			return new Response(JSON.stringify({ message: "Cart cleared", deletedItemsCount: deletionResult.count }), { status: 201 });
+
+			// Delete all CartItems associated with the cart
+			const deletionResult = await prisma.cartItem.deleteMany({
+				where: { cartId },
+			});
+
+			// Create response with header to tell client to clear localStorage
+			const response = new Response(
+				JSON.stringify({
+					message: "Cart cleared",
+					deletedItemsCount: deletionResult.count,
+				}),
+				{ status: 201 }
+			);
+
+			// If we're deleting the cart completely, tell client to clear storage
+			if (url.searchParams.has("deleteCart")) {
+				response.headers.set("x-clear-cart", "true");
+			}
+
+			return response;
 		}
 	} catch (error) {
+		console.error("Error occurred while clearing cart:", error);
 		return new Response(JSON.stringify({ error: "Error occurred while clearing cart" }), { status: 500 });
 	}
 }
@@ -203,16 +243,20 @@ export async function DELETE(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
 	try {
 		const { cartItemId, quantityToDecrease = 1 } = await request.json();
+
 		// Validate input data here if needed...
 		const existingCartItem = await prisma.cartItem.findUnique({
 			where: {
 				id: cartItemId,
 			},
 		});
+
 		if (!existingCartItem) {
 			return NextResponse.json({ error: "Cart item not found" }, { status: 404 });
 		}
+
 		const newQuantity = existingCartItem.quantity - quantityToDecrease;
+
 		if (newQuantity <= 0) {
 			// Delete cart item if the quantity is less than or equal to zero
 			await prisma.cartItem.delete({

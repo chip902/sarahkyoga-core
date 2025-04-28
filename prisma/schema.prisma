@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -9,22 +10,22 @@ datasource db {
 }
 
 model User {
-  accounts         Account[]
-  authenticators   Authenticator[]
-  carts            Cart[]
-  orders           Order[]
-  sessions         Session[]
   email            String          @unique
   emailVerified    DateTime?
   password         String?
-  firstName        String?
-  lastName         String?
   id               String          @id @default(uuid())
   role             String?         @default("user")
   image            String?
   type             String?
   resetToken       String?         @unique
   resetTokenExpiry DateTime?
+  firstName        String?
+  lastName         String?
+  accounts         Account[]
+  authenticators   Authenticator[]
+  carts            Cart[]
+  orders           Order[]
+  sessions         Session[]
 }
 
 model Account {
@@ -108,9 +109,9 @@ model Order {
   userId      String
   total       Float
   status      String      @default("pending")
-  orderNumber String      @unique
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  orderNumber String      @unique
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items       OrderItem[]
 }

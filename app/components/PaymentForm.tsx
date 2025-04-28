@@ -1,12 +1,11 @@
 // components/PaymentForm.tsx
 "use client";
 
-import { useStripe, useElements, CardElement, Elements } from "@stripe/react-stripe-js";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { FormControl, FormLabel, Button, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import useCart from "../hooks/useCart";
-import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 
 interface PaymentFormProps {
 	isLoading: boolean;
@@ -21,7 +20,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
-	const { clearCart } = useCart();
+	const { clearCartStorage } = useCart();
 
 	const handleSubmit = async (event: any) => {
 		event.preventDefault();
@@ -50,35 +49,44 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 				console.error("Payment error:", error);
 				handleError(`Payment Error: ${error.message}`);
 			} else if (paymentIntent && paymentIntent.status === "succeeded") {
+				const cartId = localStorage.getItem("cartId");
+
+				// Prepare headers
+				const headers: Record<string, string> = {};
+				if (cartId) {
+					headers["x-cart-id"] = cartId;
+				}
 				// Handle successful payment here
 				try {
-					let response;
-					if (registrationData) {
-						response = await axios.post("/api/payment/confirm", {
+					const response = await axios.post(
+						"/api/payment/confirm",
+						{
 							paymentIntentId: paymentIntent.id,
 							registrationData,
-							clientSecret,
-						});
-					} else {
-						response = await axios.post("/api/payment/confirm", {
-							paymentIntentId: paymentIntent.id,
-							clientSecret,
 							billingDetails,
-						});
+						},
+						{ headers }
+					);
+
+					// Clear cart from localStorage on successful checkout
+					if (response.data.success || response.data.shouldClearLocalStorage) {
+						localStorage.removeItem("cartId");
+						clearCartStorage();
 					}
-					// use the response as needed...
-				} catch (err) {
-					console.error("API Error:", err);
-					handleError(`Server Error - Payment Confirmation Failed: ${err}`);
+
+					// Redirect to success page
+					router.push("/booking/success");
+				} catch (error) {
+					console.error("Checkout error:", error);
+					handleError("Payment confirmed but order processing failed. Please contact support.");
 				}
 			}
 		} catch (error) {
 			console.error("Stripe confirmation error:", error);
 			handleError(`Stripe Payment Confirmation Failed: ${error}`);
+			router.push("/booking/checkout");
 		} finally {
 			setIsLoading(false);
-			clearCart();
-			router.push("/booking/success");
 		}
 	};
 

@@ -1,4 +1,3 @@
-import { theme as proTheme } from "@chakra-ui/pro-theme";
 import { extendTheme } from "@chakra-ui/react";
 
 const fontConfig = {
@@ -70,7 +69,7 @@ const extension = {
 			body: {
 				backgroundImage: "url('/background.jpg')",
 				backgroundSize: "cover",
-				backgroundPosition: "center",
+				backgroundPosition: "50% 20%",
 				backgroundRepeat: "no-repeat",
 				fontFamily: "var(--font-quicksand)",
 				color: "grey.800",
@@ -223,7 +222,8 @@ const components = {
 				marginTop: 5,
 				paddingY: 2,
 				paddingX: [2, 2],
-				backgroundColor: "brand.900",
+				backgroundColor: "brand.200",
+				color: "white",
 				fontWeight: "bold",
 				borderRadius: "8px",
 				_hover: {
@@ -380,6 +380,7 @@ const components = {
 				fontWeight: "bold",
 				position: "relative",
 				textDecoration: "none",
+				display: "inline-block",
 				_hover: {
 					textDecoration: "none",
 					_after: {
@@ -422,4 +423,4 @@ const extendedConfig = extendTheme({
 	},
 });
 
-export const skyTheme = extendTheme(proTheme, extendedConfig);
+export const skyTheme = extendTheme(extendedConfig);

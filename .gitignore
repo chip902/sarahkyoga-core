@@ -36,3 +36,7 @@ config/*.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Prisma
+/prisma/migrations/
+/app/generated/
