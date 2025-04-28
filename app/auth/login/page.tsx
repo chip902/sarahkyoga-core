@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Alert,
 	AlertDescription,
@@ -26,6 +26,7 @@ const Login = () => {
 	// State to store email and password
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [error, setError] = useState("");
 	const { data: session, status } = useSession();
 	const router = useRouter();
 
@@ -34,26 +35,37 @@ const Login = () => {
 		const result = await signIn("credentials", {
 			email,
 			password,
+			redirect: false,
 		});
+
 		if (result?.error) {
-			// Handle login error
-			console.error("Login failed:", result.error);
-			return (
+			// Set the error message if login fails
+			setError(result.error);
+			return;
+		}
+		{
+			error && (
 				<Alert status="error" variant="account" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
 					<AlertIcon boxSize="40px" mr={0} />
 					<AlertTitle mt={4} mb={1} fontSize="lg">
 						Access Denied
 					</AlertTitle>
-					<AlertDescription maxWidth="sm">Your Email or Password was not found; please try again.</AlertDescription>
+					<AlertDescription maxWidth="sm">{error}</AlertDescription>
 				</Alert>
 			);
 		}
-		if (status === "authenticated" && session.user.role === "admin") {
-			router.push("/admin/dashboard");
-		} else {
-			router.push("/dashboard");
-		}
 	};
+
+	useEffect(() => {
+		// When the session loads or changes
+		if (status === "authenticated") {
+			if (session?.user?.role === "admin") {
+				router.push("/admin/dashboard");
+			} else {
+				router.push("/dashboard");
+			}
+		}
+	}, [status, session, router]);
 
 	return (
 		<Box w="100%" pt={{ base: "200", md: "28" }} display="flex" justifyContent="center" alignItems="flex-start">
@@ -70,6 +82,24 @@ const Login = () => {
 				mx="auto"
 				display="block">
 				<Stack spacing={{ base: "6", md: "8" }}>
+					{/* Render error alert if there's an error */}
+					{error && (
+						<Alert
+							status="error"
+							variant="account"
+							flexDirection="column"
+							alignItems="center"
+							justifyContent="center"
+							textAlign="center"
+							height="200px">
+							<AlertIcon boxSize="40px" mr={0} />
+							<AlertTitle mt={4} mb={1} fontSize="lg">
+								Access Denied
+							</AlertTitle>
+							<AlertDescription maxWidth="sm">{error}</AlertDescription>
+						</Alert>
+					)}
+
 					<Stack spacing={{ base: "4", md: "6" }}>
 						<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
 							<Heading variant="login" size={{ base: "lg", md: "sm" }}>
@@ -77,7 +107,6 @@ const Login = () => {
 							</Heading>
 						</Stack>
 					</Stack>
-
 					<Stack spacing={{ base: 4, md: 6 }}>
 						<Stack spacing={{ base: 4, md: 5 }}>
 							<FormControl>
@@ -89,14 +118,12 @@ const Login = () => {
 								<Input id="password" placeholder="********" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 							</FormControl>
 						</Stack>
-
 						<HStack justify="space-between">
 							<Checkbox defaultChecked>Remember me</Checkbox>
 							<Link color="black" href="/auth/forgot-password" fontSize={{ base: "sm", md: "md" }}>
 								Forgot Password?
 							</Link>
 						</HStack>
-
 						<Stack spacing={{ base: "3", md: "4" }}>
 							<Button onClick={handleLogin}>Sign in</Button>
 							<Button variant="secondary" leftIcon={<GoogleIcon />} onClick={() => signIn("google")}>
@@ -104,7 +131,6 @@ const Login = () => {
 							</Button>
 						</Stack>
 					</Stack>
-
 					<Text textAlign="center" fontSize={{ base: "sm", md: "md" }}>
 						<Link color="black" href="/register">
 							Don&apos;t have an account? Sign up
