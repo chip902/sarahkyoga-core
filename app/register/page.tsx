@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { useState } from "react";
 import axios from "axios";
 import { Box, Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, Spinner, Stack, useToast } from "@chakra-ui/react";
@@ -56,16 +55,15 @@ const Register = () => {
 				position="relative"
 				zIndex="1"
 				mx="auto"
-				display="block"
-				onSubmit={handleRegister}>
-				<Stack spacing={{ base: "4", md: "6" }}>
-					<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
-						<Heading size={{ base: "md", md: "sm" }}>Sign Up!</Heading>
-					</Stack>
-
+				display="block">
+				<form onSubmit={handleRegister}>
 					<Stack spacing={{ base: "4", md: "6" }}>
+						<Stack spacing={{ base: "2", md: "3" }} textAlign="center">
+							<Heading size={{ base: "md", md: "sm" }}>Sign Up!</Heading>
+						</Stack>
+
 						<Stack spacing={{ base: "3", md: "4" }}>
-							<Flex direction={{ base: "column", md: "row" }} mb={{ base: 2, md: 2 }} gap={{ base: "3", md: "4" }}>
+							<Flex direction={{ base: "column", md: "row" }} mb={2} gap={{ base: "3", md: "4" }}>
 								<FormControl isRequired id="firstName">
 									<FormLabel fontFamily="inherit">First Name</FormLabel>
 									<Input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
@@ -85,17 +83,18 @@ const Register = () => {
 								<FormLabel>Password</FormLabel>
 								<Input onChange={(e) => setPassword(e.target.value)} value={password} type="password" />
 							</FormControl>
+
+							<Divider my={4} />
+
+							<Flex justify="flex-end" py={{ base: "8", md: "4" }}>
+								<Button type="submit" disabled={isLoading} colorScheme="blue">
+									{isLoading ? <Spinner size="sm" mr={2} /> : null}
+									Submit
+								</Button>
+							</Flex>
 						</Stack>
-
-						<Divider />
-
-						<Flex justify="flex-end" py={{ base: "8", md: "4" }}>
-							<Button type="submit" disabled={isLoading}>
-								Submit {isLoading && <Spinner ml="2" size="sm" />}
-							</Button>
-						</Flex>
 					</Stack>
-				</Stack>
+				</form>
 			</Container>
 		</Box>
 	);
