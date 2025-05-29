@@ -21,12 +21,7 @@ const AboutPage = () => {
 			<Container maxW={{ base: "100%", md: "760px" }} mx="auto">
 				{/* About Sarah Section */}
 				<Box mt={{ base: "24", md: "32" }} mb={{ base: "16", md: "24" }}>
-					<Box
-						bg="rgba(255, 255, 255, 0.7)"
-						boxShadow="xl"
-						borderRadius="md"
-						p={{ base: "16px", md: "24px" }} // Explicit pixel values
-						width="100%">
+					<Box bg="rgba(255, 255, 255, 0.7)" boxShadow="xl" borderRadius="md" p={{ base: "16px", md: "24px" }} width="100%">
 						<Box px={{ base: "16px", md: "24px" }}>
 							<Heading fontFamily="inherit" as="h1" fontSize={{ base: "2xl", md: "3xl" }} p={5}>
 								ABOUT SARAH
@@ -35,6 +30,16 @@ const AboutPage = () => {
 								Sarah found yoga while training for her first marathon. She looked to yoga as just another part of her training regimen and
 								after her first class, she realized that it would become much more. Yoga changed the way Sarah breathed, looked at herself as
 								well as the world. After diving into the practice, she discovered she wanted to share this gift with others.
+							</Text>
+							<Text fontSize={{ base: "md", md: "lg" }} mb="5" lineHeight="taller" p={5}>
+								A native New Yorker, Sarah received her RYT 200 certification from Laughing Lotus Yoga Center under the tutelage of Mary Dana
+								Abbot in 2015. In 2021, Sarah completed her Katonah Yoga® certification and started Sarah K Yoga LLC. Sarah believes in the
+								power of personal practice and communal practice as an essential for wellness.
+							</Text>
+							<Text fontSize={{ base: "md", md: "lg" }} mb="5" lineHeight="taller" p={5}>
+								Sarah instructs privately and is grateful to teach weekly with Yoga on York in York Maine and Prasada Yoga Center in North
+								Hampton, NH. When Sarah is not on the mat, you can find her gardening, jogging around the New Hampshire/Maine Seacoast, baking
+								pies or on the beach with her husband Steve, son Axel and daughter Lucy.
 							</Text>
 						</Box>
 					</Box>
