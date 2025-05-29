@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { Box, Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Modal, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { Box, Button, Container, Divider, Flex, FormControl, FormLabel, Heading, Input, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
