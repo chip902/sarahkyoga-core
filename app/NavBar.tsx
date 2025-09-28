@@ -105,14 +105,11 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 											Private Sessions
 										</Button>
 									</NextLink>
-									<HStack>
-										<NextLink href="/" passHref>
-											<Button variant="linkNav" onClick={onClose} my={5} isDisabled _disabled={{ cursor: "not-allowed", opacity: 0.6 }}>
-												Workshops
-											</Button>
-										</NextLink>
-										<Icon as={GiEmptyHourglass} color="gray.400" />
-									</HStack>
+									<NextLink href="/workshops" passHref>
+										<Button variant="linkNav" onClick={onClose} my={5}>
+											Workshops
+										</Button>
+									</NextLink>
 								</VStack>
 							</MenuList>
 						</Menu>
@@ -223,7 +220,7 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 														Private Sessions
 													</Button>
 												</NextLink>
-												<NextLink href="/" passHref>
+												<NextLink href="/workshops" passHref>
 													<Button variant="mobileMenu" onClick={onClose}>
 														Workshops
 													</Button>
