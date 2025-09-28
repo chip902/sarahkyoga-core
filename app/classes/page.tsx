@@ -45,6 +45,25 @@ export default function YogaClasses() {
 
 					<Divider />
 
+					{/* Tuesday Classes https://www.yogaonyork.com/*/}
+					<Box maxWidth="80ch" width="90%" mx="auto">
+						<Heading size="md" color="brand.600">
+							Tuesday
+						</Heading>
+						<NextLink target="_blank" href="https://yogaonyork.com/" passHref>
+							<Text height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+								Yoga on York
+							</Text>
+						</NextLink>
+						<Text fontWeight="bold">Chair Yoga 11a-12p</Text>
+						<Text mt={2}>
+							Chair yoga invites you to find mobility in a way that is gentle and supportive. Chair yoga ia great option for those wanting a more
+							grounding practice, recovering from injury and beginners alike. All abilities welcome.
+						</Text>
+					</Box>
+
+					<Divider />
+
 					{/* Wednesday Classes https://www.yogaonyork.com/*/}
 					<Box maxWidth="80ch" width="90%" mx="auto">
 						<Heading size="md" color="brand.600">

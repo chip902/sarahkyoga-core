@@ -79,7 +79,7 @@ export default function Workshops() {
 		<Flex
 			direction="column"
 			align="center"
-			marginTop={["5vh", "5vh", "15vh", "15vh"]}
+			marginTop={["20vh", "20vh", "20vh", "20vh"]}
 			paddingX={["4", "8", "16", "24"]}
 			paddingY="8"
 			width="100%"
@@ -151,13 +151,12 @@ export default function Workshops() {
 										<Text fontSize="3xl" fontWeight="bold" color="brand.600">
 											{workshop.price}
 										</Text>
-										<Button 
-											variant="cta" 
-											size="lg" 
-											as={NextLink} 
+										<Button
+											variant="cta"
+											size="lg"
+											as={NextLink}
 											href={workshop.link}
-											target={workshop.link.startsWith('http') ? "_blank" : undefined}
-										>
+											target={workshop.link.startsWith("http") ? "_blank" : undefined}>
 											Reserve Spot
 										</Button>
 									</VStack>
@@ -257,13 +256,12 @@ export default function Workshops() {
 										<Text fontSize="xl" fontWeight="bold" color="brand.600">
 											{workshop.price}
 										</Text>
-										<Button 
-											variant="cta" 
-											size="sm" 
-											as={NextLink} 
+										<Button
+											variant="cta"
+											size="sm"
+											as={NextLink}
 											href={workshop.link}
-											target={workshop.link.startsWith('http') ? "_blank" : undefined}
-										>
+											target={workshop.link.startsWith("http") ? "_blank" : undefined}>
 											Register
 										</Button>
 									</HStack>

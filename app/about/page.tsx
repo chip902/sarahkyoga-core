@@ -37,9 +37,13 @@ const AboutPage = () => {
 								power of personal practice and communal practice as an essential for wellness.
 							</Text>
 							<Text fontSize={{ base: "md", md: "lg" }} mb="5" lineHeight="taller" p={5}>
-								Sarah instructs privately and is grateful to teach weekly with Yoga on York in York Maine and Prasada Yoga Center in North
-								Hampton, NH. When Sarah is not on the mat, you can find her gardening, jogging around the New Hampshire/Maine Seacoast, baking
-								pies or on the beach with her husband Steve, son Axel and daughter Lucy.
+								Sarah values many movement modalites as a way to optimize living in a body. She integrates Katonah Yoga, Hatha, functional
+								mobility and strength into all of her classes. You can expect creative use of props, a mini anatomy lesson all while still
+								feeling the grounding and magically benefits of yoga.
+							</Text>
+							<Text fontSize={{ base: "md", md: "lg" }} mb="5" lineHeight="taller" p={5}>
+								Sarah instructs privately and publicly along the Seacoast. When Sarah is not on the mat, you can find her gardening, chasing
+								chickens, baking pies or on the beach with her husband Steve, son Axel and daughter Lucy.
 							</Text>
 						</Box>
 					</Box>
