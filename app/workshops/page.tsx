@@ -175,7 +175,7 @@ export default function Workshops() {
 
 								<Box>
 									<Heading size="md" color="brand.600" mb={3}>
-										What You'll Experience:
+										What You&apos;ll Experience:
 									</Heading>
 									<Stack direction={["column", "column", "row"]} spacing={4}>
 										{workshop.highlights.map((highlight, i) => (
