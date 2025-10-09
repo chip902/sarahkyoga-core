@@ -28,10 +28,16 @@ export async function POST(request: Request) {
 		const { paymentIntentId, registrationData, billingDetails, promoCode } = await request.json();
 		const session = await getServerSession(authOptions);
 
-		// Retrieve the Payment Intent to confirm status
-		const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-		if (paymentIntent.status !== "succeeded") {
-			return NextResponse.json({ error: "Payment not completed" }, { status: 400 });
+		// Check if this is a free order (no payment required)
+		const isFreeOrder = paymentIntentId === "free-order";
+		let paymentIntent: Stripe.PaymentIntent | null = null;
+
+		// Retrieve the Payment Intent to confirm status (skip for free orders)
+		if (!isFreeOrder) {
+			paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+			if (paymentIntent.status !== "succeeded") {
+				return NextResponse.json({ error: "Payment not completed" }, { status: 400 });
+			}
 		}
 
 		let userId = uuidv4();
@@ -242,7 +248,7 @@ export async function POST(request: Request) {
 				const currentUrl = new URL(request.url, "https://sarahkyoga.com");
 				const sendEmailEndpoint = url.resolve(currentUrl.origin, "/api/send-email");
 
-				const toEmail = paymentIntent.receipt_email || registrationData?.email || billingDetails.email;
+				const toEmail = paymentIntent?.receipt_email || registrationData?.email || billingDetails.email;
 				if (!toEmail) {
 					console.error("No email address provided for sending confirmation email.");
 					return NextResponse.json({ error: "No email address provided" }, { status: 400 });

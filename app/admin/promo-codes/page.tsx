@@ -261,9 +261,7 @@ const PromoCodesPage = () => {
 								<Tr key={promoCode.id}>
 									<Td fontWeight="bold">{promoCode.code}</Td>
 									<Td>
-										<Badge colorScheme={promoCode.type === "FREE_CLASS" ? "green" : "blue"}>
-											{promoCode.type}
-										</Badge>
+										<Badge colorScheme={promoCode.type === "FREE_CLASS" ? "green" : "blue"}>{promoCode.type}</Badge>
 									</Td>
 									<Td>
 										{promoCode.type === "PERCENTAGE"
@@ -277,23 +275,12 @@ const PromoCodesPage = () => {
 										{promoCode.maxUses && ` / ${promoCode.maxUses}`}
 									</Td>
 									<Td>
-										<Badge colorScheme={promoCode.isActive ? "green" : "red"}>
-											{promoCode.isActive ? "Active" : "Inactive"}
-										</Badge>
+										<Badge colorScheme={promoCode.isActive ? "green" : "red"}>{promoCode.isActive ? "Active" : "Inactive"}</Badge>
 									</Td>
-									<Td>
-										{promoCode.expiresAt
-											? new Date(promoCode.expiresAt).toLocaleDateString()
-											: "Never"}
-									</Td>
+									<Td>{promoCode.expiresAt ? new Date(promoCode.expiresAt).toLocaleDateString() : "Never"}</Td>
 									<Td>
 										<HStack spacing={2}>
-											<IconButton
-												aria-label="Edit"
-												icon={<EditIcon />}
-												size="sm"
-												onClick={() => handleOpenModal(promoCode)}
-											/>
+											<IconButton aria-label="Edit" icon={<EditIcon />} size="sm" onClick={() => handleOpenModal(promoCode)} />
 											<Button
 												size="sm"
 												colorScheme={promoCode.isActive ? "orange" : "green"}
@@ -328,11 +315,7 @@ const PromoCodesPage = () => {
 						<VStack spacing={4}>
 							{!editingPromoCode && (
 								<FormControl>
-									<Checkbox
-										isChecked={formData.autoGenerate}
-										onChange={(e) =>
-											setFormData({ ...formData, autoGenerate: e.target.checked })
-										}>
+									<Checkbox isChecked={formData.autoGenerate} onChange={(e) => setFormData({ ...formData, autoGenerate: e.target.checked })}>
 										Auto-generate code
 									</Checkbox>
 								</FormControl>
@@ -342,11 +325,9 @@ const PromoCodesPage = () => {
 								<FormControl isRequired>
 									<FormLabel>Code</FormLabel>
 									<Input
-										placeholder="SUMMER2024"
+										placeholder="SUMMER2026"
 										value={formData.code}
-										onChange={(e) =>
-											setFormData({ ...formData, code: e.target.value.toUpperCase() })
-										}
+										onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
 										isDisabled={!!editingPromoCode}
 									/>
 								</FormControl>
@@ -370,15 +351,11 @@ const PromoCodesPage = () => {
 
 							{formData.type !== "FREE_CLASS" && (
 								<FormControl isRequired>
-									<FormLabel>
-										Value {formData.type === "PERCENTAGE" ? "(%)" : "($)"}
-									</FormLabel>
+									<FormLabel>Value {formData.type === "PERCENTAGE" ? "(%)" : "($)"}</FormLabel>
 									<Input
 										type="number"
 										value={formData.value}
-										onChange={(e) =>
-											setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })
-										}
+										onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) || 0 })}
 										min={0}
 										max={formData.type === "PERCENTAGE" ? 100 : undefined}
 									/>
@@ -415,9 +392,7 @@ const PromoCodesPage = () => {
 							</FormControl>
 
 							<FormControl>
-								<Checkbox
-									isChecked={formData.isActive}
-									onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}>
+								<Checkbox isChecked={formData.isActive} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}>
 									Active
 								</Checkbox>
 							</FormControl>

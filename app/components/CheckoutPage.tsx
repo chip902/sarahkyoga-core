@@ -104,6 +104,59 @@ const CheckoutPage = () => {
 		setPromoCodeError(null);
 	};
 
+	// Handle free order completion (no payment required)
+	const handleFreeOrderComplete = async () => {
+		setIsLoading(true);
+		try {
+			// Get cart ID
+			const cartId = localStorage.getItem("cartId");
+			const headers: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			if (cartId) {
+				headers["x-cart-id"] = cartId;
+			}
+
+			// Create order directly without payment
+			const response = await axios.post(
+				"/api/payment/confirm",
+				{
+					paymentIntentId: "free-order", // Special indicator for free orders
+					registrationData: registrationData.password ? registrationData : null,
+					billingDetails,
+					promoCode: appliedPromoCode?.promoCode || null,
+				},
+				{ headers }
+			);
+
+			if (response.data.success) {
+				// Clear cart
+				localStorage.removeItem("cartId");
+				toast({
+					title: "Order placed successfully!",
+					description: "Your free order has been confirmed.",
+					status: "success",
+					duration: 5000,
+					isClosable: true,
+				});
+				// Redirect to success page
+				window.location.href = "/booking/success";
+			}
+		} catch (error: any) {
+			const errorMessage = error.response?.data?.error || "Failed to complete order";
+			setApiError(errorMessage);
+			toast({
+				title: "Error",
+				description: errorMessage,
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
 		if (apiError) {
 			toast({ title: "An error occurred.", description: apiError, status: "error", duration: 5000, isClosable: true });
@@ -112,15 +165,24 @@ const CheckoutPage = () => {
 	// Fetch cart items and create Payment Intent
 	useEffect(() => {
 		if (Array.isArray(cartItems) && cartItems.length > 0) {
-			const cartTotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			const cartTotal = cartItems.reduce((acc, item) => {
+				const price = item.variant ? item.variant.price : item.product.price;
+				return acc + price * item.quantity;
+			}, 0);
 			const finalTotal = appliedPromoCode ? appliedPromoCode.newTotal : cartTotal;
-			// Create Payment Intent
-			axios
-				.post("/api/payment/intent", {
-					amount: finalTotal * 100, // Convert to cents
-				})
-				.then((response) => setClientSecret(response.data.clientSecret))
-				.catch((error) => console.error("Error creating payment intent:", error));
+
+			// Only create payment intent if total is greater than $0.50 (Stripe minimum)
+			if (finalTotal >= 0.5) {
+				axios
+					.post("/api/payment/intent", {
+						amount: Math.round(finalTotal * 100), // Convert to cents and round
+					})
+					.then((response) => setClientSecret(response.data.clientSecret))
+					.catch((error) => console.error("Error creating payment intent:", error));
+			} else {
+				// For free orders, set a special flag instead of creating payment intent
+				setClientSecret("free-order");
+			}
 		}
 	}, [cartItems, appliedPromoCode]);
 
@@ -135,9 +197,13 @@ const CheckoutPage = () => {
 	const stripePromise = loadStripe(
 		process.env.NODE_ENV == "development" ? String(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV!) : String(process.env.STRIPE_PUBLISH_KEY_PROD!)
 	);
-	// Stripe Elements options
+	// Check if this is a free order
+	const isFreeOrder = clientSecret === "free-order";
+	const finalTotal = appliedPromoCode ? appliedPromoCode.newTotal : total;
+
+	// Stripe Elements options (only needed for paid orders)
 	const options: StripeElementsOptions = {
-		clientSecret,
+		clientSecret: isFreeOrder ? "" : clientSecret,
 	};
 	// Styling variables
 	const bgColor = useColorModeValue("white", "brand.600");
@@ -199,7 +265,7 @@ const CheckoutPage = () => {
 					)}
 
 					{/* Promo Code Section */}
-					<Box mt={6} p={4} borderWidth="1px" borderRadius="md">
+					<Box mt={6} p={4} mb={6} borderWidth="1px" borderRadius="md">
 						<Heading fontFamily="inherit" size="sm" mb={3}>
 							Have a Promo Code?
 						</Heading>
@@ -352,20 +418,39 @@ const CheckoutPage = () => {
 							</FormControl>
 						</Box>
 						<Box mb={{ base: 4, md: 2 }}>
-							<Elements stripe={stripePromise} options={options}>
-								{/* Payment Form */}
-								{clientSecret && (
-									<PaymentForm
+							{isFreeOrder ? (
+								// Show simple button for free orders
+								<Box>
+									<Text fontSize="lg" fontWeight="bold" color="green.500" mb={4}>
+										🎉 Your order is FREE!
+									</Text>
+									<Button
+										colorScheme="green"
+										size="lg"
+										width="100%"
+										onClick={handleFreeOrderComplete}
 										isLoading={isLoading}
-										setIsLoading={setIsLoading}
-										billingDetails={billingDetails}
-										registrationData={registrationData.password ? registrationData : null}
-										clientSecret={clientSecret}
-										handleError={setApiError}
-										promoCode={appliedPromoCode?.promoCode || null}
-									/>
-								)}
-							</Elements>
+										loadingText="Processing...">
+										Complete Free Order
+									</Button>
+								</Box>
+							) : (
+								// Show Stripe payment form for paid orders
+								<Elements stripe={stripePromise} options={options}>
+									{/* Payment Form */}
+									{clientSecret && (
+										<PaymentForm
+											isLoading={isLoading}
+											setIsLoading={setIsLoading}
+											billingDetails={billingDetails}
+											registrationData={registrationData.password ? registrationData : null}
+											clientSecret={clientSecret}
+											handleError={setApiError}
+											promoCode={appliedPromoCode?.promoCode || null}
+										/>
+									)}
+								</Elements>
+							)}
 						</Box>
 					</Stack>
 				</Box>
