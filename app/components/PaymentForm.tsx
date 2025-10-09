@@ -14,9 +14,10 @@ interface PaymentFormProps {
 	registrationData: any;
 	clientSecret: string;
 	handleError: (error: string | null) => void;
+	promoCode?: any;
 }
 
-const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData, clientSecret, handleError }: PaymentFormProps) => {
+const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData, clientSecret, handleError, promoCode }: PaymentFormProps) => {
 	const stripe = useStripe();
 	const elements = useElements();
 	const router = useRouter();
@@ -64,6 +65,7 @@ const PaymentForm = ({ isLoading, setIsLoading, billingDetails, registrationData
 							paymentIntentId: paymentIntent.id,
 							registrationData,
 							billingDetails,
+							promoCode: promoCode || null,
 						},
 						{ headers }
 					);

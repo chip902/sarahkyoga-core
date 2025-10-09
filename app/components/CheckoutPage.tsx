@@ -42,6 +42,12 @@ const CheckoutPage = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiError, setApiError] = useState<string | null>(null);
 
+	// Promo code state
+	const [promoCode, setPromoCode] = useState("");
+	const [appliedPromoCode, setAppliedPromoCode] = useState<any>(null);
+	const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
+	const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+
 	const [clientSecret, setClientSecret] = useState("");
 	const [billingDetails, setBillingDetails] = useState({
 		firstName: "",
@@ -55,6 +61,47 @@ const CheckoutPage = () => {
 			country: "US",
 		},
 	});
+	// Handle promo code validation and application
+	const handleApplyPromoCode = async () => {
+		if (!promoCode.trim()) {
+			setPromoCodeError("Please enter a promo code");
+			return;
+		}
+
+		setIsValidatingPromo(true);
+		setPromoCodeError(null);
+
+		try {
+			const response = await axios.post("/api/promo-code/validate", {
+				code: promoCode.trim(),
+				total: total,
+			});
+
+			if (response.data.valid) {
+				setAppliedPromoCode(response.data);
+				toast({
+					title: "Promo code applied!",
+					description: `You saved $${response.data.discountAmount.toFixed(2)}`,
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error: any) {
+			const errorMessage = error.response?.data?.error || "Invalid promo code";
+			setPromoCodeError(errorMessage);
+			setAppliedPromoCode(null);
+		} finally {
+			setIsValidatingPromo(false);
+		}
+	};
+
+	const handleRemovePromoCode = () => {
+		setAppliedPromoCode(null);
+		setPromoCode("");
+		setPromoCodeError(null);
+	};
+
 	useEffect(() => {
 		if (apiError) {
 			toast({ title: "An error occurred.", description: apiError, status: "error", duration: 5000, isClosable: true });
@@ -63,19 +110,25 @@ const CheckoutPage = () => {
 	// Fetch cart items and create Payment Intent
 	useEffect(() => {
 		if (Array.isArray(cartItems) && cartItems.length > 0) {
-			const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			const cartTotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			const finalTotal = appliedPromoCode ? appliedPromoCode.newTotal : cartTotal;
 			// Create Payment Intent
 			axios
 				.post("/api/payment/intent", {
-					amount: total * 100, // Convert to cents
+					amount: finalTotal * 100, // Convert to cents
 				})
 				.then((response) => setClientSecret(response.data.clientSecret))
 				.catch((error) => console.error("Error creating payment intent:", error));
 		}
-	}, [cartItems]);
+	}, [cartItems, appliedPromoCode]);
 
-	// Calculate total
-	const total = cartItems?.length ? cartItems.reduce((acc: number, item: CartItemWithProduct) => acc + item.product.price * item.quantity, 0) : 0;
+	// Calculate total (use variant price if available, otherwise use product price)
+	const total = cartItems?.length
+		? cartItems.reduce((acc: number, item: CartItemWithProduct) => {
+				const price = item.variant ? item.variant.price : item.product.price;
+				return acc + price * item.quantity;
+		  }, 0)
+		: 0;
 	// Get the stripePromise from loadStripe
 	const stripePromise = loadStripe(
 		process.env.NODE_ENV == "development" ? String(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV!) : String(process.env.STRIPE_PUBLISH_KEY_PROD!)
@@ -106,23 +159,87 @@ const CheckoutPage = () => {
 					</Heading>
 					{cartItems.length > 0 ? (
 						<Stack spacing={4}>
-							{cartItems.map((item: CartItemWithProduct) => (
-								<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
-									<Text fontWeight="bold" fontSize="lg">
-										{item.product.name}
-									</Text>
-									<Text>Quantity: {item.quantity}</Text>
-									<Text>Price: ${item.product.price.toFixed(2)} each</Text>
-								</Box>
-							))}
+							{cartItems.map((item: CartItemWithProduct) => {
+								const itemPrice = item.variant ? item.variant.price : item.product.price;
+								const itemName = item.variant
+									? `${item.product.name} - ${item.variant.name}`
+									: item.product.name;
+
+								return (
+									<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
+										<Text fontWeight="bold" fontSize="lg">
+											{itemName}
+										</Text>
+										<Text>Quantity: {item.quantity}</Text>
+										<Text>Price: ${itemPrice.toFixed(2)} each</Text>
+									</Box>
+								);
+							})}
+							<Divider />
+							<Text fontWeight="bold" fontSize="lg">
+								Subtotal: ${total.toFixed(2)}
+							</Text>
+
+							{appliedPromoCode && (
+								<>
+									<Flex justifyContent="space-between" alignItems="center" color="green.500">
+										<Text fontWeight="semibold">
+											Discount ({appliedPromoCode.promoCode.code}):
+										</Text>
+										<Text fontWeight="semibold">-${appliedPromoCode.discountAmount.toFixed(2)}</Text>
+									</Flex>
+								</>
+							)}
+
 							<Divider />
 							<Text fontWeight="bold" fontSize="xl">
-								Total: ${total.toFixed(2)}
+								Total: ${appliedPromoCode ? appliedPromoCode.newTotal.toFixed(2) : total.toFixed(2)}
 							</Text>
 						</Stack>
 					) : (
 						<Text>Your cart is empty.</Text>
 					)}
+
+					{/* Promo Code Section */}
+					<Box mt={6} p={4} borderWidth="1px" borderRadius="md">
+						<Heading fontFamily="inherit" size="sm" mb={3}>
+							Have a Promo Code?
+						</Heading>
+						{!appliedPromoCode ? (
+							<>
+								<Flex gap={2}>
+									<Input
+										placeholder="Enter promo code"
+										value={promoCode}
+										onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+										onKeyPress={(e) => e.key === "Enter" && handleApplyPromoCode()}
+										isDisabled={isValidatingPromo}
+									/>
+									<Button
+										colorScheme="blue"
+										onClick={handleApplyPromoCode}
+										isLoading={isValidatingPromo}
+										loadingText="Validating">
+										Apply
+									</Button>
+								</Flex>
+								{promoCodeError && (
+									<Text color="red.500" fontSize="sm" mt={2}>
+										{promoCodeError}
+									</Text>
+								)}
+							</>
+						) : (
+							<Flex justifyContent="space-between" alignItems="center">
+								<Text color="green.500" fontWeight="semibold">
+									✓ Code {appliedPromoCode.promoCode.code} applied
+								</Text>
+								<Button size="sm" variant="ghost" colorScheme="red" onClick={handleRemovePromoCode}>
+									Remove
+								</Button>
+							</Flex>
+						)}
+					</Box>
 				</Box>
 
 				{/* Payment and Billing Details */}
@@ -251,6 +368,7 @@ const CheckoutPage = () => {
 										registrationData={registrationData.password ? registrationData : null}
 										clientSecret={clientSecret}
 										handleError={setApiError}
+										promoCode={appliedPromoCode?.promoCode || null}
 									/>
 								)}
 							</Elements>

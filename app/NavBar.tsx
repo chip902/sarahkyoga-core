@@ -132,6 +132,9 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 									<NextLink href="/admin/users" passHref legacyBehavior>
 										<MenuItem>Manage Users</MenuItem>
 									</NextLink>
+									<NextLink href="/admin/promo-codes" passHref legacyBehavior>
+										<MenuItem>Promo Codes</MenuItem>
+									</NextLink>
 									<NextLink href="/admin/newsletter" passHref legacyBehavior>
 										<MenuItem>Newsletter</MenuItem>
 									</NextLink>

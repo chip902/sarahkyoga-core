@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 			: new Stripe(String(process.env.STRIPE_SECRET_KEY_PROD!));
 
 	try {
-		const { paymentIntentId, registrationData, billingDetails } = await request.json();
+		const { paymentIntentId, registrationData, billingDetails, promoCode } = await request.json();
 		const session = await getServerSession(authOptions);
 
 		// Retrieve the Payment Intent to confirm status
@@ -149,7 +149,10 @@ export async function POST(request: Request) {
 		try {
 			const cartItems = await prisma.cartItem.findMany({
 				where: { cartId },
-				include: { product: true },
+				include: {
+					product: true,
+					variant: true,
+				},
 			});
 
 			if (!cartItems || cartItems.length === 0) {
@@ -157,8 +160,11 @@ export async function POST(request: Request) {
 				return NextResponse.json({ error: "Cart is empty" }, { status: 406 });
 			}
 
-			// Create an order
-			const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+			// Create an order (use variant price if available, otherwise use product price)
+			const total = cartItems.reduce((acc, item) => {
+				const price = item.variant ? item.variant.price : item.product.price;
+				return acc + price * item.quantity;
+			}, 0);
 			const orderNumber = generateOrderNumber();
 			let newOrder;
 			let templateName;
@@ -183,6 +189,13 @@ export async function POST(request: Request) {
 			const htmlContent = template.html.replace("{firstName}", billingDetails.firstName).replace("{orderId}", orderNumber);
 
 			try {
+				// Calculate discount amount if promo code is provided
+				let discountAmount = 0;
+				if (promoCode && promoCode.id) {
+					const { calculateDiscount } = await import("@/lib/promoCodeUtils");
+					discountAmount = calculateDiscount(promoCode.type, promoCode.value, total);
+				}
+
 				newOrder = await prisma.order.create({
 					data: {
 						userId,
@@ -191,12 +204,34 @@ export async function POST(request: Request) {
 						items: {
 							create: cartItems.map((item) => ({
 								productId: item.productId,
+								variantId: item.variantId || null,
 								quantity: item.quantity,
-								price: item.product.price,
+								price: item.variant ? item.variant.price : item.product.price,
 							})),
 						},
+						...(promoCode &&
+							promoCode.id && {
+								promoCodes: {
+									create: {
+										promoCodeId: promoCode.id,
+										discountAmount,
+									},
+								},
+							}),
 					},
 				});
+
+				// Increment promo code usage count
+				if (promoCode && promoCode.id) {
+					await prisma.promoCode.update({
+						where: { id: promoCode.id },
+						data: {
+							usedCount: {
+								increment: 1,
+							},
+						},
+					});
+				}
 			} catch (err) {
 				console.error("Failed to create order", err);
 				return NextResponse.json({ error: "Order not created" }, { status: 500 });
