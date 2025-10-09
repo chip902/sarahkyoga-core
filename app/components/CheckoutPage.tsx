@@ -15,8 +15,9 @@ import {
 	Skeleton,
 	Container,
 	useToast,
+	Button,
 } from "@chakra-ui/react";
-import { CartItem, Product } from "@/app/generated/prisma/client";
+import { CartItem, Product, ProductVariant } from "@/app/generated/prisma/client";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import axios from "axios";
@@ -27,6 +28,7 @@ import useCart from "../hooks/useCart";
 interface CartItemWithProduct extends CartItem {
 	quantity: any;
 	product: Product;
+	variant?: ProductVariant | null;
 }
 
 const CheckoutPage = () => {
@@ -161,9 +163,7 @@ const CheckoutPage = () => {
 						<Stack spacing={4}>
 							{cartItems.map((item: CartItemWithProduct) => {
 								const itemPrice = item.variant ? item.variant.price : item.product.price;
-								const itemName = item.variant
-									? `${item.product.name} - ${item.variant.name}`
-									: item.product.name;
+								const itemName = item.variant ? `${item.product.name} - ${item.variant.name}` : item.product.name;
 
 								return (
 									<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
@@ -183,9 +183,7 @@ const CheckoutPage = () => {
 							{appliedPromoCode && (
 								<>
 									<Flex justifyContent="space-between" alignItems="center" color="green.500">
-										<Text fontWeight="semibold">
-											Discount ({appliedPromoCode.promoCode.code}):
-										</Text>
+										<Text fontWeight="semibold">Discount ({appliedPromoCode.promoCode.code}):</Text>
 										<Text fontWeight="semibold">-${appliedPromoCode.discountAmount.toFixed(2)}</Text>
 									</Flex>
 								</>
@@ -212,14 +210,10 @@ const CheckoutPage = () => {
 										placeholder="Enter promo code"
 										value={promoCode}
 										onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-										onKeyPress={(e) => e.key === "Enter" && handleApplyPromoCode()}
+										onKeyDown={(e) => e.key === "Enter" && handleApplyPromoCode()}
 										isDisabled={isValidatingPromo}
 									/>
-									<Button
-										colorScheme="blue"
-										onClick={handleApplyPromoCode}
-										isLoading={isValidatingPromo}
-										loadingText="Validating">
+									<Button colorScheme="blue" onClick={handleApplyPromoCode} isLoading={isValidatingPromo} loadingText="Validating">
 										Apply
 									</Button>
 								</Flex>
