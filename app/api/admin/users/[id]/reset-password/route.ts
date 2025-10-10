@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
 		// Generate reset token
 		const resetToken = uuid();
-		const tokenExpiry = new Date(Date.now() + 900 * 1000); // Token expires in 15 minutes
+		const tokenExpiry = new Date(Date.now() + 12 * 60 * 60 * 1000); // Token expires in 12 hours
 
 		// Update user with reset token
 		await prisma.user.update({
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 				<p>An administrator has initiated a password reset for your account.</p>
 				<p>Please click on the following link to reset your password:</p>
 				<a href="https://sarahkyoga.com/auth/reset-password/${resetToken}">Reset Password</a>
-				<p>This link will expire in 15 minutes.</p>
+				<p>This link will expire in 12 hours.</p>
 				<p>If you did not request a password reset, please contact us immediately.</p>
 				<p>Thanks,</p>
 				<p>Sarah</p>
