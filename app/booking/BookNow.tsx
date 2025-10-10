@@ -4,11 +4,11 @@ import { useSession } from "next-auth/react";
 import { Button, Spinner, useToast } from "@chakra-ui/react";
 import { useAddToCart } from "@/app/hooks/useAddToCart";
 
-export const BookNowButton = ({ productId }: { productId: string }) => {
+export const BookNowButton = ({ productId, variantId }: { productId: string; variantId?: string }) => {
 	const { data: session } = useSession();
 	const toast = useToast();
 
-	const { addToCart, isLoading } = useAddToCart(productId);
+	const { addToCart, isLoading } = useAddToCart(productId, variantId);
 
 	// Handler for the add to cart action
 	const handleAddToCart = async () => {

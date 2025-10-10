@@ -17,6 +17,7 @@ import {
 	Collapse,
 	IconButton,
 	useToast,
+	Divider,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Calendar } from "react-date-range";
@@ -130,7 +131,31 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			alignItems="center"
 			textAlign="center"
 			transition="max-width 0.5s ease-in-out">
+			{/* Class Passes Section */}
+			<Box mb={8} width="100%" px={4}>
+				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.200">
+					Class Passes
+				</Heading>
+				<Text fontSize="md" mb={6} color="brand.200">
+					Save money by purchasing a class pass! Use them for any private session.
+				</Text>
+				<SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(280px, 1fr))">
+					{isLoading ? (
+						<Spinner />
+					) : (
+						products
+							?.filter((product) => product.type === "CLASS_PASS")
+							.map((product) => <ProductItem key={product.id} product={product} quantity={1} />)
+					)}
+				</SimpleGrid>
+			</Box>
+
+			<Divider my={8} borderColor="brand.400" />
+
 			<VStack spacing={4} alignItems="center" width="100%">
+				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.200">
+					Book a Private Session
+				</Heading>
 				<Box as="section" pt={{ base: "4", md: "8" }} pb={{ base: "12", md: "24" }}>
 					<Container>
 						<Box px="4" py="5" bg="brand.700" opacity="0.8" borderRadius="lg">

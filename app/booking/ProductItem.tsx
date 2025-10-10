@@ -1,4 +1,5 @@
 // ProductItem.tsx
+import { useState } from "react";
 import {
 	Card,
 	CardHeader,
@@ -20,8 +21,19 @@ import {
 	Center,
 	Tag,
 	HStack,
+	Radio,
+	RadioGroup,
+	Stack,
+	Box,
 } from "@chakra-ui/react";
 import { BookNowButton } from "./BookNow";
+
+interface ProductVariant {
+	id: string;
+	name: string;
+	price: number;
+	quantity: number;
+}
 
 export interface ProductItemProps {
 	product: {
@@ -29,6 +41,8 @@ export interface ProductItemProps {
 		description: string | null;
 		id: string;
 		price: number;
+		type?: string;
+		variants?: ProductVariant[];
 	};
 	quantity: number;
 	key: string;
@@ -37,6 +51,18 @@ export interface ProductItemProps {
 const ProductItem = ({ product }: ProductItemProps) => {
 	// Modal control
 	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	// Variant selection state
+	const hasVariants = product.variants && product.variants.length > 0;
+	const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(
+		hasVariants ? product.variants?.[0]?.id : undefined
+	);
+
+	// Get the selected variant or use product price as default
+	const selectedVariant = hasVariants
+		? product.variants?.find(v => v.id === selectedVariantId)
+		: null;
+	const displayPrice = selectedVariant ? selectedVariant.price : product.price;
 
 	// Extract duration and type from product name if available
 	const isDuration = product.name.match(/(\d+)\s*min/i);
@@ -50,7 +76,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 		<>
 			<Card borderRadius="md" overflow="hidden" boxShadow="md" maxW="100%" height="100%" position="relative">
 				{/* Price Tag - Positioned in top-right corner */}
-				{product.price && (
+				{(displayPrice > 0 || product.price > 0) && (
 					<Tag
 						position="absolute"
 						top="0"
@@ -66,7 +92,9 @@ const ProductItem = ({ product }: ProductItemProps) => {
 						borderTopLeftRadius="0"
 						borderBottomRightRadius="0"
 						boxShadow="sm">
-						${product.price}
+						{hasVariants && selectedVariant
+							? `$${selectedVariant.price}`
+							: `$${product.price}`}
 					</Tag>
 				)}
 
@@ -98,6 +126,26 @@ const ProductItem = ({ product }: ProductItemProps) => {
 								{product.description || ""}
 							</Text>
 
+							{/* Variant Selection for Class Passes */}
+							{hasVariants && (
+								<Box mt={3} mb={2}>
+									<Text fontSize="sm" fontWeight="semibold" mb={2}>
+										Select Package:
+									</Text>
+									<RadioGroup onChange={setSelectedVariantId} value={selectedVariantId}>
+										<Stack spacing={2}>
+											{product.variants?.map((variant) => (
+												<Radio key={variant.id} value={variant.id} size="sm">
+													<Text fontSize="sm">
+														{variant.name} - ${variant.price}
+													</Text>
+												</Radio>
+											))}
+										</Stack>
+									</RadioGroup>
+								</Box>
+							)}
+
 							<Button size="xs" variant="link" colorScheme="blue" onClick={onOpen} alignSelf="flex-start" mt="auto">
 								More info
 							</Button>
@@ -106,7 +154,10 @@ const ProductItem = ({ product }: ProductItemProps) => {
 
 					<CardFooter pt={2} pb={3} mt="auto">
 						<Center w="100%">
-							<BookNowButton productId={product.id} />
+							<BookNowButton
+								productId={product.id}
+								variantId={selectedVariantId}
+							/>
 						</Center>
 					</CardFooter>
 				</VStack>
@@ -119,9 +170,11 @@ const ProductItem = ({ product }: ProductItemProps) => {
 					<ModalHeader>
 						<Flex justifyContent="space-between" alignItems="center">
 							<Text>{product.name}</Text>
-							{product.price && (
+							{(displayPrice > 0 || product.price > 0) && (
 								<Tag size="lg" colorScheme="brand" variant="solid" fontSize="xl" py={1} px={3}>
-									${product.price}
+									{hasVariants && selectedVariant
+										? `$${selectedVariant.price}`
+										: `$${product.price}`}
 								</Tag>
 							)}
 						</Flex>
@@ -141,8 +194,35 @@ const ProductItem = ({ product }: ProductItemProps) => {
 								</Badge>
 							)}
 						</Flex>
+
+						{/* Variant Selection in Modal */}
+						{hasVariants && (
+							<Box mt={4}>
+								<Text fontWeight="semibold" mb={2}>
+									Select Package:
+								</Text>
+								<RadioGroup onChange={setSelectedVariantId} value={selectedVariantId}>
+									<Stack spacing={2}>
+										{product.variants?.map((variant) => (
+											<Radio key={variant.id} value={variant.id}>
+												<Flex justifyContent="space-between" w="100%">
+													<Text>{variant.name}</Text>
+													<Text fontWeight="bold" ml={4}>
+														${variant.price}
+													</Text>
+												</Flex>
+											</Radio>
+										))}
+									</Stack>
+								</RadioGroup>
+							</Box>
+						)}
+
 						<Center mt={6} w="100%">
-							<BookNowButton productId={product.id} />
+							<BookNowButton
+								productId={product.id}
+								variantId={selectedVariantId}
+							/>
 						</Center>
 					</ModalBody>
 				</ModalContent>

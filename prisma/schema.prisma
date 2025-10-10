@@ -71,17 +71,19 @@ model Authenticator {
 }
 
 model Product {
-  id             String      @id @default(uuid())
+  id             String           @id @default(uuid())
   name           String
   description    String?
   price          Float
+  type           ProductType      @default(CLASS)
   duration       Int?
   availableSlots Int?
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime         @default(now())
   updatedAt      DateTime?
   imageUrl       String?
   CartItem       CartItem[]
   OrderItem      OrderItem[]
+  variants       ProductVariant[]
 }
 
 model Cart {
@@ -94,38 +96,43 @@ model Cart {
 }
 
 model CartItem {
-  id        String   @id @default(uuid())
+  id        String          @id @default(uuid())
   cartId    String
   productId String
-  quantity  Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  quantity  Int             @default(1)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  cart      Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 }
 
 model Order {
-  id          String      @id @default(uuid())
+  id          String           @id @default(uuid())
   userId      String
   total       Float
-  status      String      @default("pending")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  orderNumber String      @unique
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      String           @default("pending")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  orderNumber String           @unique
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   items       OrderItem[]
+  promoCodes  OrderPromoCode[]
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
+  id        String          @id @default(uuid())
   orderId   String
   productId String
-  quantity  Int      @default(1)
+  variantId String?
+  quantity  Int             @default(1)
   price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  order     Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 }
 
 model Newsletter {
@@ -151,4 +158,58 @@ model Subscriber {
 enum Status {
   DRAFT
   SENT
+}
+
+model ProductVariant {
+  id         String      @id @default(uuid())
+  productId  String
+  name       String
+  price      Float
+  quantity   Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  CartItem   CartItem[]
+  OrderItem  OrderItem[]
+}
+
+model PromoCode {
+  id          String           @id @default(uuid())
+  code        String           @unique
+  type        PromoCodeType
+  value       Float
+  maxUses     Int?
+  usedCount   Int              @default(0)
+  expiresAt   DateTime?
+  isActive    Boolean          @default(true)
+  description String?
+  createdBy   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  orders      OrderPromoCode[]
+}
+
+model OrderPromoCode {
+  id             String    @id @default(uuid())
+  orderId        String
+  promoCodeId    String
+  discountAmount Float
+  createdAt      DateTime  @default(now())
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  promoCode      PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, promoCodeId])
+}
+
+enum ProductType {
+  CLASS
+  CLASS_PASS
+  WORKSHOP
+  OTHER
+}
+
+enum PromoCodeType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_CLASS
 }

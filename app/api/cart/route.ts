@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { cookies } from "next/headers";
 export async function POST(request: NextRequest) {
 	try {
-		const { productId } = await request.json();
+		const { productId, variantId } = await request.json();
 		const session = await getServerSession(authOptions);
 		const cookiesStore = cookies();
 
@@ -57,16 +57,17 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Now, add the item to the cart
-		// Check if the product is already in the cart
+		// Check if the product (and variant if applicable) is already in the cart
 		const existingCartItem = await prisma.cartItem.findFirst({
 			where: {
 				cartId: cart.id,
 				productId,
+				variantId: variantId || null,
 			},
 		});
 
 		if (existingCartItem) {
-			// If the product is already in the cart, increase the quantity
+			// If the product/variant is already in the cart, increase the quantity
 			const updatedCartItem = await prisma.cartItem.update({
 				where: {
 					id: existingCartItem.id,
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
 				data: {
 					cartId: cart.id,
 					productId,
+					variantId: variantId || null,
 					quantity: 1,
 				},
 			});
@@ -110,6 +112,7 @@ export async function GET(request: NextRequest) {
 					items: {
 						include: {
 							product: true, // Include product details
+							variant: true, // Include variant details if applicable
 						},
 					},
 				},
@@ -132,6 +135,7 @@ export async function GET(request: NextRequest) {
 					items: {
 						include: {
 							product: true, // Include product details
+							variant: true, // Include variant details if applicable
 						},
 					},
 				},

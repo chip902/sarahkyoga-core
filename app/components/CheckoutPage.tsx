@@ -15,8 +15,9 @@ import {
 	Skeleton,
 	Container,
 	useToast,
+	Button,
 } from "@chakra-ui/react";
-import { CartItem, Product } from "@/app/generated/prisma/client";
+import { CartItem, Product, ProductVariant } from "@/app/generated/prisma/client";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, StripeElementsOptions } from "@stripe/stripe-js";
 import axios from "axios";
@@ -27,6 +28,7 @@ import useCart from "../hooks/useCart";
 interface CartItemWithProduct extends CartItem {
 	quantity: any;
 	product: Product;
+	variant?: ProductVariant | null;
 }
 
 const CheckoutPage = () => {
@@ -42,6 +44,12 @@ const CheckoutPage = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [apiError, setApiError] = useState<string | null>(null);
 
+	// Promo code state
+	const [promoCode, setPromoCode] = useState("");
+	const [appliedPromoCode, setAppliedPromoCode] = useState<any>(null);
+	const [promoCodeError, setPromoCodeError] = useState<string | null>(null);
+	const [isValidatingPromo, setIsValidatingPromo] = useState(false);
+
 	const [clientSecret, setClientSecret] = useState("");
 	const [billingDetails, setBillingDetails] = useState({
 		firstName: "",
@@ -55,6 +63,100 @@ const CheckoutPage = () => {
 			country: "US",
 		},
 	});
+	// Handle promo code validation and application
+	const handleApplyPromoCode = async () => {
+		if (!promoCode.trim()) {
+			setPromoCodeError("Please enter a promo code");
+			return;
+		}
+
+		setIsValidatingPromo(true);
+		setPromoCodeError(null);
+
+		try {
+			const response = await axios.post("/api/promo-code/validate", {
+				code: promoCode.trim(),
+				total: total,
+			});
+
+			if (response.data.valid) {
+				setAppliedPromoCode(response.data);
+				toast({
+					title: "Promo code applied!",
+					description: `You saved $${response.data.discountAmount.toFixed(2)}`,
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error: any) {
+			const errorMessage = error.response?.data?.error || "Invalid promo code";
+			setPromoCodeError(errorMessage);
+			setAppliedPromoCode(null);
+		} finally {
+			setIsValidatingPromo(false);
+		}
+	};
+
+	const handleRemovePromoCode = () => {
+		setAppliedPromoCode(null);
+		setPromoCode("");
+		setPromoCodeError(null);
+	};
+
+	// Handle free order completion (no payment required)
+	const handleFreeOrderComplete = async () => {
+		setIsLoading(true);
+		try {
+			// Get cart ID
+			const cartId = localStorage.getItem("cartId");
+			const headers: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			if (cartId) {
+				headers["x-cart-id"] = cartId;
+			}
+
+			// Create order directly without payment
+			const response = await axios.post(
+				"/api/payment/confirm",
+				{
+					paymentIntentId: "free-order", // Special indicator for free orders
+					registrationData: registrationData.password ? registrationData : null,
+					billingDetails,
+					promoCode: appliedPromoCode?.promoCode || null,
+				},
+				{ headers }
+			);
+
+			if (response.data.success) {
+				// Clear cart
+				localStorage.removeItem("cartId");
+				toast({
+					title: "Order placed successfully!",
+					description: "Your free order has been confirmed.",
+					status: "success",
+					duration: 5000,
+					isClosable: true,
+				});
+				// Redirect to success page
+				window.location.href = "/booking/success";
+			}
+		} catch (error: any) {
+			const errorMessage = error.response?.data?.error || "Failed to complete order";
+			setApiError(errorMessage);
+			toast({
+				title: "Error",
+				description: errorMessage,
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
 		if (apiError) {
 			toast({ title: "An error occurred.", description: apiError, status: "error", duration: 5000, isClosable: true });
@@ -63,26 +165,45 @@ const CheckoutPage = () => {
 	// Fetch cart items and create Payment Intent
 	useEffect(() => {
 		if (Array.isArray(cartItems) && cartItems.length > 0) {
-			const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-			// Create Payment Intent
-			axios
-				.post("/api/payment/intent", {
-					amount: total * 100, // Convert to cents
-				})
-				.then((response) => setClientSecret(response.data.clientSecret))
-				.catch((error) => console.error("Error creating payment intent:", error));
-		}
-	}, [cartItems]);
+			const cartTotal = cartItems.reduce((acc, item) => {
+				const price = item.variant ? item.variant.price : item.product.price;
+				return acc + price * item.quantity;
+			}, 0);
+			const finalTotal = appliedPromoCode ? appliedPromoCode.newTotal : cartTotal;
 
-	// Calculate total
-	const total = cartItems?.length ? cartItems.reduce((acc: number, item: CartItemWithProduct) => acc + item.product.price * item.quantity, 0) : 0;
+			// Only create payment intent if total is greater than $0.50 (Stripe minimum)
+			if (finalTotal >= 0.5) {
+				axios
+					.post("/api/payment/intent", {
+						amount: Math.round(finalTotal * 100), // Convert to cents and round
+					})
+					.then((response) => setClientSecret(response.data.clientSecret))
+					.catch((error) => console.error("Error creating payment intent:", error));
+			} else {
+				// For free orders, set a special flag instead of creating payment intent
+				setClientSecret("free-order");
+			}
+		}
+	}, [cartItems, appliedPromoCode]);
+
+	// Calculate total (use variant price if available, otherwise use product price)
+	const total = cartItems?.length
+		? cartItems.reduce((acc: number, item: CartItemWithProduct) => {
+				const price = item.variant ? item.variant.price : item.product.price;
+				return acc + price * item.quantity;
+		  }, 0)
+		: 0;
 	// Get the stripePromise from loadStripe
 	const stripePromise = loadStripe(
 		process.env.NODE_ENV == "development" ? String(process.env.NEXT_PUBLIC_STRIPE_PUBLISH_KEY_DEV!) : String(process.env.STRIPE_PUBLISH_KEY_PROD!)
 	);
-	// Stripe Elements options
+	// Check if this is a free order
+	const isFreeOrder = clientSecret === "free-order";
+	const finalTotal = appliedPromoCode ? appliedPromoCode.newTotal : total;
+
+	// Stripe Elements options (only needed for paid orders)
 	const options: StripeElementsOptions = {
-		clientSecret,
+		clientSecret: isFreeOrder ? "" : clientSecret,
 	};
 	// Styling variables
 	const bgColor = useColorModeValue("white", "brand.600");
@@ -106,23 +227,79 @@ const CheckoutPage = () => {
 					</Heading>
 					{cartItems.length > 0 ? (
 						<Stack spacing={4}>
-							{cartItems.map((item: CartItemWithProduct) => (
-								<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
-									<Text fontWeight="bold" fontSize="lg">
-										{item.product.name}
-									</Text>
-									<Text>Quantity: {item.quantity}</Text>
-									<Text>Price: ${item.product.price.toFixed(2)} each</Text>
-								</Box>
-							))}
+							{cartItems.map((item: CartItemWithProduct) => {
+								const itemPrice = item.variant ? item.variant.price : item.product.price;
+								const itemName = item.variant ? `${item.product.name} - ${item.variant.name}` : item.product.name;
+
+								return (
+									<Box key={item.id} p={4} borderWidth="1px" borderRadius="md">
+										<Text fontWeight="bold" fontSize="lg">
+											{itemName}
+										</Text>
+										<Text>Quantity: {item.quantity}</Text>
+										<Text>Price: ${itemPrice.toFixed(2)} each</Text>
+									</Box>
+								);
+							})}
+							<Divider />
+							<Text fontWeight="bold" fontSize="lg">
+								Subtotal: ${total.toFixed(2)}
+							</Text>
+
+							{appliedPromoCode && (
+								<>
+									<Flex justifyContent="space-between" alignItems="center" color="green.500">
+										<Text fontWeight="semibold">Discount ({appliedPromoCode.promoCode.code}):</Text>
+										<Text fontWeight="semibold">-${appliedPromoCode.discountAmount.toFixed(2)}</Text>
+									</Flex>
+								</>
+							)}
+
 							<Divider />
 							<Text fontWeight="bold" fontSize="xl">
-								Total: ${total.toFixed(2)}
+								Total: ${appliedPromoCode ? appliedPromoCode.newTotal.toFixed(2) : total.toFixed(2)}
 							</Text>
 						</Stack>
 					) : (
 						<Text>Your cart is empty.</Text>
 					)}
+
+					{/* Promo Code Section */}
+					<Box mt={6} p={4} mb={6} borderWidth="1px" borderRadius="md">
+						<Heading fontFamily="inherit" size="sm" mb={3}>
+							Have a Promo Code?
+						</Heading>
+						{!appliedPromoCode ? (
+							<>
+								<Flex gap={2}>
+									<Input
+										placeholder="Enter promo code"
+										value={promoCode}
+										onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+										onKeyDown={(e) => e.key === "Enter" && handleApplyPromoCode()}
+										isDisabled={isValidatingPromo}
+									/>
+									<Button colorScheme="blue" onClick={handleApplyPromoCode} isLoading={isValidatingPromo} loadingText="Validating">
+										Apply
+									</Button>
+								</Flex>
+								{promoCodeError && (
+									<Text color="red.500" fontSize="sm" mt={2}>
+										{promoCodeError}
+									</Text>
+								)}
+							</>
+						) : (
+							<Flex justifyContent="space-between" alignItems="center">
+								<Text color="green.500" fontWeight="semibold">
+									✓ Code {appliedPromoCode.promoCode.code} applied
+								</Text>
+								<Button size="sm" variant="ghost" colorScheme="red" onClick={handleRemovePromoCode}>
+									Remove
+								</Button>
+							</Flex>
+						)}
+					</Box>
 				</Box>
 
 				{/* Payment and Billing Details */}
@@ -241,19 +418,39 @@ const CheckoutPage = () => {
 							</FormControl>
 						</Box>
 						<Box mb={{ base: 4, md: 2 }}>
-							<Elements stripe={stripePromise} options={options}>
-								{/* Payment Form */}
-								{clientSecret && (
-									<PaymentForm
+							{isFreeOrder ? (
+								// Show simple button for free orders
+								<Box>
+									<Text fontSize="lg" fontWeight="bold" color="green.500" mb={4}>
+										🎉 Your order is FREE!
+									</Text>
+									<Button
+										colorScheme="green"
+										size="lg"
+										width="100%"
+										onClick={handleFreeOrderComplete}
 										isLoading={isLoading}
-										setIsLoading={setIsLoading}
-										billingDetails={billingDetails}
-										registrationData={registrationData.password ? registrationData : null}
-										clientSecret={clientSecret}
-										handleError={setApiError}
-									/>
-								)}
-							</Elements>
+										loadingText="Processing...">
+										Complete Free Order
+									</Button>
+								</Box>
+							) : (
+								// Show Stripe payment form for paid orders
+								<Elements stripe={stripePromise} options={options}>
+									{/* Payment Form */}
+									{clientSecret && (
+										<PaymentForm
+											isLoading={isLoading}
+											setIsLoading={setIsLoading}
+											billingDetails={billingDetails}
+											registrationData={registrationData.password ? registrationData : null}
+											clientSecret={clientSecret}
+											handleError={setApiError}
+											promoCode={appliedPromoCode?.promoCode || null}
+										/>
+									)}
+								</Elements>
+							)}
 						</Box>
 					</Stack>
 				</Box>

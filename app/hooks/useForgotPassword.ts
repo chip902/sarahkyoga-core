@@ -21,20 +21,22 @@ const useForgotPassword = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ email }),
+					body: JSON.stringify({ email: email.trim() }),
 				});
 
+				const data = await response.json();
+
 				if (response.ok) {
-					setMessage("Password reset link sent to your email.");
+					setMessage(data.message || "Password reset link sent to your email.");
 					if (resetForm) {
 						resetForm();
 					}
 				} else {
-					const errorData = await response.json();
-					setMessage(`Error sending reset link: ${errorData.message}`);
+					setMessage(`Error: ${data.error || "Failed to send reset link"}`);
 				}
 			} catch (error) {
-				setMessage("An Error occurred during the process. Please try again later.");
+				console.error("Password reset error:", error);
+				setMessage("An error occurred during the process. Please try again later.");
 			} finally {
 				setIsLoading(false);
 			}

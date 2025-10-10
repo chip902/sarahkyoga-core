@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"; // Import this for auth status
 
-export const useAddToCart = (productId: string) => {
+export const useAddToCart = (productId: string, variantId?: string) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const queryClient = useQueryClient();
 	const toast = useToast();
@@ -14,7 +14,7 @@ export const useAddToCart = (productId: string) => {
 
 	const isLoggedIn = status === "authenticated";
 
-	const addToCart = async () => {
+	const addToCart = async (selectedVariantId?: string) => {
 		setIsLoading(true);
 
 		try {
@@ -33,7 +33,10 @@ export const useAddToCart = (productId: string) => {
 			const response = await fetch("/api/cart", {
 				method: "POST",
 				headers,
-				body: JSON.stringify({ productId }),
+				body: JSON.stringify({
+					productId,
+					variantId: selectedVariantId || variantId || null
+				}),
 			});
 
 			if (!response.ok) {
