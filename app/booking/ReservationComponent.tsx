@@ -133,7 +133,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			transition="max-width 0.5s ease-in-out">
 			{/* Class Passes Section */}
 			<Box mb={8} width="100%" px={4}>
-				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.100">
+				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.200">
 					Class Passes
 				</Heading>
 				<Text fontSize="md" mb={6} color="brand.200">
@@ -153,7 +153,7 @@ const ReservationComponent = ({ onNext }: IReservationComponentProps) => {
 			<Divider my={8} borderColor="brand.400" />
 
 			<VStack spacing={4} alignItems="center" width="100%">
-				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.100">
+				<Heading fontFamily="inherit" fontSize={{ base: "xl", md: "2xl" }} mb={4} color="brand.200">
 					Book a Private Session
 				</Heading>
 				<Box as="section" pt={{ base: "4", md: "8" }} pb={{ base: "12", md: "24" }}>
