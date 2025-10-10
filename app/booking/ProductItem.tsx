@@ -54,14 +54,10 @@ const ProductItem = ({ product }: ProductItemProps) => {
 
 	// Variant selection state
 	const hasVariants = product.variants && product.variants.length > 0;
-	const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(
-		hasVariants ? product.variants[0].id : undefined
-	);
+	const [selectedVariantId, setSelectedVariantId] = useState<string | undefined>(hasVariants ? product.variants?.[0]?.id : undefined);
 
 	// Get the selected variant or use product price as default
-	const selectedVariant = hasVariants
-		? product.variants.find(v => v.id === selectedVariantId)
-		: null;
+	const selectedVariant = hasVariants ? product.variants?.find((v) => v.id === selectedVariantId) : null;
 	const displayPrice = selectedVariant ? selectedVariant.price : product.price;
 
 	// Extract duration and type from product name if available
@@ -92,9 +88,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 						borderTopLeftRadius="0"
 						borderBottomRightRadius="0"
 						boxShadow="sm">
-						{hasVariants && selectedVariant
-							? `$${selectedVariant.price}`
-							: `$${product.price}`}
+						{hasVariants && selectedVariant ? `$${selectedVariant.price}` : `$${product.price}`}
 					</Tag>
 				)}
 
@@ -134,7 +128,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 									</Text>
 									<RadioGroup onChange={setSelectedVariantId} value={selectedVariantId}>
 										<Stack spacing={2}>
-											{product.variants!.map((variant) => (
+											{product.variants?.map((variant) => (
 												<Radio key={variant.id} value={variant.id} size="sm">
 													<Text fontSize="sm">
 														{variant.name} - ${variant.price}
@@ -154,10 +148,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 
 					<CardFooter pt={2} pb={3} mt="auto">
 						<Center w="100%">
-							<BookNowButton
-								productId={product.id}
-								variantId={selectedVariantId}
-							/>
+							<BookNowButton productId={product.id} variantId={selectedVariantId} />
 						</Center>
 					</CardFooter>
 				</VStack>
@@ -172,9 +163,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 							<Text>{product.name}</Text>
 							{(displayPrice > 0 || product.price > 0) && (
 								<Tag size="lg" colorScheme="brand" variant="solid" fontSize="xl" py={1} px={3}>
-									{hasVariants && selectedVariant
-										? `$${selectedVariant.price}`
-										: `$${product.price}`}
+									{hasVariants && selectedVariant ? `$${selectedVariant.price}` : `$${product.price}`}
 								</Tag>
 							)}
 						</Flex>
@@ -203,7 +192,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 								</Text>
 								<RadioGroup onChange={setSelectedVariantId} value={selectedVariantId}>
 									<Stack spacing={2}>
-										{product.variants!.map((variant) => (
+										{product.variants?.map((variant) => (
 											<Radio key={variant.id} value={variant.id}>
 												<Flex justifyContent="space-between" w="100%">
 													<Text>{variant.name}</Text>
@@ -219,10 +208,7 @@ const ProductItem = ({ product }: ProductItemProps) => {
 						)}
 
 						<Center mt={6} w="100%">
-							<BookNowButton
-								productId={product.id}
-								variantId={selectedVariantId}
-							/>
+							<BookNowButton productId={product.id} variantId={selectedVariantId} />
 						</Center>
 					</ModalBody>
 				</ModalContent>

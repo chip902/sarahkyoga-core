@@ -13,22 +13,22 @@ const useResetPassword = (token: string) => {
 
 		try {
 			const response = await axios.post(`/api/auth/resetpassword/${token}`, {
-				newPassword: newPassword, // Send directly as a field
+				newPassword: newPassword,
 			});
 
 			if (response.status === 200) {
-				// Handle success
 				setError(null);
 				setIsLoading(false);
 				return true;
 			} else {
-				setError("Error resetting password. Please try again.");
+				setError(response.data?.error || "Error resetting password. Please try again.");
 				setIsLoading(false);
 				return false;
 			}
-		} catch (error) {
-			console.error("An error occurred:", error);
-			setError("An error occurred during password reset.");
+		} catch (error: any) {
+			console.error("Password reset error:", error);
+			const errorMessage = error.response?.data?.error || "An error occurred during password reset.";
+			setError(errorMessage);
 			setIsLoading(false);
 			return false;
 		}
