@@ -2,75 +2,58 @@
 import { Box, Heading, Text, Divider, Stack, Flex, Button, Center, Card, CardBody, Badge, VStack, HStack, Icon } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import { useAddToCart } from "@/app/hooks/useAddToCart";
+
+const EXTENDED_PRACTICE_PRODUCT_ID = "be136787-fb03-407d-af05-094a0df6e1f7";
 
 export default function Workshops() {
 	const router = useRouter();
-	const handleBooking = () => {
-		router.push("/booking");
-	};
+
+	const {
+		addToCart: addExtendedPracticeToCart,
+		isLoading: isAddingExtendedPractice,
+	} = useAddToCart(EXTENDED_PRACTICE_PRODUCT_ID);
 
 	const workshops = [
 		{
-			title: "Katonah Yoga® Extended Practice and Theory",
-			type: "Workshop",
-			duration: "5 Hours (11a-4p)",
-			level: "All Levels",
-			price: "$125",
-			date: "Saturday November 8",
-			location: "Prasada Yoga Center, North Hampton, NH",
+			title: "Journey to All Levels / Beginner Series Part 2",
+			type: "Series",
+			duration: "Four-week series • Saturdays 12:30–2:00pm",
+			level: "All Levels / Advanced Beginner",
+			price: "$150 series / $50 drop-in",
+			date: "March series at Yoga on York",
+			location: "Yoga on York",
 			description:
-				"Katonah Yoga® is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have. We use maps like the Magic Square to orient so that we can strive to find center and circumference and how mediating polarities gives us an opportunity to have a personal insight.",
+				"This four-week Journey to All Levels series is designed to break down more intermediate poses, including backbends, twists, hip openers and building stamina.",
+			highlights: [
+				"Week 1: Twists",
+				"Week 2: Shoulders & Sidebends",
+				"Week 3: Backbends",
+				"Week 4: Hips",
+			],
+			details:
+				"This series is a continuation of the Beginner Series and is appropriate for students who have their foundational poses down and want to build toward an all-levels practice.",
+			link: "https://www.yogaonyork.com/workshops-events",
+			featured: true,
+		},
+		{
+			title: "Katonah Yoga® Extended Practice",
+			type: "Workshop",
+			duration: "2 Hours (10:30am–12:30pm)",
+			level: "All Levels",
+			price: "$45",
+			date: "Saturday March 1",
+			location: "The Studio",
+			description:
+				"Katonah Yoga® is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands-on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have.",
 			highlights: [
 				"Body as a house metaphor and practice",
 				"Physical practice, lecture and pranayama",
 				"Magic Square orientation techniques",
-				"5hrs towards Katonah Yoga® Certification",
 			],
 			details:
-				"For this workshop, Sarah will introduce you to how we use the metaphor of a body as a house and how we use our practice to clean it up and organize it. Katonah Yoga is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has pattern, pattern belies intelligence; by virtue of repetition there is potential for insight.",
-			link: "https://prasadayogacenter.com/",
-			featured: true,
-		},
-		{
-			title: "The Art of Sequencing",
-			type: "Teacher Training Workshop",
-			duration: "2.5 Hours (12:30-3p)",
-			level: "Teachers & Students",
-			price: "$75",
-			date: "Saturday November 15",
-			location: "Yoga on York, York ME",
-			description:
-				"Sequencing a yoga class is like creating a story. Intelligent storytelling allows the practitioner to move with consciousness and flow, best preparing them for the peak pose. In this workshop, we will dive into the wonderful yet sometimes complex world of sequencing a yoga class.",
-			highlights: [
-				"Transitions and time management",
-				"Anatomy and sun salutation variations",
-				"Peak pose preparation techniques",
-				"2.5 hours of CE with Yoga Alliance",
-			],
-			details:
-				"We will address transitions, time management, anatomy and using sun salutation variations towards working into a peak pose. Whether you are a new teacher just starting to craft your flows, or a seasoned teacher that has found yourself in a funk, we will collaborate using tools, techniques and community to create a safe and fun practice for all levels.",
-			link: "https://www.yogaonyork.com/workshops-events",
-			featured: false,
-		},
-		{
-			title: "The Art of Adjustments",
-			type: "Teacher Training Workshop",
-			duration: "2.5 Hours (12:30-3p)",
-			level: "Teachers & Students",
-			price: "$75",
-			date: "Saturday December 13",
-			location: "TBD",
-			description:
-				"Providing adjustments in class is a powerful tool for teachers to use in public and private settings to better connect students with their bodies and the material. Before you make contact, it is important to understand both anatomy, the asana and the potency of supporting another body.",
-			highlights: [
-				"Safe and accessible adjustment techniques",
-				"Verbal assists and prop usage",
-				"Anatomy and asana understanding",
-				"2.5 hours of CE with Yoga Alliance",
-			],
-			details:
-				"In this workshop, we will practice safe and accessible adjustment for commonly practiced asana, using verbal assists and how to use props as a helpful adjusting tool.",
-			link: "https://www.yogaonyork.com/workshops-events",
+				"For this extended practice, Sarah will introduce how we use the metaphor of the body as a house and how we use practice to clean it up and organize it. Katonah Yoga is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has pattern, pattern belies intelligence; by virtue of repetition there is potential for insight.",
+			link: "#",
 			featured: false,
 		},
 	];
@@ -256,14 +239,29 @@ export default function Workshops() {
 										<Text fontSize="xl" fontWeight="bold" color="brand.600">
 											{workshop.price}
 										</Text>
-										<Button
-											variant="cta"
-											size="sm"
-											as={NextLink}
-											href={workshop.link}
-											target={workshop.link.startsWith("http") ? "_blank" : undefined}>
-											Register
-										</Button>
+										{workshop.title === "Katonah Yoga® Extended Practice" ? (
+											<Button
+												variant="cta"
+												size="sm"
+												onClick={() => {
+													if (isAddingExtendedPractice) return;
+													addExtendedPracticeToCart();
+												}}
+												isDisabled={isAddingExtendedPractice}
+											>
+												{isAddingExtendedPractice ? "Adding..." : "Add to cart"}
+											</Button>
+										) : (
+											<Button
+												variant="cta"
+												size="sm"
+												as={NextLink}
+												href={workshop.link}
+												target={workshop.link.startsWith("http") ? "_blank" : undefined}
+											>
+												Register
+											</Button>
+										)}
 									</HStack>
 								</VStack>
 							</CardBody>
@@ -290,7 +288,7 @@ export default function Workshops() {
 						Have questions about which workshop is right for you? Want to book a private session or learn about upcoming workshops?
 					</Text>
 					<Button variant="cta" size="lg" as={NextLink} href="https://www.yogaonyork.com/workshops-events" target="_blank">
-						Sign Up for The Art of Sequencing
+						View Upcoming Workshops at Yoga on York
 					</Button>
 				</VStack>
 			</Box>
