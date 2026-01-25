@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
 		const cookiesStore = cookies();
 
 		let cart;
-
+		let isGuest = false;
+		
 		if (session && session.user) {
 			const userId = session.user.id;
 
@@ -31,29 +32,25 @@ export async function POST(request: NextRequest) {
 			}
 		} else {
 			// For guest users
+			isGuest = true;
 			const clientCartId = request.headers.get("x-cart-id");
 			let cartId = clientCartId;
-
+		
 			if (!cartId) {
 				// Generate a new cartId
 				cartId = uuidv4();
 			}
-
+		
 			// Get or create cart (still in database)
 			cart = await prisma.cart.findFirst({
 				where: { id: cartId },
 			});
-
+		
 			if (!cart) {
 				cart = await prisma.cart.create({
 					data: { id: cartId },
 				});
 			}
-
-			// Return the cartId in the response for the client to store in localStorage
-			const response = NextResponse.json(cart);
-			response.headers.set("x-cart-id", cart.id);
-			return response;
 		}
 
 		// Now, add the item to the cart
@@ -76,7 +73,12 @@ export async function POST(request: NextRequest) {
 					quantity: existingCartItem.quantity + 1,
 				},
 			});
-			return NextResponse.json(updatedCartItem, { status: 201 });
+
+			const response = NextResponse.json(updatedCartItem, { status: 201 });
+			if (isGuest) {
+				response.headers.set("x-cart-id", cart.id);
+			}
+			return response;
 		} else {
 			// Create a new CartItem
 			const cartItem = await prisma.cartItem.create({
@@ -87,7 +89,12 @@ export async function POST(request: NextRequest) {
 					quantity: 1,
 				},
 			});
-			return NextResponse.json(cartItem, { status: 201 });
+
+			const response = NextResponse.json(cartItem, { status: 201 });
+			if (isGuest) {
+				response.headers.set("x-cart-id", cart.id);
+			}
+			return response;
 		}
 	} catch (error) {
 		console.error("Error adding product to cart:", error);
