@@ -10,28 +10,28 @@ export default function Workshops() {
 
 	const workshops = [
 		{
-			title: "Journey to All Levels / Beginner Series Part 2",
-			type: "Series",
-			duration: "Four-week series • Saturdays 12:30–2:00pm",
-			level: "All Levels / Advanced Beginner",
-			price: "$150 series / $50 drop-in",
-			date: "March series at Yoga on York",
-			location: "Yoga on York",
+			title: "Creative Flow + Restorative & Sound Practice",
+			type: "Workshop",
+			duration: "90 minutes (9:00 AM – 10:30 AM)",
+			level: "All Levels",
+			price: "$35",
+			date: "Friday April 4",
+			location: "The Studio",
 			description:
-				"This four-week Journey to All Levels series is designed to break down more intermediate poses, including backbends, twists, hip openers and building stamina.",
-			highlights: ["Week 1: Twists", "Week 2: Shoulders & Sidebends", "Week 3: Backbends", "Week 4: Hips"],
+				"Join Sarah for an invigorating 45 minutes of a Katonah Yoga inspired flow practice followed by 45 minutes of a restorative practice accompanied by sound healing.",
+			highlights: ["Katonah Yoga inspired flow", "Restorative practice", "Sound healing accompaniment"],
 			details:
-				"This series is a continuation of the Beginner Series and is appropriate for students who have their foundational poses down and want to build toward an all-levels practice.",
-			link: "https://www.yogaonyork.com/workshops-events",
+				"This workshop combines the energizing qualities of a Katonah Yoga flow with the deep relaxation of restorative poses, all enhanced by healing sound frequencies.",
+			link: "#",
 			featured: true,
 		},
 		{
-			title: "Katonah Yoga® Extended Practice",
+			title: "Katonah Yoga Extended Practice",
 			type: "Workshop",
-			duration: "2 Hours (10:30am–12:30pm)",
+			duration: "2 Hours (10:30 AM – 12:30 PM)",
 			level: "All Levels",
 			price: "$45",
-			date: "Saturday March 1",
+			date: "Saturday May 3",
 			location: "The Studio",
 			description:
 				"Katonah Yoga® is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands-on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have.",
@@ -71,11 +71,6 @@ export default function Workshops() {
 						<CardBody padding="6">
 							<VStack align="stretch" spacing={4} height="100%">
 								<VStack align="start" spacing={2}>
-									{workshop.featured ? (
-										<Badge colorScheme="red" fontSize="xs">
-											FEATURED
-										</Badge>
-									) : null}
 									<Heading size="lg" color="brand.600">
 										{workshop.title}
 									</Heading>
@@ -100,22 +95,6 @@ export default function Workshops() {
 								<Text fontSize="md" color="gray.700" flex="1">
 									{workshop.description}
 								</Text>
-
-								<Box>
-									<Text fontSize="sm" fontWeight="semibold" color="brand.600" mb={2}>
-										Highlights:
-									</Text>
-									<VStack align="start" spacing={1}>
-										{workshop.highlights.slice(0, 2).map((highlight, i) => (
-											<HStack key={i} align="start">
-												<Box width="4px" height="4px" borderRadius="full" bg="brand.100" mt="1.5" flexShrink={0} />
-												<Text fontSize="sm" color="gray.600">
-													{highlight}
-												</Text>
-											</HStack>
-										))}
-									</VStack>
-								</Box>
 
 								<HStack justify="space-between" align="center" pt="2">
 									<Text fontSize="xl" fontWeight="bold" color="brand.600">
