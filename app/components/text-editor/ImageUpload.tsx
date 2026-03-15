@@ -29,24 +29,27 @@ interface ImageUploadButtonProps {
 
 export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedImage, setSelectedImage] = useState<string | null>(null);
+	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [imageWidth, setImageWidth] = useState(300);
 	const [alignment, setAlignment] = useState("none");
+	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const toast = useToast();
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
+			setSelectedFile(file);
 			const reader = new FileReader();
 			reader.onload = (e) => {
-				setSelectedImage(e.target?.result as string);
+				setPreviewUrl(e.target?.result as string);
 			};
 			reader.readAsDataURL(file);
 		}
 	};
 
-	const handleInsertImage = () => {
+	const handleInsertImage = async () => {
 		if (!onImageInsert) {
 			toast({
 				title: "Implementation Error",
@@ -58,23 +61,53 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 			return;
 		}
 
-		if (selectedImage) {
+		if (!selectedFile) return;
+
+		setIsUploading(true);
+
+		try {
+			const formData = new FormData();
+			formData.append("image", selectedFile);
+
+			const response = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+				throw new Error(data.error || "Upload failed");
+			}
+
+			const { url } = await response.json();
+
 			const alignClass = alignment !== "none" ? `float-${alignment}` : "";
 			const imageHtml = `<div class="image-container" style="text-align: center; margin: 1em 0;" contenteditable="true">
-			<img 
-			  src="${selectedImage}" 
-			  alt="Uploaded image" 
-			  class="${alignClass}" 
+			<img
+			  src="${url}"
+			  alt="Uploaded image"
+			  class="${alignClass}"
 			  style="max-width: 100%; width: ${imageWidth}px; display: inline-block;"
 			/>
 		  </div>`;
 
 			onImageInsert(imageHtml);
 			setIsOpen(false);
-			setSelectedImage(null);
+			setPreviewUrl(null);
+			setSelectedFile(null);
 			if (fileInputRef.current) {
 				fileInputRef.current.value = "";
 			}
+		} catch (err) {
+			toast({
+				title: "Upload Failed",
+				description: err instanceof Error ? err.message : "Failed to upload image",
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		} finally {
+			setIsUploading(false);
 		}
 	};
 
@@ -91,12 +124,12 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 							<Input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} size="sm" />
 						</Box>
 
-						{selectedImage && (
+						{previewUrl && (
 							<>
 								<Box>
 									<FormLabel>Preview</FormLabel>
 									<Box borderWidth={1} borderRadius="md" p={2}>
-										<Image src={selectedImage} alt="Preview" width={`${imageWidth}px`} maxWidth="100%" />
+										<Image src={previewUrl} alt="Preview" width={`${imageWidth}px`} maxWidth="100%" />
 									</Box>
 								</Box>
 
@@ -119,7 +152,7 @@ export function ImageUploadButton({ onImageInsert }: ImageUploadButtonProps) {
 									</Select>
 								</Box>
 
-								<Button onClick={handleInsertImage} colorScheme="blue" width="100%">
+								<Button onClick={handleInsertImage} colorScheme="blue" width="100%" isLoading={isUploading} loadingText="Uploading...">
 									Insert Image
 								</Button>
 							</>
