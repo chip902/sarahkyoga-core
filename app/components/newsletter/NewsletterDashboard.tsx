@@ -25,6 +25,8 @@ interface Newsletter {
 	style: TextStyle;
 	createdAt: Date;
 	isDraft: boolean;
+	publishedAt?: Date | null;
+	sentDate?: Date | null;
 }
 
 const NewsletterDashboard: React.FC = () => {
@@ -45,7 +47,7 @@ const NewsletterDashboard: React.FC = () => {
 					...newsletter,
 					createdAt: new Date(newsletter.createdAt),
 					style: newsletter.style || DEFAULT_STYLE,
-				}))
+				})),
 			);
 		} catch (error) {
 			toast({
@@ -62,7 +64,7 @@ const NewsletterDashboard: React.FC = () => {
 		fetchNewsletters();
 	}, [fetchNewsletters]);
 
-	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => {
+	const handleSave = async (data: { subject: string; content: string; style: TextStyle; isDraft: boolean; silent?: boolean }) => {
 		try {
 			const endpoint = editingNewsletter ? `/api/newsletter/${editingNewsletter.id}` : "/api/newsletter";
 			const method = editingNewsletter ? "PATCH" : "POST";
@@ -81,24 +83,31 @@ const NewsletterDashboard: React.FC = () => {
 			if (!response.ok) throw new Error("Failed to save newsletter");
 
 			const savedNewsletter = await response.json();
+			const normalizedNewsletter = {
+				...savedNewsletter,
+				createdAt: new Date(savedNewsletter.createdAt),
+				style: savedNewsletter.style || DEFAULT_STYLE,
+			};
 
 			if (editingNewsletter) {
-				setNewsletters(
-					newsletters.map((n) => (n.id === savedNewsletter.id ? { ...savedNewsletter, createdAt: new Date(savedNewsletter.createdAt) } : n))
-				);
+				setNewsletters(newsletters.map((n) => (n.id === normalizedNewsletter.id ? normalizedNewsletter : n)));
 			} else {
-				setNewsletters([{ ...savedNewsletter, createdAt: new Date(savedNewsletter.createdAt) }, ...newsletters]);
+				setNewsletters([normalizedNewsletter, ...newsletters]);
 			}
 
-			setEditingNewsletter(null);
-			setActiveTab(data.isDraft ? 2 : 1);
+			if (!data.silent) {
+				setActiveTab(data.isDraft ? 2 : 1);
 
-			toast({
-				title: `Newsletter ${data.isDraft ? "saved as draft" : "published"}`,
-				status: "success",
-				duration: 3000,
-				isClosable: true,
-			});
+				toast({
+					title: `Newsletter ${data.isDraft ? "saved as draft" : "published"}`,
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+
+			setEditingNewsletter(normalizedNewsletter);
+			return normalizedNewsletter;
 		} catch (error) {
 			toast({
 				title: "Error saving newsletter",
@@ -107,7 +116,38 @@ const NewsletterDashboard: React.FC = () => {
 				duration: 5000,
 				isClosable: true,
 			});
+			throw error;
 		}
+	};
+
+	const handlePublished = (newsletterId: string) => {
+		const now = new Date();
+
+		setNewsletters((currentNewsletters) =>
+			currentNewsletters.map((newsletter) =>
+				newsletter.id === newsletterId
+					? {
+							...newsletter,
+							isDraft: false,
+							publishedAt: now,
+							sentDate: now,
+						}
+					: newsletter,
+			),
+		);
+
+		setEditingNewsletter((currentNewsletter) =>
+			currentNewsletter && currentNewsletter.id === newsletterId
+				? {
+						...currentNewsletter,
+						isDraft: false,
+						publishedAt: now,
+						sentDate: now,
+					}
+				: currentNewsletter,
+		);
+
+		setActiveTab(1);
 	};
 
 	const handleEdit = async (newsletter: Newsletter) => {
@@ -176,6 +216,7 @@ const NewsletterDashboard: React.FC = () => {
 						<TextEditor
 							key={editingNewsletter?.id || "new"}
 							onSave={handleSave}
+							onPublished={handlePublished}
 							initialContent={editingNewsletter?.content || ""}
 							initialStyle={editingNewsletter?.style || DEFAULT_STYLE}
 							initialSubject={editingNewsletter?.title || ""}

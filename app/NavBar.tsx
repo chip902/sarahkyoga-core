@@ -126,18 +126,11 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 									Admin
 								</MenuButton>
 								<MenuList>
-									<NextLink href="/admin/dashboard" passHref legacyBehavior>
-										<MenuItem>Dashboard</MenuItem>
-									</NextLink>
-									<NextLink href="/admin/users" passHref legacyBehavior>
-										<MenuItem>Manage Users</MenuItem>
-									</NextLink>
-									<NextLink href="/admin/promo-codes" passHref legacyBehavior>
-										<MenuItem>Promo Codes</MenuItem>
-									</NextLink>
-									<NextLink href="/admin/newsletter" passHref legacyBehavior>
-										<MenuItem>Newsletter</MenuItem>
-									</NextLink>
+									<MenuItem as={NextLink} href="/admin/dashboard">Dashboard</MenuItem>
+									<MenuItem as={NextLink} href="/admin/users">Manage Users</MenuItem>
+									<MenuItem as={NextLink} href="/admin/promo-codes">Promo Codes</MenuItem>
+									<MenuItem as={NextLink} href="/admin/newsletter">Newsletter</MenuItem>
+									<MenuItem as={NextLink} href="/admin/subscribers">Subscribers</MenuItem>
 									<MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
 								</MenuList>
 							</Menu>
@@ -238,6 +231,49 @@ const NavBar = ({ isResponsive }: NavBarProps) => {
 									</NextLink>
 									{status === "loading" ? (
 										<Spinner size="lg" marginRight={70} />
+									) : status === "authenticated" && session?.user.role === "admin" ? (
+										<>
+											<Accordion allowToggle>
+												<AccordionItem border="none">
+													<AccordionButton>
+														<Box as="span" flex="1" textAlign="left" fontWeight="semibold">
+															Admin
+														</Box>
+														<AccordionIcon />
+													</AccordionButton>
+													<AccordionPanel pb={4}>
+														<NextLink href="/admin/dashboard" passHref>
+															<Button variant="mobileMenu" onClick={onClose}>
+																Dashboard
+															</Button>
+														</NextLink>
+														<NextLink href="/admin/users" passHref>
+															<Button variant="mobileMenu" onClick={onClose}>
+																Manage Users
+															</Button>
+														</NextLink>
+														<NextLink href="/admin/promo-codes" passHref>
+															<Button variant="mobileMenu" onClick={onClose}>
+																Promo Codes
+															</Button>
+														</NextLink>
+														<NextLink href="/admin/newsletter" passHref>
+															<Button variant="mobileMenu" onClick={onClose}>
+																Newsletter
+															</Button>
+														</NextLink>
+														<NextLink href="/admin/subscribers" passHref>
+															<Button variant="mobileMenu" onClick={onClose}>
+																Subscribers
+															</Button>
+														</NextLink>
+													</AccordionPanel>
+												</AccordionItem>
+											</Accordion>
+											<Button variant="mobileMenu" onClick={handleSignOut}>
+												Sign Out
+											</Button>
+										</>
 									) : status === "authenticated" ? (
 										<Button variant="mobileMenu" onClick={handleSignOut}>
 											Sign Out

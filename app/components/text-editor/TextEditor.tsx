@@ -47,7 +47,8 @@ interface TextEditorProps {
 	initialStyle?: TextStyle;
 	initialSubject?: string;
 	newsletterId?: string;
-	onSave?: (data: { subject: string; content: string; style: TextStyle; isDraft: boolean }) => Promise<void>;
+	onSave?: (data: { subject: string; content: string; style: TextStyle; isDraft: boolean; silent?: boolean }) => Promise<{ id: string } | void>;
+	onPublished?: (newsletterId: string) => void;
 }
 
 export default function TextEditor({
@@ -56,6 +57,7 @@ export default function TextEditor({
 	initialSubject = "",
 	newsletterId,
 	onSave,
+	onPublished,
 }: TextEditorProps) {
 	const textEditorRef = useRef<HTMLElement | null>(null);
 	const [subject, setSubject] = useState(initialSubject);
@@ -65,17 +67,19 @@ export default function TextEditor({
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isPublishDialogOpen, setIsPublishDialogOpen] = useState(false);
+	const [persistedNewsletterId, setPersistedNewsletterId] = useState(newsletterId || "");
 	const toast = useToast();
 
 	useEffect(() => {
 		setContent(initialContent);
 		setSubject(initialSubject);
+		setPersistedNewsletterId(newsletterId || "");
 		if (textEditorRef.current) {
 			textEditorRef.current.innerHTML = initialContent;
 		}
 		setHistory([{ content: initialContent, timestamp: new Date() }]);
 		setHistoryIndex(0);
-	}, [initialContent, initialSubject]);
+	}, [initialContent, initialSubject, newsletterId]);
 
 	useEffect(() => {
 		if (history.length === 0) {
@@ -228,7 +232,7 @@ export default function TextEditor({
 		}
 	};
 
-	const handleSave = async (isDraft: boolean, isTest: boolean) => {
+	const validateSubject = () => {
 		if (!subject.trim()) {
 			toast({
 				title: "Subject is required",
@@ -236,61 +240,69 @@ export default function TextEditor({
 				duration: 3000,
 				isClosable: true,
 			});
-			return;
+			return false;
 		}
-		if (!isDraft) {
-			setIsSaving(true);
-			setIsPublishDialogOpen(true);
+		return true;
+	};
+
+	const saveDraft = async (silent = false) => {
+		if (!validateSubject()) {
+			return null;
+		}
+		if (onSave) {
+			const savedNewsletter = await onSave({
+				subject,
+				content,
+				style,
+				isDraft: true,
+				silent,
+			});
+			if (savedNewsletter?.id) {
+				setPersistedNewsletterId(savedNewsletter.id);
+				return savedNewsletter;
+			}
+			if (persistedNewsletterId) {
+				return { id: persistedNewsletterId };
+			}
+			return null;
+		}
+
+		const endpoint = persistedNewsletterId ? `/api/newsletter/${persistedNewsletterId}` : "/api/newsletter";
+		const method = persistedNewsletterId ? "PATCH" : "POST";
+
+		const response = await fetch(endpoint, {
+			method,
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				title: subject,
+				content,
+				style,
+				isDraft: true,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error("Failed to save newsletter");
+		}
+
+		const savedNewsletter = await response.json();
+		setPersistedNewsletterId(savedNewsletter.id);
+		return savedNewsletter;
+	};
+
+	const handleDraftSave = async () => {
+		if (!validateSubject()) {
 			return;
 		}
 		setIsSaving(true);
 		try {
-			if (onSave) {
-				await onSave({
-					subject,
-					content,
-					style,
-					isDraft,
-				});
-				if (isTest == false) {
-					return;
-				}
-			}
-			if (isTest) {
-				const endpoint = "/api/newsletter/test";
-				await axios.post(endpoint, {
-					subject,
-					content,
-					style,
-					isDraft,
-				});
-				return;
-			} else {
-				const endpoint = newsletterId ? `/api/newsletter/${newsletterId}` : "/api/newsletter";
-				const method = "POST";
-
-				const response = await fetch(endpoint, {
-					method,
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						subject,
-						content,
-						style,
-						isDraft,
-					}),
-				});
-
-				if (!response.ok) {
-					throw new Error("Failed to save newsletter");
-				}
-
-				toast({
-					title: `Newsletter ${isDraft ? (isTest ? "saved as draft and sent test email." : "saved as draft") : "published"}`,
-					status: "success",
-					duration: 3000,
-					isClosable: true,
-				});
-			}
+			await saveDraft();
+			toast({
+				title: "Newsletter saved as draft",
+				status: "success",
+				duration: 3000,
+				isClosable: true,
+			});
 		} catch (error) {
 			toast({
 				title: "Error saving newsletter",
@@ -299,6 +311,84 @@ export default function TextEditor({
 				duration: 5000,
 				isClosable: true,
 			});
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleTestPublish = async () => {
+		if (!validateSubject()) {
+			return;
+		}
+		setIsSaving(true);
+		try {
+			await saveDraft(true);
+			await axios.post("/api/newsletter/test", {
+				subject,
+				content,
+				style,
+				isDraft: true,
+			});
+			toast({
+				title: "Newsletter saved as draft and sent test email.",
+				status: "success",
+				duration: 3000,
+				isClosable: true,
+			});
+		} catch (error) {
+			toast({
+				title: "Error saving newsletter",
+				description: error instanceof Error ? error.message : "Unknown error occurred",
+				status: "error",
+				duration: 5000,
+				isClosable: true,
+			});
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleOpenPublishDialog = () => {
+		if (!validateSubject()) {
+			return;
+		}
+		setIsPublishDialogOpen(true);
+	};
+
+	const handlePublishConfirm = async () => {
+		setIsSaving(true);
+		try {
+			const savedNewsletter = await saveDraft(true);
+			if (!savedNewsletter?.id) {
+				throw new Error("Failed to save newsletter before publishing");
+			}
+
+			const response = await fetch("/api/newsletter/publish", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					newsletterId: savedNewsletter.id,
+				}),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({ error: "Failed to publish newsletter" }));
+				const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}: Failed to publish newsletter`;
+				throw new Error(errorMessage);
+			}
+
+			toast({
+				title: "Newsletter published",
+				description: "The newsletter has been sent to all subscribers",
+				status: "success",
+				duration: 5000,
+				isClosable: true,
+			});
+
+			onPublished?.(savedNewsletter.id);
+			setIsPublishDialogOpen(false);
+		} catch (error) {
+			throw error;
 		} finally {
 			setIsSaving(false);
 		}
@@ -364,13 +454,13 @@ export default function TextEditor({
 			</Box>
 
 			<HStack mt={4} spacing={4}>
-				<Button colorScheme="blue" onClick={() => handleSave(true, false)} isLoading={isSaving}>
+				<Button colorScheme="blue" onClick={handleDraftSave} isLoading={isSaving}>
 					Save as Draft
 				</Button>
-				<Button colorScheme="green" onClick={() => handleSave(false, false)} isLoading={isSaving}>
+				<Button colorScheme="green" onClick={handleOpenPublishDialog} isLoading={isSaving}>
 					Publish
 				</Button>
-				<Button variant="preview" onClick={() => handleSave(true, true)} isLoading={isSaving}>
+				<Button variant="preview" onClick={handleTestPublish} isLoading={isSaving}>
 					Test Publish
 				</Button>
 			</HStack>
@@ -392,16 +482,13 @@ export default function TextEditor({
 				isOpen={isPublishDialogOpen}
 				onClose={() => {
 					setIsPublishDialogOpen(false);
-					setIsSaving(false);
 				}}
 				newsletter={{
-					id: newsletterId || "",
+					id: persistedNewsletterId,
 					title: subject,
 				}}
-				onConfirm={() => {
-					handleSave(false, false);
-					setIsSaving(false);
-				}}
+				onConfirm={handlePublishConfirm}
+				isPublishing={isSaving}
 			/>
 		</Box>
 	);

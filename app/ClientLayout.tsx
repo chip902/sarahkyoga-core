@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import PrivacyBanner from "./PrivacyBanner";
 import useResponsive from "./hooks/useResponsive";
 import ShoppingCartPopout from "./components/ShoppingCartPopout";
+import Footer from "./components/Footer";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 	const isResponsive = useResponsive();
@@ -15,16 +16,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 		<html lang="en" className={font.quicksand.variable}>
 			<body>
 				<Providers>
-					<NavBar isResponsive={isResponsive} />
-					<Box as="main" mt="80px">
-						{children}
-					</Box>
-					<PrivacyBanner />
-					{isResponsive && (
-						<Box position="fixed" bottom={4} right={4} zIndex={10}>
-							<ShoppingCartPopout isResponsive={isResponsive} />
+					<Box minH="100vh" display="flex" flexDirection="column">
+						<NavBar isResponsive={isResponsive} />
+						<Box as="main" mt="80px" flex="1">
+							{children}
 						</Box>
-					)}
+						<Footer />
+						<PrivacyBanner />
+						{isResponsive && (
+							<Box position="fixed" bottom={4} right={4} zIndex={10}>
+								<ShoppingCartPopout isResponsive={isResponsive} />
+							</Box>
+						)}
+					</Box>
 				</Providers>
 			</body>
 		</html>
