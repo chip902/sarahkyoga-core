@@ -1,18 +1,19 @@
 "use client";
-import { Box, Heading, Text, Divider, Stack, Flex, Button, Card, CardBody, Badge, VStack, HStack } from "@chakra-ui/react";
-import NextLink from "next/link";
+import { Heading, Text, Divider, Stack, Flex, Button, Card, CardBody, Badge, VStack, HStack } from "@chakra-ui/react";
 import { useAddToCart } from "@/app/hooks/useAddToCart";
 
 const EXTENDED_PRACTICE_PRODUCT_ID = "be136787-fb03-407d-af05-094a0df6e1f7";
+const CREATIVE_FLOW_PRODUCT_ID = "23e8ac04-bb7c-47b7-9127-b6574d53f0ba";
 
 export default function Workshops() {
 	const { addToCart: addExtendedPracticeToCart, isLoading: isAddingExtendedPractice } = useAddToCart(EXTENDED_PRACTICE_PRODUCT_ID);
+	const { addToCart: addCreativeFlowToCart, isLoading: isAddingCreativeFlow } = useAddToCart(CREATIVE_FLOW_PRODUCT_ID);
 
 	const workshops = [
 		{
 			title: "Creative Flow + Restorative & Sound Practice",
 			type: "Workshop",
-			duration: "90 minutes (9:00 AM – 10:30 AM)",
+			duration: "90 minutes (9:00 AM \u2013 10:30 AM)",
 			level: "All Levels",
 			price: "$35",
 			date: "Friday April 4",
@@ -22,26 +23,56 @@ export default function Workshops() {
 			highlights: ["Katonah Yoga inspired flow", "Restorative practice", "Sound healing accompaniment"],
 			details:
 				"This workshop combines the energizing qualities of a Katonah Yoga flow with the deep relaxation of restorative poses, all enhanced by healing sound frequencies.",
-			link: "#",
 			featured: true,
 		},
 		{
 			title: "Katonah Yoga Extended Practice",
 			type: "Workshop",
-			duration: "2 Hours (10:30 AM – 12:30 PM)",
+			duration: "2 Hours (10:30 AM \u2013 12:30 PM)",
 			level: "All Levels",
 			price: "$45",
 			date: "Saturday May 3",
 			location: "The Studio",
 			description:
-				"Katonah Yoga® is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands-on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have.",
+				"Katonah Yoga\u00ae is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands-on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have.",
 			highlights: ["Body as a house metaphor and practice", "Physical practice, lecture and pranayama", "Magic Square orientation techniques"],
 			details:
 				"For this extended practice, Sarah will introduce how we use the metaphor of the body as a house and how we use practice to clean it up and organize it. Katonah Yoga is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has pattern, pattern belies intelligence; by virtue of repetition there is potential for insight.",
-			link: "#",
 			featured: false,
 		},
 	];
+
+	const getCartButton = (workshop: (typeof workshops)[number]) => {
+		if (workshop.title === "Katonah Yoga Extended Practice") {
+			return (
+				<Button
+					variant="cta"
+					size="sm"
+					onClick={() => {
+						if (isAddingExtendedPractice) return;
+						addExtendedPracticeToCart();
+					}}
+					isDisabled={isAddingExtendedPractice}>
+					{isAddingExtendedPractice ? "Adding..." : "Add to cart"}
+				</Button>
+			);
+		}
+		if (workshop.title === "Creative Flow + Restorative & Sound Practice") {
+			return (
+				<Button
+					variant="cta"
+					size="sm"
+					onClick={() => {
+						if (isAddingCreativeFlow) return;
+						addCreativeFlowToCart();
+					}}
+					isDisabled={isAddingCreativeFlow}>
+					{isAddingCreativeFlow ? "Adding..." : "Add to cart"}
+				</Button>
+			);
+		}
+		return null;
+	};
 
 	return (
 		<Flex
@@ -100,27 +131,7 @@ export default function Workshops() {
 									<Text fontSize="xl" fontWeight="bold" color="brand.600">
 										{workshop.price}
 									</Text>
-									{workshop.title === "Katonah Yoga® Extended Practice" ? (
-										<Button
-											variant="cta"
-											size="sm"
-											onClick={() => {
-												if (isAddingExtendedPractice) return;
-												addExtendedPracticeToCart();
-											}}
-											isDisabled={isAddingExtendedPractice}>
-											{isAddingExtendedPractice ? "Adding..." : "Add to cart"}
-										</Button>
-									) : (
-										<Button
-											variant="cta"
-											size="sm"
-											as={NextLink}
-											href={workshop.link}
-											target={workshop.link.startsWith("http") ? "_blank" : undefined}>
-											Register
-										</Button>
-									)}
+									{getCartButton(workshop)}
 								</HStack>
 							</VStack>
 						</CardBody>
