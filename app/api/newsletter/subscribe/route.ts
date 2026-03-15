@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import prisma from "@/prisma/client";
 
 export async function POST(request: Request) {
@@ -9,17 +10,22 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Email is required" }, { status: 400 });
 		}
 
+		const normalizedEmail = email.toLowerCase().trim();
+
 		// Check if email already exists in Subscriber table
 		const existingSubscriber = await prisma.subscriber.findUnique({
-			where: { email },
+			where: { email: normalizedEmail },
 		});
 
 		if (existingSubscriber) {
-			// Reactivate if inactive
-			if (!existingSubscriber.active) {
+			// Reactivate if inactive, ensure token exists
+			if (!existingSubscriber.active || !existingSubscriber.unsubscribeToken) {
 				await prisma.subscriber.update({
-					where: { email },
-					data: { active: true },
+					where: { email: normalizedEmail },
+					data: {
+						active: true,
+						unsubscribeToken: existingSubscriber.unsubscribeToken ?? randomUUID(),
+					},
 				});
 			}
 			return NextResponse.json({
@@ -30,7 +36,7 @@ export async function POST(request: Request) {
 
 		// Check if email exists in User table with newsletterOptIn
 		const existingUser = await prisma.user.findUnique({
-			where: { email },
+			where: { email: normalizedEmail },
 		});
 
 		if (existingUser?.newsletterOptIn) {
@@ -43,9 +49,10 @@ export async function POST(request: Request) {
 		// Create new subscriber
 		await prisma.subscriber.create({
 			data: {
-				email,
+				email: normalizedEmail,
 				name: name || null,
 				active: true,
+				unsubscribeToken: randomUUID(),
 			},
 		});
 

@@ -6,6 +6,7 @@ const nextConfig = {
         PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
         POSTGRES_URL: process.env.POSTGRES_URL,
     },
+    turbopack: {},
     webpack: (config, { isServer }) => {
         if (!isServer) {
             config.resolve.fallback = {

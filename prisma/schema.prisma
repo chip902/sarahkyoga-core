@@ -147,11 +147,12 @@ model Newsletter {
 }
 
 model Subscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  active    Boolean  @default(true)
+  id               String   @id @default(cuid())
+  email            String   @unique
+  name             String?
+  createdAt        DateTime @default(now())
+  active           Boolean  @default(true)
+  unsubscribeToken String?  @unique
 }
 
 enum Status {

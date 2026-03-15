@@ -1,6 +1,6 @@
 {
 	"name": "sarahkyoga-core",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"private": true,
 	"scripts": {
 		"export": "next export",
@@ -23,6 +23,7 @@
 		"@next/third-parties": "^16.1.6",
 		"@prisma/adapter-pg": "^7.5.0",
 		"@prisma/client": "^7.5.0",
+		"@prisma/client-runtime-utils": "7.5.0",
 		"@sendgrid/mail": "^8.1.6",
 		"@stripe/react-stripe-js": "^2.9.0",
 		"@stripe/stripe-js": "^7.9.0",
@@ -73,5 +74,8 @@
 		"uuid": "^11.1.0",
 		"zod": "^3.25.76"
 	},
-	"type": "module"
+	"type": "module",
+	"devDependencies": {
+		"dotenv": "^17.3.1"
+	}
 }
