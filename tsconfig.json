@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -40,6 +40,7 @@
     ".next/types/**/*.ts",
     "app/api/users/route.ts",
     "prisma/seed.js",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
