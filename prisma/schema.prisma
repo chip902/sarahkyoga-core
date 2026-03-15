@@ -21,6 +21,7 @@ model User {
   resetTokenExpiry DateTime?
   firstName        String?
   lastName         String?
+  newsletterOptIn  Boolean         @default(false)
   accounts         Account[]
   authenticators   Authenticator[]
   carts            Cart[]
