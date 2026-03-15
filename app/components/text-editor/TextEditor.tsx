@@ -57,7 +57,7 @@ export default function TextEditor({
 	newsletterId,
 	onSave,
 }: TextEditorProps) {
-	const textEditorRef = useRef<HTMLDivElement>(null);
+	const textEditorRef = useRef<HTMLElement | null>(null);
 	const [subject, setSubject] = useState(initialSubject);
 	const [content, setContent] = useState(initialContent);
 	const [style, setStyle] = useState<TextStyle>(initialStyle);
@@ -344,7 +344,9 @@ export default function TextEditor({
 					},
 				}}>
 				<ContentEditable
-					innerRef={textEditorRef}
+					innerRef={(element: HTMLElement | null) => {
+						textEditorRef.current = element;
+					}}
 					html={content}
 					onChange={handleChange}
 					className="text-editor-content"
