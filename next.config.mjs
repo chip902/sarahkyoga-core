@@ -23,6 +23,7 @@ const nextConfig = {
     typescript: {
         ignoreBuildErrors: false,
     },
+    turbopack: {}
 };
 
 export default nextConfig;

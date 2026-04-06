@@ -90,6 +90,30 @@ export default function YogaClasses() {
 
 					<Divider />
 
+					{/* Thursday Class */}
+					<Box maxWidth="80ch" width="90%" mx="auto">
+						<Heading size="md" color="brand.600">
+							Thursday
+						</Heading>
+						<NextLink target="_blank" href="https://www.the603studio.com/scheduling" passHref>
+							<Text height="100%" lineHeight="1.2" backgroundColor="transparent" flex={1} variant="inline">
+								The Studio
+							</Text>
+						</NextLink>
+						<Text fontWeight="bold">Katonah Yoga®️ 9-10a</Text>
+						<Text mt={2}>
+							Katonah Yoga® is a syncretic Hatha yoga practice developed by Nevine Michaan over 40 years. She and her teachers incorporate
+							classical Hatha yoga with Taoist theory, geometry, magic, mythology, metaphor, and imagination — in a practical framework designed
+							to potentiate personal and communal well-being.
+						</Text>
+						<Text mt={2}>
+							Katonah Yoga® is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has
+							pattern, pattern belies intelligence; by virtue of repetition there is potential for insight.
+						</Text>
+					</Box>
+
+					<Divider />
+
 					{/* Friday Class */}
 					<Box maxWidth="80ch" width="90%" mx="auto">
 						<Heading size="md" color="brand.600">

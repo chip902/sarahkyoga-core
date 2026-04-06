@@ -38,6 +38,5 @@ config/*.json
 next-env.d.ts
 
 # Prisma
-/prisma/migrations/
 /app/generated/
 .claude/*

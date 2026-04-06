@@ -8,7 +8,8 @@
 		"build": "prisma generate && next build --webpack && next-sitemap --config next-sitemap.config.cjs",
 		"lint": "eslint .",
 		"start": "next start",
-		"seed": "ts-node prisma/seed.mjs"
+		"seed": "ts-node prisma/seed.mjs",
+		"seed:mind-the-gap": "node prisma/seed-mind-the-gap.js"
 	},
 	"dependencies": {
 		"@chakra-ui/icons": "^2.2.4",

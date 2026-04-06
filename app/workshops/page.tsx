@@ -1,78 +1,37 @@
 "use client";
-import { Heading, Text, Divider, Stack, Flex, Button, Card, CardBody, Badge, VStack, HStack } from "@chakra-ui/react";
+import { Heading, Text, Divider, Stack, Flex, Card, CardBody, Badge, VStack, HStack, Button } from "@chakra-ui/react";
 import { useAddToCart } from "@/app/hooks/useAddToCart";
+import { useProducts } from "@/app/hooks/useProducts";
 
-const EXTENDED_PRACTICE_PRODUCT_ID = "be136787-fb03-407d-af05-094a0df6e1f7";
-const CREATIVE_FLOW_PRODUCT_ID = "23e8ac04-bb7c-47b7-9127-b6574d53f0ba";
+const WORKSHOP_PRODUCT_NAME = "Mind The Gap: Finding Your Rib-Pelvis Stack";
 
 export default function Workshops() {
-	const { addToCart: addExtendedPracticeToCart, isLoading: isAddingExtendedPractice } = useAddToCart(EXTENDED_PRACTICE_PRODUCT_ID);
-	const { addToCart: addCreativeFlowToCart, isLoading: isAddingCreativeFlow } = useAddToCart(CREATIVE_FLOW_PRODUCT_ID);
+	const { data: products = [] } = useProducts();
+	const workshopProduct = products.find((product) => product.name === WORKSHOP_PRODUCT_NAME);
+	const { addToCart, isLoading: isAddingToCart } = useAddToCart(workshopProduct?.id ?? "");
+
+	const handleAddToCart = () => {
+		if (!workshopProduct || isAddingToCart) return;
+		addToCart();
+	};
 
 	const workshops = [
 		{
-			title: "Creative Flow + Restorative & Sound Practice",
+			title: WORKSHOP_PRODUCT_NAME,
 			type: "Workshop",
-			duration: "90 minutes (9:00 AM \u2013 10:30 AM)",
+			duration: "90 minutes (10:00 AM \u2013 11:30 AM)",
 			level: "All Levels",
-			price: "$35",
-			date: "Friday April 4",
+			price: "$50",
+			date: "Sunday April 19",
 			location: "The Studio",
 			description:
-				"Join Sarah for an invigorating 45 minutes of a Katonah Yoga inspired flow practice followed by 45 minutes of a restorative practice accompanied by sound healing.",
-			highlights: ["Katonah Yoga inspired flow", "Restorative practice", "Sound healing accompaniment"],
+				'In this 90-minute workshop Sarah & Melissa will explore the concept of "the stack"- the dynamic relationship between the rib cage and pelvis. Participants will learn how alignment between these two structures influences breathing, core engagement, posture, and performance.',
+			highlights: ["Guided movement", "Breath work", "Simple alignment assessments"],
 			details:
-				"This workshop combines the energizing qualities of a Katonah Yoga flow with the deep relaxation of restorative poses, all enhanced by healing sound frequencies.",
+				"We'll break down what an optimal stack looks and feels like, why many people lose it in daily life and training, and how that impacts stability and force transfer. Through guided movement, breath work, and simple assessments, you'll develop awareness of your own patterns and learn practical strategies to restore alignment. The session will also introduce ways to appropriately challenge the stack, helping you build resilience and control under load. Suitable for all levels, this workshop is ideal for anyone looking to move better, train smarter, and understand their body more deeply.",
 			featured: true,
 		},
-		{
-			title: "Katonah Yoga Extended Practice",
-			type: "Workshop",
-			duration: "2 Hours (10:30 AM \u2013 12:30 PM)",
-			level: "All Levels",
-			price: "$45",
-			date: "Saturday May 3",
-			location: "The Studio",
-			description:
-				"Katonah Yoga\u00ae is a rich theory developed by Nevine Michaan and her teachers. It incorporates Hatha yoga, Taoist theory and sacred geometry. We use metaphor, props and hands-on adjustments to not only explore the shapes we look to embody through asana, but to recognize habits, patterns and blind spots that we all have.",
-			highlights: ["Body as a house metaphor and practice", "Physical practice, lecture and pranayama", "Magic Square orientation techniques"],
-			details:
-				"For this extended practice, Sarah will introduce how we use the metaphor of the body as a house and how we use practice to clean it up and organize it. Katonah Yoga is organized around three principles of esoteric dialogue: all polarities are mediated by trinity; the universe has pattern, pattern belies intelligence; by virtue of repetition there is potential for insight.",
-			featured: false,
-		},
 	];
-
-	const getCartButton = (workshop: (typeof workshops)[number]) => {
-		if (workshop.title === "Katonah Yoga Extended Practice") {
-			return (
-				<Button
-					variant="cta"
-					size="sm"
-					onClick={() => {
-						if (isAddingExtendedPractice) return;
-						addExtendedPracticeToCart();
-					}}
-					isDisabled={isAddingExtendedPractice}>
-					{isAddingExtendedPractice ? "Adding..." : "Add to cart"}
-				</Button>
-			);
-		}
-		if (workshop.title === "Creative Flow + Restorative & Sound Practice") {
-			return (
-				<Button
-					variant="cta"
-					size="sm"
-					onClick={() => {
-						if (isAddingCreativeFlow) return;
-						addCreativeFlowToCart();
-					}}
-					isDisabled={isAddingCreativeFlow}>
-					{isAddingCreativeFlow ? "Adding..." : "Add to cart"}
-				</Button>
-			);
-		}
-		return null;
-	};
 
 	return (
 		<Flex
@@ -131,8 +90,15 @@ export default function Workshops() {
 									<Text fontSize="xl" fontWeight="bold" color="brand.600">
 										{workshop.price}
 									</Text>
-									{getCartButton(workshop)}
+									<Button variant="cta" size="sm" onClick={handleAddToCart} isDisabled={!workshopProduct || isAddingToCart}>
+										{isAddingToCart ? "Adding..." : "Add to cart"}
+									</Button>
 								</HStack>
+								{!workshopProduct && (
+									<Text fontSize="xs" color="red.500">
+										Workshop product is not available yet.
+									</Text>
+								)}
 							</VStack>
 						</CardBody>
 					</Card>
